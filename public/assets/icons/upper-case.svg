@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(0.657333,0,0,0.657333,2.011,6.98331)">
+        <g id="Asset-Font-Symbols-All-Caps" serif:id="Asset/Font-Symbols/All-Caps">
+            <g id="AA">
+                <path id="Shape" d="M5.61,9.636L7.656,3.872L7.7,3.872L9.68,9.636L5.61,9.636ZM5.94,0L0,15.708L3.476,15.708L4.708,12.21L10.582,12.21L11.77,15.708L15.356,15.708L9.482,0L5.94,0Z" style="fill-rule:nonzero;"/>
+                <path id="Shape1" serif:id="Shape" d="M20.68,9.636L22.726,3.872L22.77,3.872L24.75,9.636L20.68,9.636ZM21.01,0L15.07,15.708L18.546,15.708L19.778,12.21L25.652,12.21L26.84,15.708L30.426,15.708L24.552,0L21.01,0Z" style="fill-rule:nonzero;"/>
+            </g>
+        </g>
+    </g>
+</svg>
