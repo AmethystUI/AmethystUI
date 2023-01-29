@@ -4,6 +4,7 @@
 <script lang="ts" context="module">
     import { openOverlayFrame } from "./Overlay.svelte";
     import { mainFontPickerData } from "../../../../stores/fontPickerStat";
+    const componentID = crypto.randomUUID();
 
     /**
      * Opens the color picker as well as the overlay frame and sets the color reference and name.
@@ -26,7 +27,7 @@
         });
 
         // open the overlay frame
-        openOverlayFrame(trackTarget, updateOverlaySize, props.trackContinuously, FontPickerOverlay);        
+        openOverlayFrame(trackTarget, updateOverlaySize, componentID, props.trackContinuously, FontPickerOverlay);        
     }
 
     // ======================== NON EXPORTABLES ========================
@@ -147,7 +148,7 @@
 	import { cubicOut } from 'svelte/easing';
     import FontPickerOverlay from "./FontPickerOverlay.svelte"; // this import causes circular dependency warning in the compiler, but it works for now. It might be an issue in the future, so keep an eye out on this line.
     
-    import { typographyStyle, collection } from "../../../../stores/collection";
+    import { typographyStyle, collection, selectedComponent, selectedOverride } from "../../../../stores/collection";
     import { mainOverlayData } from "../../../../stores/overlayStat";
     import { get } from "svelte/store";
     import MultiSelect, { textDecoration, typeFilters } from "../Basics/MultiSelect.svelte";
@@ -163,20 +164,19 @@
     // If such reference does not exist or no longer exists, we will just duplicate the value we currently have so that the value can persist on and not reset itself.
     // If there is any error during checking or assigning, we can just reset everything for safety.
     
-    try {
-        if ($mainFontPickerData.fontRefName && $mainOverlayData.elementNumber !== -1) {
-            if ($mainOverlayData.overrideNumber !== -1) {
-                fontRef = $collection[$mainOverlayData.elementNumber].styleOverrides[$mainOverlayData.overrideNumber].style[$mainFontPickerData.fontRefName]; // there is an overlay, so choose the overlay style
+    $: currentElementSelected = get(mainOverlayData).activeComponentID === componentID;
+    $: try { // only try to update the reference if the active elemnt ID matches the current one
+        if ($mainFontPickerData.fontRefName && $selectedComponent !== -1) {
+            if ($selectedOverride !== -1) {
+                fontRef = $collection[$selectedComponent].styleOverrides[$selectedOverride].style[$mainFontPickerData.fontRefName]; // there is an overlay, so choose the overlay style
             } else {
-                fontRef = $collection[$mainOverlayData.elementNumber].style[$mainFontPickerData.fontRefName];  // there is no overlay, so choose the root style
+                fontRef = $collection[$selectedComponent].style[$mainFontPickerData.fontRefName];  // there is no overlay, so choose the root style
             }
         } else {
-            fontRef = {...fontRef}; // persistence of color even after reference is cleared
+            fontRef = {...fontRef}; // persistence of fonts even after reference is cleared
         }
     } catch (error) {
         // if there is an error, just reset the overlay because it's probably due to some bad timing between the layers and the picker
-        $mainOverlayData.elementNumber = -1;
-        $mainOverlayData.overrideNumber = -1;
         $mainFontPickerData.fontRefName = undefined;
         $mainFontPickerData.fontName = "Typography";
     }
@@ -203,6 +203,14 @@
         const vals:textDecorationType[] = e.detail.values;
         // set the value of the decorations accordingly
         fontRef.textDecorations = e.detail.values;
+        // update collection so that svelte can update the associated components
+        $collection = $collection;
+    }
+
+    type sizeAttribute = "size" | "tracking" | "lineHeight"; // these correspond to the attributes thats stored in collection
+    const updateTextSizing = (att: sizeAttribute, e: CustomEvent) => { // used for font size, tracking and line height only.
+        fontRef[att].v = e.detail.v;
+        fontRef[att].u = e.detail.u;
         // update collection so that svelte can update the associated components
         $collection = $collection;
     }
@@ -254,27 +262,21 @@
 
             <div style="min-height: 2px"></div>
 
-            <UnitInput name={"Size"} sub={true} v={0} hasMargin={false} />
+            <UnitInput name={"Size"} sub={true} v={fontRef.size.v} u={fontRef.size.u} hasMargin={false} on:updateValue={e => {
+                updateTextSizing("size", e)
+            }}/>
             
             <div style="min-height: 2px"></div>
             
-            <UnitInput name={"Tracking"} sub={true} v={0} hasMargin={false} />
+            <UnitInput name={"Tracking"} minVal={-100} sub={true} v={fontRef.tracking.v} u={fontRef.tracking.u} hasMargin={false} on:updateValue={e => {
+                updateTextSizing("tracking", e)
+            }}/>
             
             <div style="min-height: 2px"></div>
 
-            <UnitInput name={"Line Height"} sub={true} v={0} hasMargin={false} />
-
-            <!-- <section id="preview-text" class="no-drag">
-                <p class="preview-title">
-                    Preview
-                </p>
-                <p class="preview-body" style={`
-                `}>
-                    As he was to begin his journey too early on the morrow to see any of the family, the ceremony of leave-taking was performed when the ladies moved for the night; and Mrs. Bennet, with great politeness and cordiality, said how happy they should be to see him at Longbourn again, whenever his engagements might allow him to visit them.
-                </p>
-
-                <div id="gradient"></div>
-            </section> -->
+            <UnitInput name={"Line Height"} minVal={-100} sub={true} v={fontRef.lineHeight.v} u={fontRef.lineHeight.u} hasMargin={false} on:updateValue={e => {
+                updateTextSizing("lineHeight", e)
+            }}/>
         </section>
     </section>
     <p id="copyright-msg" class="no-drag">

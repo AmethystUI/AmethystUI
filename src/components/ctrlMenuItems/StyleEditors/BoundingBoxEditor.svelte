@@ -143,26 +143,26 @@
     <!-- width & height -->
     <section>
         <Slider name="Size" min={0} max={500} v={cSAvg} hasMargin={true} on:updateValue={updateSizeAll} currentParentWidth={currentParentWidth}/>
-        <UnitInput name="Width" usePercent={true} v={cW} currentUnit={cWu} on:updateValue={updateWidth} hasMargin={true} sub={true}/>
-        <UnitInput name="Height" usePercent={true} v={cH} currentUnit={cHu} on:updateValue={updateHeight} hasMargin={false} sub={true}/>
+        <UnitInput name="Width" usePercent={true} v={cW} u={cWu} on:updateValue={updateWidth} hasMargin={true} sub={true}/>
+        <UnitInput name="Height" usePercent={true} v={cH} u={cHu} on:updateValue={updateHeight} hasMargin={false} sub={true}/>
     </section>
 
     <!-- margin -->
     <section>
         <Slider name="Margin" min={0} max={200} v={cMAvg} hasMargin={true} on:updateValue={updateMarginAll} currentParentWidth={currentParentWidth}/>
-        <UnitInput name="Top" v={cMT} currentUnit={cMTu} on:updateValue={evt => updateMargin(evt, "Top")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
-        <UnitInput name="Right" v={cMR} currentUnit={cMRu} on:updateValue={evt => updateMargin(evt, "Right")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
-        <UnitInput name="Bottom" v={cMB} currentUnit={cMBu} on:updateValue={evt => updateMargin(evt, "Bottom")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
-        <UnitInput name="Left" v={cML} currentUnit={cMLu} on:updateValue={evt => updateMargin(evt, "Left")} hasMargin={false} maxWidth={"70px"} useFC={false} sub={true}/>
+        <UnitInput name="Top" v={cMT} u={cMTu} on:updateValue={evt => updateMargin(evt, "Top")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
+        <UnitInput name="Right" v={cMR} u={cMRu} on:updateValue={evt => updateMargin(evt, "Right")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
+        <UnitInput name="Bottom" v={cMB} u={cMBu} on:updateValue={evt => updateMargin(evt, "Bottom")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
+        <UnitInput name="Left" v={cML} u={cMLu} on:updateValue={evt => updateMargin(evt, "Left")} hasMargin={false} maxWidth={"70px"} useFC={false} sub={true}/>
     </section>
 
     <!-- padding -->
     <section>
         <Slider name="Padding" min={0} max={100} v={cPAvg} hasMargin={true} on:updateValue={updatePaddingAll} currentParentWidth={currentParentWidth}/>
-        <UnitInput name="Top" v={cPT} currentUnit={cPTu} on:updateValue={evt => updatePadding(evt, "Top")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
-        <UnitInput name="Right" v={cPR} currentUnit={cPRu} on:updateValue={evt => updatePadding(evt, "Right")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
-        <UnitInput name="Bottom" v={cPB} currentUnit={cPBu} on:updateValue={evt => updatePadding(evt, "Bottom")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
-        <UnitInput name="Left" v={cPL} currentUnit={cPLu} on:updateValue={evt => updatePadding(evt, "Left")} hasMargin={false} maxWidth={"70px"} useFC={false} sub={true}/>
+        <UnitInput name="Top" v={cPT} u={cPTu} on:updateValue={evt => updatePadding(evt, "Top")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
+        <UnitInput name="Right" v={cPR} u={cPRu} on:updateValue={evt => updatePadding(evt, "Right")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
+        <UnitInput name="Bottom" v={cPB} u={cPBu} on:updateValue={evt => updatePadding(evt, "Bottom")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
+        <UnitInput name="Left" v={cPL} u={cPLu} on:updateValue={evt => updatePadding(evt, "Left")} hasMargin={false} maxWidth={"70px"} useFC={false} sub={true}/>
     </section>
 
 </main>

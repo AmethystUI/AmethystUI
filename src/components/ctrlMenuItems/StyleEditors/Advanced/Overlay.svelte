@@ -34,9 +34,10 @@
      * 
      * @param {HTMLElement} trackingTarget - The element to track.
      * @param {() => void} updateSizeFunc - The function to update the size of the overlay
+     * @param {string} componentID - The ID of the component that is about to become active
      * @param {boolean} [trackContinuously] - Whether to track to the element continuously (Default true)
      */
-    export function openOverlayFrame(trackingTarget: HTMLElement | Element, updateSizeFunc: ()=>void, trackContinuously=true, content?:any):void {
+    export function openOverlayFrame(trackingTarget: HTMLElement | Element, updateSizeFunc: ()=>void, componentID: string, trackContinuously=true, content?:any):void {
         // set update frame size function
         updateFrameSize = updateSizeFunc;
         
@@ -48,8 +49,7 @@
         mainOverlayData.update(overlayDat => { // update the overlay
             overlayDat.overlayLocked=true; // lock overlay so it doesn't click off when activating
             overlayDat.isOpening = true;
-            overlayDat.elementNumber = get(selectedComponent); // update the current element number
-            overlayDat.overrideNumber = get(selectedOverride); // update the current override number
+            overlayDat.activeComponentID = componentID; // update active component ID
             return overlayDat
         });
 
@@ -87,6 +87,9 @@
      * Close the overlay, assumign that it's open.
      */
     export function closeOverlay():void {
+        // cancel position tracking
+        cancelAnimationFrame(get(mainOverlayData).positionTrackingID);
+        
         setTimeout(() => {
             if(get(mainOverlayData).isOpening){ // when this execisOpeningmeans that the reopening latch is opened and we shouldn't close the overlay. We will reset the latch and then close it on the next call.
                 mainOverlayData.update(overlayDat => {overlayDat.isOpening = false; return overlayDat});
@@ -100,11 +103,10 @@
                 overlayDat.dragLocked = false; // undo drag lock
                 overlayDat.overlayLocked = false; // undo overlay lock
                 overlayDat.initialDrag = true; // reset initial drag to initial state
+                overlayDat.activeComponentID = undefined; // reset active component
                 return overlayDat;
             })
-    
-            // cancel position tracking
-            cancelAnimationFrame(get(mainOverlayData).positionTrackingID);
+
             // clear tracking animation
             mainOverlayData.update(overlayDat => {overlayDat.positionTrackingID = undefined; return overlayDat});
 

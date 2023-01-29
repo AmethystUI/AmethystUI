@@ -6,8 +6,8 @@
     
     export let name:string;
     export let v: any;
+    export let u:units = "px";
     export let hasMargin: boolean;
-    export let currentUnit:units = "px";
     export let maxWidth:string = "";
     export let minWidth:string = "";
     export let useFC:boolean = true; // whether or not to use fit-content as an option
@@ -33,7 +33,7 @@
         if (v < minVal) v = minVal;
 
         disp("updateValue", {
-            v:v, u:currentUnit
+            v:v, u:u
         })
         disp("blurred");
     }
@@ -55,13 +55,13 @@
 
         if(v !== undefined && String(v).length > 0 && !isNaN(Number(v))){
             disp("updateValue", {
-                v:v, u:currentUnit
+                v:v, u:u
             })
         }
     }
 
     // dispatch value changes if v changes
-    $: if((v !== undefined && v.length > 0 && v !== "-") || (currentUnit !== null)){ // update when V is not null or empty or illegal strings, or when current unit has changed
+    $: if((v !== undefined && v.length > 0 && v !== "-") || (u !== null)){ // update when V is not null or empty or illegal strings, or when current unit has changed
 
         // check if V is value. Sometimes this function can run when V is not valid as the user is changing the unit. So we need to check again
         if(v !== undefined && v.length > 0 && v !== "-"){
@@ -79,7 +79,7 @@
         }
 
         disp("updateValue", {
-            v:v, u:currentUnit
+            v:v, u:u
         })
     }
 
@@ -128,63 +128,63 @@
     <section class={`${openDirection} ${unitSelOpen ? "sel-opened" : ""}`}>
         
         <!-- do not show input if unit is fit-content -->
-        {#if currentUnit !== "fit-content"}
+        {#if u !== "fit-content"}
             <input bind:this={valueInputField} bind:value={v} on:keydown={keyPress} on:blur={preventNullV} on:focus={() => disp("focused")}/>
         {/if}
         
         <!-- unit selection part -->
         <div id="unit-display" style={`${
-            currentUnit === "fit-content" ? "width:100%; border-radius:4px" : ""
+            u === "fit-content" ? "width:100%; border-radius:4px" : ""
         }`} class={`${unitSelOpen ? "selected" : ""}`} on:click={openUnitSel}>
             <p>
-                {currentUnit}
+                {u}
             </p>
         </div>
 
         <section id="unit-sel-container" class={`${openDirection} ${!unitSelOpen ? "hidden" : ""}`} bind:this={dropDownElement}>
-            {#if currentUnit !== "px"}
-                <div on:click={() => currentUnit="px"}><p>
+            {#if u !== "px"}
+                <div on:click={() => u="px"}><p>
                     px
                 </p></div>
             {/if}
-            {#if currentUnit !== "pt"}
-                <div on:click={() => currentUnit="pt"}><p>
+            {#if u !== "pt"}
+                <div on:click={() => u="pt"}><p>
                     pt
                 </p></div>
             {/if}
-            {#if currentUnit !== "pc"}
-                <div on:click={() => currentUnit="pc"}><p>
+            {#if u !== "pc"}
+                <div on:click={() => u="pc"}><p>
                     pc
                 </p></div>
             {/if}
-            {#if currentUnit !== "em"}
-                <div on:click={() => currentUnit="em"}><p>
+            {#if u !== "em"}
+                <div on:click={() => u="em"}><p>
                     em
                 </p></div>
             {/if}
-            {#if currentUnit !== "rem"}
-                <div on:click={() => currentUnit="rem"}><p>
+            {#if u !== "rem"}
+                <div on:click={() => u="rem"}><p>
                     rem
                 </p></div>
             {/if}
-            {#if currentUnit !== "vw"}
-                <div on:click={() => currentUnit="vw"}><p>
+            {#if u !== "vw"}
+                <div on:click={() => u="vw"}><p>
                     vw
                 </p></div>
             {/if}
-            {#if currentUnit !== "vh"}
-                <div on:click={() => currentUnit="vh"}><p>
+            {#if u !== "vh"}
+                <div on:click={() => u="vh"}><p>
                     vh
                 </p></div>
             {/if}
             <!-- % doesn't work because of the page layout setup. Too lazy to change it rn -->
-            {#if currentUnit !== "%" && usePercent}
-                <div on:click={() => currentUnit="%"}><p>
+            {#if u !== "%" && usePercent}
+                <div on:click={() => u="%"}><p>
                     %
                 </p></div>
             {/if}
-            {#if currentUnit !== "fit-content" && useFC}
-                <div on:click={() => currentUnit="fit-content"}><p>
+            {#if u !== "fit-content" && useFC}
+                <div on:click={() => u="fit-content"}><p>
                     Fit Content
                 </p></div>
             {/if}

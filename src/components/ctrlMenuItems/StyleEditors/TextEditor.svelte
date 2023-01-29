@@ -144,6 +144,14 @@
         // update collection so that svelte can update the associated components
         $collection = $collection;
     }
+    
+    type sizeAttribute = "size" | "tracking" | "lineHeight"; // these correspond to the attributes thats stored in collection
+    const updateTextSizing = (att: sizeAttribute, e: CustomEvent) => { // used for font size, tracking and line height only.
+        fontRef[att].v = e.detail.v;
+        fontRef[att].u = e.detail.u;
+        // update collection so that svelte can update the associated components
+        $collection = $collection;
+    }
 
     // DEBUG: bruh
     onMount(() => {
@@ -184,9 +192,21 @@
     
     <!-- Sizing control -->
     <section>
-        <UnitInput name={"Size"} v={0} sub={true} hasMargin={true}/>
-        <UnitInput name={"Tracking"} v={0} sub={true} hasMargin={true}/>
-        <UnitInput name={"Line Height"} v={0} sub={true} hasMargin={false}/>
+        <UnitInput name={"Size"} sub={true} v={fontRef.size.v} u={fontRef.size.u} hasMargin={true} on:updateValue={e => {
+            updateTextSizing("size", e)
+        }}/>
+        
+        <div style="min-height: 2px"></div>
+        
+        <UnitInput name={"Tracking"} minVal={-100} sub={true} v={fontRef.tracking.v} u={fontRef.tracking.u} hasMargin={true} on:updateValue={e => {
+            updateTextSizing("tracking", e)
+        }}/>
+        
+        <div style="min-height: 2px"></div>
+
+        <UnitInput name={"Line Height"} minVal={-100} sub={true} v={fontRef.lineHeight.v} u={fontRef.lineHeight.u} hasMargin={false} on:updateValue={e => {
+            updateTextSizing("lineHeight", e)
+        }}/>
 
         <!-- Add later for variable fonts -->
         <!-- <ValueInput name={"Weight"} v={0} sub={true} hasMargin={false} align={"center"} alignTitle={"left"}/> -->

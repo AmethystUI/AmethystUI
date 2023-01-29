@@ -39,7 +39,6 @@ const dragging = writable(undefined);
     export let priority = 1;
     export let itemClass = '';
     export let zoneClass = '';
-    export let keyFn = (i) => i;
     export let useHandle = false;
     export const dropzone = new type(id, priority, itemCount, itemSize);
 
@@ -441,7 +440,7 @@ const dragging = writable(undefined);
             {#if !!$collection[i].styleOverrides && $collection[i].showing}
                 <section class="overrideContainer">
                     {#each $collection[i].styleOverrides as override, j (j)}
-                        <Override name={override.name} height={layerHeight} elmntIndex={i} overrideIndex={j} />
+                        <Override height={layerHeight} elmntIndex={i} overrideIndex={j} />
                     {/each}
                 </section>
             {/if}

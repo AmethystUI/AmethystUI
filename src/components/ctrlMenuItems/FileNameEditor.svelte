@@ -26,7 +26,7 @@
 
 <!-- HTML -->
 <main>
-    <span type="text" contenteditable=true placeholder="Untitled" on:keypress={preventNewline} on:paste={(e) => e.preventDefault()} bind:this={fileNameField} style="max-width:calc(100vw - {leftMenuWidth}px - {controlSectionWidth}px)">{$fileStat.name}</span>
+    <span contenteditable=true placeholder="Untitled" on:keypress={preventNewline} on:paste={(e) => e.preventDefault()} bind:this={fileNameField} style="max-width:calc(100vw - {leftMenuWidth}px - {controlSectionWidth}px)">{$fileStat.name}</span>
 
     {#if $fileStat.alwaysShowSaveStatus}
         {#if !$fileStat.saved}

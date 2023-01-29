@@ -167,19 +167,19 @@
         <!-- width & height -->
         <section>
             <Slider name="Width" min={0} max={200} v={cBWAvg} hasMargin={true} on:updateValue={updateBorderWidthAll} currentParentWidth={currentParentWidth} colorRef={clr}/>
-            <UnitInput name="Top" v={cBWT} currentUnit={cBWTu} on:updateValue={evt => updateBorderWidth(evt, "Top")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
-            <UnitInput name="Right" v={cBWR} currentUnit={cBWRu} on:updateValue={evt => updateBorderWidth(evt, "Right")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
-            <UnitInput name="Bottom" v={cBWB} currentUnit={cBWBu} on:updateValue={evt => updateBorderWidth(evt, "Bottom")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
-            <UnitInput name="Left" v={cBWL} currentUnit={cBWLu} on:updateValue={evt => updateBorderWidth(evt, "Left")} hasMargin={false} maxWidth={"70px"} useFC={false} sub={true}/>
+            <UnitInput name="Top" v={cBWT} u={cBWTu} on:updateValue={evt => updateBorderWidth(evt, "Top")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
+            <UnitInput name="Right" v={cBWR} u={cBWRu} on:updateValue={evt => updateBorderWidth(evt, "Right")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
+            <UnitInput name="Bottom" v={cBWB} u={cBWBu} on:updateValue={evt => updateBorderWidth(evt, "Bottom")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
+            <UnitInput name="Left" v={cBWL} u={cBWLu} on:updateValue={evt => updateBorderWidth(evt, "Left")} hasMargin={false} maxWidth={"70px"} useFC={false} sub={true}/>
         </section>
 
         <!-- border radius -->
         <section>
             <Slider name="Radius" min={0} max={200} v={cBRAvg} hasMargin={true} on:updateValue={updateBorderRadiusAll} currentParentWidth={currentParentWidth} colorRef={clr}/>
-            <UnitInput name="Top" v={cBRT} currentUnit={cBRTu} on:updateValue={evt => updateBorderRadius(evt, "Top")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
-            <UnitInput name="Right" v={cBRR} currentUnit={cBRRu} on:updateValue={evt => updateBorderRadius(evt, "Right")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
-            <UnitInput name="Bottom" v={cBRB} currentUnit={cBRBu} on:updateValue={evt => updateBorderRadius(evt, "Bottom")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
-            <UnitInput name="Left" v={cBRL} currentUnit={cBRLu} on:updateValue={evt => updateBorderRadius(evt, "Left")} hasMargin={false} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
+            <UnitInput name="Top" v={cBRT} u={cBRTu} on:updateValue={evt => updateBorderRadius(evt, "Top")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
+            <UnitInput name="Right" v={cBRR} u={cBRRu} on:updateValue={evt => updateBorderRadius(evt, "Right")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
+            <UnitInput name="Bottom" v={cBRB} u={cBRBu} on:updateValue={evt => updateBorderRadius(evt, "Bottom")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
+            <UnitInput name="Left" v={cBRL} u={cBRLu} on:updateValue={evt => updateBorderRadius(evt, "Left")} hasMargin={false} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
         </section>
 
         <!-- border color -->

@@ -18,9 +18,7 @@ export interface overlayData {
     isOpening : boolean,
     dragLocked : boolean,
     initialDrag : boolean,
-    dataMode : dataMode,
-    elementNumber? : number,
-    overrideNumber? : number,
+    activeComponentID : string
 }
 
 export let mainOverlayData = writable<overlayData>({
@@ -35,9 +33,9 @@ export let mainOverlayData = writable<overlayData>({
     visible : false,
     dragLocked : false, // when this is true, we stop updating the position all together and the picker acts like a window
     initialDrag : true,
+    activeComponentID : undefined,
     overlayLocked : false,
     isOpening : false,
-    dataMode : "none",
 });
 
 export const setX = (val:number):Promise<void> => {
@@ -61,8 +59,6 @@ export const setY = (val:number) => {
 export const setSelectedElmnt = (elmntNum?:number, overrideNum?:number) => {
     setTimeout(() => {
         let currentVal:overlayData = get(mainOverlayData);
-        if(elmntNum !== undefined) currentVal.elementNumber = elmntNum;
-        if(overrideNum !== undefined) currentVal.overrideNumber = overrideNum;
         mainOverlayData.set({...currentVal});
     }, 0);
 }
@@ -70,7 +66,5 @@ export const setSelectedElmnt = (elmntNum?:number, overrideNum?:number) => {
 // clears all prop references
 export const clearElmnt = () => {
     let currentVal:overlayData = get(mainOverlayData);
-    currentVal.elementNumber = -1;
-    currentVal.overrideNumber = -1;
     mainOverlayData.set({...currentVal});
 }

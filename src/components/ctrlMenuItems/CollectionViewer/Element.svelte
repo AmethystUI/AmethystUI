@@ -99,11 +99,11 @@
         title={$collection[elmntIndex].showing ? "collapse" : "expand"}>
     </div>
     <!-- icon + title -->
-    <img rel="preload" src={iconURI} alt="" style="transition:none">
+    <img src={iconURI} alt="" style="transition:none">
     <p>{HTMltagInfo[tagType].name}</p>
 
     <div style="margin-right:4px;" on:click={() => {addOverride(elmntIndex)}} title="Add Override">
-        <img rel="preload" src={"./assets/icons/plus.svg"} alt="">
+        <img src={"./assets/icons/plus.svg"} alt="">
     </div>
 </main>
 

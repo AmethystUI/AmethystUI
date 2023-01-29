@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { collection, selectedComponent, selectedOverride, borderOutlineStyle, boxShadow, color, units } from "../../../stores/collection";
+    import { collection, selectedComponent, selectedOverride, boxShadow, color, units } from "../../../stores/collection";
     
     import UnitInput from "./Basics/UnitInput.svelte";
     import { setX, setY, mainOverlayData } from "../../../stores/overlayStat";
@@ -71,37 +71,22 @@
         }
     }
 
-    /*
-     * Overlay shittery.
-     *
-     * I reccomend you collapse all of these when
-     * developing unless you need to fix a bug in it.
-     */
-    const updateOverlayPosition = (animationFrame = false) =>{ // update position of the shadow selector overlay
-        try {
-            const colorPreviewSquareBB = colorPreviewSquare.getBoundingClientRect();
-    
-            setX(colorPreviewSquareBB.x - $mainOverlayData.w/2 - 20);
-            setY(colorPreviewSquareBB.y + 20);
-    
-            if(animationFrame) $mainOverlayData.positionTrackingID = requestAnimationFrame(() => updateOverlayPosition(animationFrame));
-        } catch (error) {
-            // if this runs, it means that the square doesn't exist. It doesn't affect anything.
-        }
-    }
 
     // we have to add element and overlay tracking to make sure that when the element/override switches, we clear the color references along with the multiplex indexes
-    let lastElmntNumber = $mainOverlayData.elementNumber;
-    let lastOverrideNumber = $mainOverlayData.overrideNumber;
-    $: if($mainOverlayData.elementNumber !== lastElmntNumber || $mainOverlayData.overrideNumber !== lastOverrideNumber){
+    let lastSelectedComponent = $selectedComponent;
+    let lastSelectedOverride = $selectedOverride;
+    
+    
+    $: if($selectedComponent !== undefined || $selectedOverride !== undefined){
+        
         // during initialization, the last state trackers may be undefined. In that case, we do not want the code to execute
-        if(lastElmntNumber !== undefined && lastOverrideNumber !== undefined && $mainColorPickerData.colorRefName === "muxBoxShadClr"){
+        if((lastSelectedComponent !== $selectedComponent || lastSelectedOverride !== $selectedOverride) && $mainColorPickerData.colorRefName === "muxBoxShadClr"){
             clearColorPickerRef();
-            currentColor = undefined;
         }
+
         // updating last state. We always want this to run.
-        lastElmntNumber = $mainOverlayData.elementNumber;
-        lastOverrideNumber = $mainOverlayData.overrideNumber;
+        lastSelectedComponent = $selectedComponent;
+        lastSelectedOverride = $selectedOverride;
     }
 
     let demuxID = 0;
@@ -192,7 +177,7 @@
                         
                         <UnitInput
                             name={"X"}
-                            v={shadow.base.x.v} currentUnit={shadow.base.x.u}
+                            v={shadow.base.x.v} u={shadow.base.x.u}
                             minWidth={"30px"} maxWidth={"80px"}
                             align={"left"}
                             minVal={-100}
@@ -205,7 +190,7 @@
     
                         <UnitInput
                             name={"Y"}
-                            v={shadow.base.y.v} currentUnit={shadow.base.y.u}
+                            v={shadow.base.y.v} u={shadow.base.y.u}
                             minWidth={"30px"} maxWidth={"80px"}
                             align={"left"}
                             minVal={-100}
@@ -218,7 +203,7 @@
                     
                         <UnitInput
                             name={"Blur"}
-                            v={shadow.base.radius.v} currentUnit={shadow.base.radius.u}
+                            v={shadow.base.radius.v} u={shadow.base.radius.u}
                             minWidth={"30px"} maxWidth={"80px"}
                             align={"left"}
                             maxVal={100}
@@ -231,7 +216,7 @@
     
                         <UnitInput
                             name={"Grow"}
-                            v={shadow.grow.v} currentUnit={shadow.grow.u}
+                            v={shadow.grow.v} u={shadow.grow.u}
                             minWidth={"30px"} maxWidth={"80px"}
                             align={"left"}
                             minVal={-100}
@@ -266,7 +251,7 @@
             top:47.5px; left:5px; margin:0;
             width: calc(100% - 10px); height:60px; border-radius: 7px;
             background-color: hsla(0deg,0%,100%,20%); z-index: -1;
-            transition: transform 400ms $normal-ease-out, opacity 300ms ease;
+            transition: transform 400ms $normal-ease-out, opacity 200ms ease;
             opacity:1;
 
             &.hidden{

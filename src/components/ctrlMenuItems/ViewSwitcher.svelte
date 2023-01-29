@@ -1,10 +1,10 @@
 <script lang="ts">
     import { currentView } from "../../stores/viewingMode";
     import { get } from "svelte/store";
-    import MultiToggle, { selection } from "./StyleEditors/Basics/MultiToggle.svelte";
+    import MultiToggle, { multiToggleSelection } from "./StyleEditors/Basics/MultiToggle.svelte";
 
     const componentUUID = crypto.randomUUID();
-    const viewToggleElements:selection[] = [
+    const viewToggleElements:multiToggleSelection<string>[] = [
         {
             iconDir : "./assets/icons/cube.svg",
             val : "edit",

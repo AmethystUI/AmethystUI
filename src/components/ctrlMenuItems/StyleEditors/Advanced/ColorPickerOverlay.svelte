@@ -4,6 +4,7 @@
 <script lang="ts" context="module">
     import { setColorPickerRef } from "../../../../stores/colorPickerStat";
     import { openOverlayFrame } from "./Overlay.svelte";
+    const componentID = crypto.randomUUID();
 
     /**
      * Opens the color picker as well as the overlay frame and sets the color reference and name.
@@ -27,7 +28,7 @@
         });
 
         // open the overlay frame
-        openOverlayFrame(trackTarget, updateOverlaySize, props.trackContinuously, ColorPickerOverlay);
+        openOverlayFrame(trackTarget, updateOverlaySize, componentID, props.trackContinuously, ColorPickerOverlay);
     }
 
     // ======================== NON EXPORTABLES ========================
@@ -127,7 +128,7 @@
 <!-- Colorpicker overlay backend -->
 <script lang="ts">
     import { mainColorPickerData } from "../../../../stores/colorPickerStat"
-    import { collection, color } from "../../../../stores/collection"
+    import { collection, color, selectedComponent, selectedOverride } from "../../../../stores/collection"
     import { hexToRgba, hslToRgb, rgbaToHex, rgbToHsl } from '../../../../helpers/colorMaths';
     import { tweened } from 'svelte/motion';
 	import { quadOut } from 'svelte/easing';
@@ -147,23 +148,21 @@
     // If such reference does not exist or no longer exists, we will just duplicate the value we currently have so that the value can persist on and not reset itself.
     // If there is any error during checking or assigning, we can just reset everything for safety.
     
-    try {
-        if ($mainColorPickerData.colorRefName && $mainOverlayData.elementNumber !== -1) {
-            if ($mainOverlayData.overrideNumber !== -1) {
-                colorRef = $collection[$mainOverlayData.elementNumber].styleOverrides[$mainOverlayData.overrideNumber].style[$mainColorPickerData.colorRefName]; // there is an overlay, so choose the overlay style
+    $: if(get(mainOverlayData).activeComponentID === componentID){ try { // only try to update the reference if the active elemnt ID matches the current one
+        if ($mainColorPickerData.colorRefName && $selectedComponent !== -1) {
+            if ($selectedOverride !== -1) {
+                colorRef = $collection[$selectedComponent].styleOverrides[$selectedOverride].style[$mainColorPickerData.colorRefName]; // there is an overlay, so choose the overlay style
             } else {
-                colorRef = $collection[$mainOverlayData.elementNumber].style[$mainColorPickerData.colorRefName];  // there is no overlay, so choose the root style
+                colorRef = $collection[$selectedComponent].style[$mainColorPickerData.colorRefName];  // there is no overlay, so choose the root style
             }
         } else {
             colorRef = {...colorRef}; // persistence of color even after reference is cleared
         }
     } catch (error) {
         // if there is an error, just reset the overlay because it's probably due to some bad timing between the layers and the picker
-        $mainOverlayData.elementNumber = -1;
-        $mainOverlayData.overrideNumber = -1;
         $mainColorPickerData.colorRefName = undefined;
         $mainColorPickerData.colorName = "Colors";
-    }
+    }}
 
     $: hue = !!colorRef ? colorRef.h : hue ?? 0;
     $: sat = !!colorRef ? colorRef.s : sat ?? 0;
@@ -429,7 +428,7 @@
     }
 
     // special cases that requires force updates
-    $: if($mainColorPickerData.showInlineHSL !== undefined) updateOverlaySize(true); // when the inlineHSL prop is changed, we want to update.
+    $: if($mainColorPickerData.showInlineHSL !== undefined && get(mainOverlayData).activeComponentID === componentID) updateOverlaySize(true); // when the inlineHSL prop is changed, we want to update.
 
     // handles all color changes
     const updateClr = (e:CustomEvent, updateValue:string) => {
