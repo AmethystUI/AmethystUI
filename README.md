@@ -1,1 +1,3 @@
-# kek
+# AmethystUI
+
+So long, CSS.
