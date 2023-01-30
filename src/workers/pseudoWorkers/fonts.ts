@@ -119,7 +119,7 @@ export async function loadFonts (web = true): Promise<{fontsLoaded: number, time
         rawTypefaceData = null;
 
         // store the processed font data into session storage
-        sessionStorage.setItem("typefaces", JSON.stringify(typefaceData));
+        sessionStorage.setItem("fonts", JSON.stringify(typefaceData));
 
         // time the process time just for debugging purposes
         const endTime = performance.now();

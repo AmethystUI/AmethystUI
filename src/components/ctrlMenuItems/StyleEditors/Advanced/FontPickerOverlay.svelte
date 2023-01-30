@@ -6,6 +6,9 @@
     import { mainFontPickerData } from "../../../../stores/fontPickerStat";
     const componentID = crypto.randomUUID();
 
+    let currentFonts: fontObject[];
+    let fontLoadFailure = false; // it should be false. But if it's true, we'll display a message and let the user retry
+
     /**
      * Opens the color picker as well as the overlay frame and sets the color reference and name.
      * 
@@ -18,17 +21,47 @@
     export function openFontPicker(propertyRef:string, propertyName:string, trackTarget: HTMLElement | Element, props={
         trackContinuously: true
     }){
+        // reset fontLoadFailure
+        fontLoadFailure = false;
         // setColorPickerRef(propertyRef); // set the color reference
-                                    
         mainFontPickerData.update(pickerDat => { // update the picker
             pickerDat.fontRefName = propertyRef; // update color reference
             pickerDat.fontName = propertyName; // update color name
             return pickerDat;
         });
 
+        // fetch font files.
+        processFonts().catch(() => {
+            fontLoadFailure = true;
+        });
+        
         // open the overlay frame
         openOverlayFrame(trackTarget, updateOverlaySize, componentID, props.trackContinuously, FontPickerOverlay);        
     }
+
+    const processFonts = (): Promise<void> => {
+        return new Promise(async (res, rej) => {
+            let rawFontData = sessionStorage.getItem("fonts");
+            // Try to fetch the font data up to 20 times with a 500ms interval each time
+            for (let i = 0; i < 20 && !rawFontData; i++) {
+                await new Promise((res) => setTimeout(res, 500));
+                rawFontData = sessionStorage.getItem("fonts");
+            }
+            // Reject the promise if the font data is still not fetched after 20 attempts
+            if (!rawFontData) {
+                return rej(new Error("Failed to fetch font data."));
+            }
+            // Try to parse the fetched font data as JSON and resolve the promise on success
+            try {
+                currentFonts = JSON.parse(rawFontData);
+                res();
+            } catch (err) {
+                // Reject the promise if the fetched font data is not valid JSON
+                rej(err);
+            }
+        });
+    };
+
 
     // ======================== NON EXPORTABLES ========================
 
@@ -154,6 +187,7 @@
     import MultiSelect, { textDecoration, typeFilters } from "../Basics/MultiSelect.svelte";
     import MultiToggle, { textAlignment, textCasing } from "../Basics/MultiToggle.svelte";
     import UnitInput from "../Basics/UnitInput.svelte";
+    import type { fontObject } from "../../../../workers/pseudoWorkers/fonts";
 
     $: name = $mainFontPickerData.fontName ?? "Fonts";
 
@@ -236,7 +270,19 @@
 
         <!-- font selection container -->
         <section id="font-selection-container">
+            <!-- first section for all the main fonts -->
+            <section id="font-list-container">
+                <!-- iterate through every font there is -->
+                <!-- {#each  as }
+                    
+                {/each} -->
+                <p></p>
+            </section>
 
+            <!-- section section for all the font variations avaiable -->
+            <section id="variation-list-container">
+                
+            </section>
         </section>
 
         <!-- font attribute container -->
@@ -296,16 +342,28 @@
             height:232px; width:632px;
             display: flex;
 
-            section{
-                width: fit-content; height:100%;
-                margin-right: 7px;
-            }
-
             #font-selection-container{
                 width:100%;
                 background-color: $primary;
                 opacity: 0.7;
-                border-radius: 6px;
+                border-radius: 6px; overflow: hidden;
+                display: flex;
+
+                #font-list-container{
+                    background-color: indianred;
+                    border-right: 5px solid hsla(0deg, 0%, 0%, 60%);
+                    margin:0;
+                    height: 100%; min-width:60%;
+                }
+                #variation-list-container{
+                    background-color: skyblue;
+                    height: 100%; width:100%; margin:0; // fill up the rest of the space
+                }
+            }
+
+            section{
+                width: fit-content; height:100%;
+                margin-right: 7px;
             }
 
             #font-attribute-container{
