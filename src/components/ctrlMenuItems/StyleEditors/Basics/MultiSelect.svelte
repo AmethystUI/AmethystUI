@@ -140,7 +140,7 @@
                     style="height: {iconSize}px; margin: 0px {iconMargin}px 0px {iconMargin}px">
 
                 {#if showAlt}
-                    <p class="alt-text">{ele.alt}</p>
+                    <p class="alt-text no-drag">{ele.alt}</p>
                 {/if}
             </div>
         {/each}

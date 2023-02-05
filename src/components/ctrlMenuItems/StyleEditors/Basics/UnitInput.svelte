@@ -244,13 +244,13 @@
                     bottom: 0;
                     transform: translate3d(0, calc(100% - 1px), 0);
                     border-radius: 0 0 4px 4px;
-                    box-shadow: 0 5px 10px 3px hsla(0,0,0,25%);
+                    box-shadow: 0 5px 10px 3px hsla(0deg, 0%, 0%, 25%);
                 }
                 &.open-top{
                     bottom: 25px;
                     transform: translate3d(0, 1px, 0);
                     border-radius: 4px 4px 0 0;
-                    box-shadow: 0 -5px 10px 3px hsla(0,0,0,25%);
+                    box-shadow: 0 -5px 10px 3px hsla(0deg, 0%, 0%, 25%);
                 }
 
                 &.hidden{
@@ -264,7 +264,7 @@
                     &:hover{
                         background-color: $accent;
                         z-index:2;
-                        box-shadow: 0 5px 10px hsla(0,0,0,25%);
+                        box-shadow: 0 5px 10px hsla(0deg, 0%, 0%, 25%);
 
                         p{
                             color: $secondary;
@@ -300,9 +300,6 @@
                 &::-webkit-inner-spin-button {
                     -webkit-appearance: none;
                     margin: 0;
-                }
-                &[type=number] {
-                    -moz-appearance: textfield;
                 }
             }
 

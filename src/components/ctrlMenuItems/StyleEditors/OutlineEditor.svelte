@@ -155,7 +155,7 @@
     }
 
     // update color picker based on if the shadow is enabled or not
-    $: if(!currentStyle.USEOUTLINE && $mainColorPickerData.colorRefName === "outlineColor"){
+    $: if(!currentStyle.USEOUTLINE && $mainColorPickerData.refName === "outlineColor"){
     // if the current style doesn't use this editor, clear ref
         clearColorPickerRef();
     }
@@ -268,10 +268,6 @@
             display: flex;
             align-items: flex-end;
             margin-bottom:10px;
-        }
-
-        .spacer{
-            height: 7px;
         }
 
         img{

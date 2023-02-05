@@ -102,9 +102,5 @@
         .spacer{
             height: 7px;
         }
-
-        img{
-            filter: invert(1); opacity: 1;
-        }
     }
 </style>

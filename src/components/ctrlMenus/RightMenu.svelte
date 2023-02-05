@@ -56,7 +56,7 @@
         <AppearanceEditor currentParentWidth={currentWidth}/>
         
         <!-- background editor -->
-        <BackgroundEditor currentParentWidth={currentWidth}/>
+        <BackgroundEditor/>
         
         <!-- border editor -->
         <BorderEditor currentParentWidth={currentWidth}/>

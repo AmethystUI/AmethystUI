@@ -4,10 +4,14 @@
 <script lang="ts" context="module">
     import { openOverlayFrame } from "./Overlay.svelte";
     import { mainFontPickerData } from "../../../../stores/fontPickerStat";
+    import { beautifiedFontName, fontObject, getFontNameValue, searchFontIndex } from "../../../../workers/pseudoWorkers/fonts";
+
     const componentID = crypto.randomUUID();
 
-    let currentFonts: fontObject[];
-    let fontLoadFailure = false; // it should be false. But if it's true, we'll display a message and let the user retry
+    const sessionStorageKey = "fonts";
+
+    let fontListContainer: HTMLElement;
+    let variationListContainer: HTMLElement;
 
     /**
      * Opens the color picker as well as the overlay frame and sets the color reference and name.
@@ -21,43 +25,55 @@
     export function openFontPicker(propertyRef:string, propertyName:string, trackTarget: HTMLElement | Element, props={
         trackContinuously: true
     }){
-        // reset fontLoadFailure
-        fontLoadFailure = false;
         // setColorPickerRef(propertyRef); // set the color reference
         mainFontPickerData.update(pickerDat => { // update the picker
-            pickerDat.fontRefName = propertyRef; // update color reference
-            pickerDat.fontName = propertyName; // update color name
+            pickerDat.refName = propertyRef; // update color reference
+            pickerDat.windowName = propertyName; // update color name
             return pickerDat;
         });
 
-        // fetch font files.
-        processFonts().catch(() => {
-            fontLoadFailure = true;
+        // fetch font files (only if there is no font file)
+        processFonts(sessionStorageKey).catch(err => {
+            console.error("Failed to cache and load font > ", err);
         });
         
         // open the overlay frame
         openOverlayFrame(trackTarget, updateOverlaySize, componentID, props.trackContinuously, FontPickerOverlay);        
     }
 
-    const processFonts = (): Promise<void> => {
+    // attempt to load the fonts from Session storage
+    const processFonts = (storageKey: string): Promise<void> => {
+        // reset fontFailure in main font picker data
+        mainFontPickerData.update(pickerDat => { pickerDat.fontLoadFailed = false; return pickerDat });
+
         return new Promise(async (res, rej) => {
-            let rawFontData = sessionStorage.getItem("fonts");
-            // Try to fetch the font data up to 20 times with a 500ms interval each time
-            for (let i = 0; i < 20 && !rawFontData; i++) {
+            let rawFontData = sessionStorage.getItem(storageKey);
+            // Try to fetch the font data up to 6 times with a 500ms interval each time (3s)
+            for (let i = 0; i < 6 && !rawFontData; i++) {
                 await new Promise((res) => setTimeout(res, 500));
-                rawFontData = sessionStorage.getItem("fonts");
+                rawFontData = sessionStorage.getItem(storageKey);
             }
             // Reject the promise if the font data is still not fetched after 20 attempts
             if (!rawFontData) {
-                return rej(new Error("Failed to fetch font data."));
+                // set fontFailure in main font picker data to true
+                mainFontPickerData.update(pickerDat => { pickerDat.fontLoadFailed = true; return pickerDat });
+
+                return rej(new Error("Cannot fetch font data from cache."));
             }
             // Try to parse the fetched font data as JSON and resolve the promise on success
             try {
-                currentFonts = JSON.parse(rawFontData);
+                // update currentFontContent in main font picker data
+                mainFontPickerData.update(pickerDat => {
+                    pickerDat.currentFontContent = JSON.parse(rawFontData);
+                    return pickerDat;
+                });
+
                 res();
             } catch (err) {
+                // set fontFailure in main font picker data to true
+                mainFontPickerData.update(pickerDat => { pickerDat.fontLoadFailed = true; return pickerDat });
                 // Reject the promise if the fetched font data is not valid JSON
-                rej(err);
+                rej(`JSON parse error > \n${err}`);
             }
         });
     };
@@ -187,9 +203,12 @@
     import MultiSelect, { textDecoration, typeFilters } from "../Basics/MultiSelect.svelte";
     import MultiToggle, { textAlignment, textCasing } from "../Basics/MultiToggle.svelte";
     import UnitInput from "../Basics/UnitInput.svelte";
-    import type { fontObject } from "../../../../workers/pseudoWorkers/fonts";
 
-    $: name = $mainFontPickerData.fontName ?? "Fonts";
+    import LoadingSpinner from "../../../ui/LoadingSpinner.svelte";
+    import { onMount } from "svelte";
+
+    $: name = $mainFontPickerData.windowName ?? "Fonts";
+    $: fontsItalisized = !!fontRef ? fontRef.textDecorations.includes("italicize") : false;
 
     let fontRef:typographyStyle;
 
@@ -198,21 +217,103 @@
     // If such reference does not exist or no longer exists, we will just duplicate the value we currently have so that the value can persist on and not reset itself.
     // If there is any error during checking or assigning, we can just reset everything for safety.
     
-    $: currentElementSelected = get(mainOverlayData).activeComponentID === componentID;
     $: try { // only try to update the reference if the active elemnt ID matches the current one
-        if ($mainFontPickerData.fontRefName && $selectedComponent !== -1) {
+        if ($mainFontPickerData.refName && $selectedComponent !== -1) {
             if ($selectedOverride !== -1) {
-                fontRef = $collection[$selectedComponent].styleOverrides[$selectedOverride].style[$mainFontPickerData.fontRefName]; // there is an overlay, so choose the overlay style
+                fontRef = $collection[$selectedComponent].styleOverrides[$selectedOverride].style[$mainFontPickerData.refName]; // there is an overlay, so choose the overlay style
             } else {
-                fontRef = $collection[$selectedComponent].style[$mainFontPickerData.fontRefName];  // there is no overlay, so choose the root style
+                fontRef = $collection[$selectedComponent].style[$mainFontPickerData.refName];  // there is no overlay, so choose the root style
             }
         } else {
             fontRef = {...fontRef}; // persistence of fonts even after reference is cleared
         }
     } catch (error) {
         // if there is an error, just reset the overlay because it's probably due to some bad timing between the layers and the picker
-        $mainFontPickerData.fontRefName = undefined;
-        $mainFontPickerData.fontName = "Typography";
+        $mainFontPickerData.refName = undefined;
+        $mainFontPickerData.windowName = "Typography";
+    }
+
+    // ====================== ON MOUNT ======================
+
+    let currentFontIndex = 0;
+    let typefaceNameContainers: HTMLDivElement[];
+
+    onMount(async () => {
+        // search for font first
+        currentFontIndex = await searchFontIndex($mainFontPickerData.currentFontContent, fontRef.typeface);
+
+        // set the scroll position to the selection in the font pickers
+        if(!!fontListContainer) fontListContainer.scrollTop = currentFontIndex * 35 - 95;
+
+        // start loading in the font previews
+        typefaceNameContainers = Array.from( fontListContainer.getElementsByTagName("div") );
+
+        // Increase preview loading load after the first render is complete
+        // setTimeout(() => {
+        //     previewLoad = 10;
+        //     loadTypefacePreview(true);
+        // }, 200)
+    })
+
+    let focusedTypefaceIndex;
+    let previewLoad = 2000;
+    const loadTypefacePreview = async (forceLoad?:boolean) => {
+        // forceLoad = !!forceLoad; // initialize boolean
+        // let scrollHeight = fontListContainer.scrollTop; // if no scroll height is specified, default to scroll top on the font container
+        // let newFocusdTypefaceIndex = Math.round((scrollHeight + 95) / 35);
+
+        // // we'll only load previews when the difference in scroll is larger than 5 
+        // if(!forceLoad && (newFocusdTypefaceIndex === focusedTypefaceIndex || newFocusdTypefaceIndex < 0 || newFocusdTypefaceIndex > $mainFontPickerData.currentFontContent.length-1)) return;
+        
+        // // if we do want to load, we update the focus index
+        // focusedTypefaceIndex = newFocusdTypefaceIndex;
+        // // console.log($mainFontPickerData.currentFontContent[4]);
+
+        // // load permitted amount of fonts
+        // let newFontCSS:string = "";
+        // for(
+        //         let i = Math.max(focusedTypefaceIndex - previewLoad, 0);
+        //         i < Math.min(focusedTypefaceIndex + previewLoad, $mainFontPickerData.currentFontContent.length-1);
+        //         i++)
+        //     {
+        //     const currentFont:fontObject = $mainFontPickerData.currentFontContent[i];
+
+        //     // if our current font is a web safe font or has already been loaded, we can skip it
+        //     if(currentFont.webSafe) continue;
+
+        //     if(document.querySelector("#custom-font-faces").innerHTML.indexOf(`custom-font${i}`) !== -1){
+        //         // if the font is already loaded on the document, we can skip loading it and assign it directly.
+        //         typefaceNameContainers[i].querySelector("p").style.fontFamily = `'custom-font${i}', Inter, system-ui, sans-serif`;
+        //         continue;
+        //     }
+
+        //     // Find preview variation. Some fonts don't have a 400 style, so we have to find the cloesest match
+        //     let previewVariation = 400;
+        //     if(!currentFont.files[`${previewVariation}`]) {
+        //         // if 400 style doesn't exist, find closest match
+        //         let i = 0;
+        //         for(i; !( currentFont.files[`${previewVariation+i}`] || currentFont.files[`${previewVariation-i}`] ); i+=100);
+
+        //         // after the correct i is found, we assign the new style
+        //         if(!!currentFont.files[`${previewVariation+i}`]){ // if the closest match is bigger, we'll use the thicker font
+        //             previewVariation += i;
+        //         } else { // Otherwise use the thinner one
+        //             previewVariation -= i;
+        //         }
+        //     }
+            
+        //     // Add the HTML required for custom font previewing
+        //     newFontCSS += `
+        //         @font-face {
+        //             font-family: 'custom-font${i}';
+        //             src: url(${currentFont.files[`${previewVariation}`]})
+        //         }
+        //     `;
+        //     // typefaceNameContainers[i].classList.add("preview-loaded");
+        // }
+
+        // // add font css
+        // document.querySelector("#custom-font-faces").innerHTML += newFontCSS;
     }
 
     // ====================== UPDATE FUNCTIONS ======================
@@ -237,6 +338,42 @@
         const vals:textDecorationType[] = e.detail.values;
         // set the value of the decorations accordingly
         fontRef.textDecorations = e.detail.values;
+        // update collection so that svelte can update the associated components
+        $collection = $collection;
+    }
+
+    const updateTypeface = (newIndex: number) => {
+        // update selected font index
+        currentFontIndex = newIndex;
+        
+        // fetch the typeface name from the index
+        const newFontObject: fontObject = $mainFontPickerData.currentFontContent[newIndex];
+        const newTypefaceName:string = newFontObject.family;
+        fontRef.typeface = newTypefaceName; // set the new typeface name
+        
+        // check to see if the new typeface supports the current variation. If not, switch variation to the closest match
+        const newTypefaceVariations:number[] = newFontObject.variations;
+        const currentVariation:number = fontRef.variation; // not every font supports a regular variant, so we have to find the closest match
+            
+        // We can assume that every typeface is guarenteed to have at least 1 variation, so this while loop will not loop forever
+        let i = 0;
+        if(!newTypefaceVariations.includes(currentVariation)){
+            for(i; !( newTypefaceVariations.includes(currentVariation-i) || newTypefaceVariations.includes(currentVariation+i) ); i+=100); // find closest match
+        }
+
+        // after left or right has been found, set the new variation
+        if(newTypefaceVariations.includes(currentVariation-i)){ // if the closest match is smaller, we'll use the thinner font
+            fontRef.variation = currentVariation - i;
+        } else { // Otherwise use the thicker one
+            fontRef.variation = currentVariation + i;
+        }
+
+        // update collection so that svelte can update the associated components
+        $collection = $collection;
+    }
+
+    const updateVariation = (newVariation: number) => {
+        fontRef.variation = newVariation;
         // update collection so that svelte can update the associated components
         $collection = $collection;
     }
@@ -270,19 +407,51 @@
 
         <!-- font selection container -->
         <section id="font-selection-container">
-            <!-- first section for all the main fonts -->
-            <section id="font-list-container">
-                <!-- iterate through every font there is -->
-                <!-- {#each  as }
-                    
-                {/each} -->
-                <p></p>
-            </section>
+            <!-- Only show fonts if it's not an empty list -->
+            {#if $mainFontPickerData.currentFontContent.length > 0}
+                <!-- first section for all the main fonts -->
+                <section bind:this={fontListContainer} id="font-list-container" on:scroll={() => loadTypefacePreview()}>
+                    <!-- iterate through every font there is -->
+                    {#each $mainFontPickerData.currentFontContent as fontObj, i (i)}
+                        <div class="text-container {fontRef.typeface === fontObj.family ? "selected" : ""}"
+                            on:click={() => updateTypeface(i)}>                            
+                            <p class="no-drag">
+                                {fontObj.family}
+                            </p>
+                        </div>
+                    {/each}
+                    <div style="height: 11px"></div>
+                </section>
 
-            <!-- section section for all the font variations avaiable -->
-            <section id="variation-list-container">
+                <!-- section section for all the font variations avaiable -->
+                <section bind:this={variationListContainer} id="variation-list-container">
+                    <!-- Iterate through every variation for the chosen font -->
+                    {#each $mainFontPickerData.currentFontContent[currentFontIndex].variations as variation}
+                        <div class="text-container {fontRef.variation === variation ? "selected" : ""}"
+                            on:click={() => updateVariation(variation)}
+                            style="font-weight: {variation}; font-style: {fontsItalisized ? "italic" : ""}">
+
+                            <p class="no-drag">{beautifiedFontName[getFontNameValue(variation, "name")]}</p>
+                        </div>
+                    {/each}
+                    <div style="height: 11px"></div>
+                </section>
                 
-            </section>
+            <!-- Show loading spinner if the content hasn't been loaded yet, but it hasn't failed yet -->
+            {:else if !$mainFontPickerData.fontLoadFailed}
+                <section id="font-load-err-container">
+                    <LoadingSpinner />
+                </section>
+            <!-- Font load failure -->
+            {:else}
+                <section id="font-load-err-container">
+                    <!-- Could not load font for some reason -->
+                    <p>Failed to load fonts</p>
+                    <button on:click={() => processFonts(sessionStorageKey)}>
+                        Retry
+                    </button>
+                </section>
+            {/if}
         </section>
 
         <!-- font attribute container -->
@@ -344,20 +513,77 @@
 
             #font-selection-container{
                 width:100%;
-                background-color: $primary;
-                opacity: 0.7;
+                background-color: $primaryl0;
                 border-radius: 6px; overflow: hidden;
                 display: flex;
 
                 #font-list-container{
-                    background-color: indianred;
-                    border-right: 5px solid hsla(0deg, 0%, 0%, 60%);
-                    margin:0;
-                    height: 100%; min-width:60%;
+                    border-right: 4px solid hsla(0deg, 0%, 0%, 30%);
+                    height: 100%; min-width: 200px; max-width: 200px; width: 200px;
                 }
                 #variation-list-container{
-                    background-color: skyblue;
                     height: 100%; width:100%; margin:0; // fill up the rest of the space
+                }
+
+                #font-list-container, #variation-list-container{
+                    padding: 5px; margin: 0;
+                    overflow-y: scroll;
+
+                    .text-container{
+                        width: calc(100% - 20px); height: 35px;
+                        padding: 0px 10px 0px 10px; border-radius: 5px;
+                        display: flex; align-items: center;
+                        cursor: pointer;
+
+                        &:hover{
+                            &.selected{
+                                background-color: $accentl2;
+                            }
+
+                            background-color: $primaryl3;
+                            p{ color: white }
+                        }
+
+                        &.selected{
+                            background-color: $accent;
+                            p{ color: white }
+                        }
+
+                        p{
+                            font-size: 14px;
+                            width: 100%; height: fit-content;
+                            white-space: nowrap; text-overflow: ellipsis; overflow: hidden;
+                            color: $secondarys4;
+                        }
+                    }
+                }
+
+                #font-load-err-container{
+                    width:100%; height:100%; margin: 0;
+                    display: flex; justify-content: center; align-items: center; flex-direction: column;
+
+                    p{
+                        padding-top: 20px;
+                        font-size: 14px;
+                        color: $secondarys1;
+                    }
+
+                    button{
+                        margin-top: 10px;
+                        background: none;
+                        padding: 5px 12px 5px 12px;
+                        border: 1.5px solid $secondarys1;
+                        border-radius: 6px;
+                        color: $secondarys1;
+                        font-size:  12px;
+                        font-variation-settings: "wght" 600;
+                        cursor: pointer;
+
+                        &:hover{
+                            background: $secondarys1;
+                            color: $primary;
+                        }
+                    }
                 }
             }
 

@@ -1,4 +1,5 @@
 import { writable, get } from "svelte/store";
+import type { fontObject } from "../workers/pseudoWorkers/fonts";
 
 /**
  * Represents data for the color picker.
@@ -6,18 +7,22 @@ import { writable, get } from "svelte/store";
  * @property {string} fontName - The name of the font.
  */
 export interface pickerData {
-    fontRefName : string,
-    fontName : string,
+    refName : string,
+    windowName : string,
     searchQuery : string // Don't forget to clear this regularly
+    currentFontContent : fontObject[], // cached in ram
+    fontLoadFailed : boolean,
 }
 
 /**
  * A writable store that holds data for the main color picker.
  */
 export let mainFontPickerData = writable<pickerData>({
-    fontRefName : undefined,
-    fontName : "Typography",
+    refName : undefined,
+    windowName : "Typography",
     searchQuery : "",
+    currentFontContent : [],
+    fontLoadFailed : false,
 });
 
 /**
@@ -26,7 +31,7 @@ export let mainFontPickerData = writable<pickerData>({
  */
 export const setFontPickerRef = (ref:string) => {
     let currentVal:pickerData = get(mainFontPickerData);
-    currentVal.fontRefName = ref;
+    currentVal.refName = ref;
     mainFontPickerData.set(currentVal);
 }
 
@@ -36,7 +41,7 @@ export const setFontPickerRef = (ref:string) => {
  */
 export const clearColorPickerRef = (colorName:string="Colors") => {
     let currentVal:pickerData = get(mainFontPickerData);
-    currentVal.fontRefName = undefined;
-    currentVal.fontName = colorName;
+    currentVal.refName = undefined;
+    currentVal.windowName = colorName;
     mainFontPickerData.set(currentVal);
 }

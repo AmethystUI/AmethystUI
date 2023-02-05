@@ -32,14 +32,5 @@
                 filter: invert(1); opacity: 0.6;
             }
         }
-
-        &.multi{
-            width:65px;  
-            
-            .more-options{
-                height:20px;
-                transform: translate3d(2px,0px,0px);
-            }
-        }
     }
 </style>

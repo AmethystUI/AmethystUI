@@ -8,8 +8,8 @@ import { writable, get } from "svelte/store";
  */
 export interface pickerData {
     showInlineHSL : boolean,
-    colorRefName : string,
-    colorName : string,
+    refName : string,
+    windowName : string,
 }
 
 /**
@@ -17,8 +17,8 @@ export interface pickerData {
  */
 export let mainColorPickerData = writable<pickerData>({
     showInlineHSL : false,
-    colorRefName : undefined,
-    colorName : "Colors",
+    refName : undefined,
+    windowName : "Colors",
 });
 
 /**
@@ -27,7 +27,7 @@ export let mainColorPickerData = writable<pickerData>({
  */
 export const setColorPickerRef = (ref:string) => {
     let currentVal:pickerData = get(mainColorPickerData);
-    currentVal.colorRefName = ref;
+    currentVal.refName = ref;
     mainColorPickerData.set(currentVal);
 }
 
@@ -37,7 +37,7 @@ export const setColorPickerRef = (ref:string) => {
  */
 export const clearColorPickerRef = (colorName:string="Colors") => {
     let currentVal:pickerData = get(mainColorPickerData);
-    currentVal.colorRefName = undefined;
-    currentVal.colorName = colorName;
+    currentVal.refName = undefined;
+    currentVal.windowName = colorName;
     mainColorPickerData.set(currentVal);
 }

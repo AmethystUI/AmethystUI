@@ -145,7 +145,7 @@
     }
     
     // update color picker based on if the shadow is enabled or not
-    $: if(!currentStyle.USEBORDER && $mainColorPickerData.colorRefName === "borderColor"){
+    $: if(!currentStyle.USEBORDER && $mainColorPickerData.refName === "borderColor"){
     // if the current style doesn't use this editor, clear ref
         clearColorPickerRef();
     }

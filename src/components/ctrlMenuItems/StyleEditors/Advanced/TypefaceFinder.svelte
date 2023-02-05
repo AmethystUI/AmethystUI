@@ -99,6 +99,7 @@
     //     `;
     //     inputTextContainer.appendChild(style);
 
+
     //     inputText.style.fontFamily = `'MyFont', Inter`;
     // }, 1000);
 

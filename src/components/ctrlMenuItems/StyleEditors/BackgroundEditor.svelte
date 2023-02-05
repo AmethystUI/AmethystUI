@@ -4,8 +4,6 @@
     import ColorPicker from "./Advanced/ColorPicker.svelte";
     import { clearColorPickerRef, mainColorPickerData } from "../../../stores/colorPickerStat";
     
-    export let currentParentWidth = 360;
-    
     // reactive
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent].style : $collection[$selectedComponent].styleOverrides[$selectedOverride].style;
 
@@ -30,7 +28,7 @@
     }
 
     // update color picker based on if the shadow is enabled or not
-    $: if(!currentStyle.USEBACKGROUND && $mainColorPickerData.colorRefName === "backgroundColor"){
+    $: if(!currentStyle.USEBACKGROUND && $mainColorPickerData.refName === "backgroundColor"){
         // if the current style doesn't use this editor, clear ref
         clearColorPickerRef();
     }

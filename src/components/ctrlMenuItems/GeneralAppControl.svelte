@@ -4,11 +4,6 @@
     import ZoomControl from "./GeneralAppControl/ZoomControl.svelte";
     const disp = createEventDispatcher();
     
-    export let dropdownStatus = {
-        currentID : "",
-        active : false,
-    }
-
     let mainContainer:HTMLElement;
 
     const toggleDropdown = () => {
@@ -68,12 +63,5 @@
             border-radius: 100px;
             margin-left: 17px;
         }
-
-        .spacer{
-            height:100%;
-            width:15px;
-        }
-
-
     }
 </style>

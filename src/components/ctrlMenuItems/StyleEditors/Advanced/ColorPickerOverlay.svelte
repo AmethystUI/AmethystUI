@@ -22,7 +22,7 @@
         setColorPickerRef(propertyRef); // set the color reference
                                     
         mainColorPickerData.update(pickerDat => { // update the picker
-            pickerDat.colorName = propertyName; // update color name
+            pickerDat.windowName = propertyName; // update color name
             pickerDat.showInlineHSL = props.showInlineHSL; // update whether or not to show the inline HSL
             return pickerDat;
         });
@@ -149,19 +149,19 @@
     // If there is any error during checking or assigning, we can just reset everything for safety.
     
     $: if(get(mainOverlayData).activeComponentID === componentID){ try { // only try to update the reference if the active elemnt ID matches the current one
-        if ($mainColorPickerData.colorRefName && $selectedComponent !== -1) {
+        if ($mainColorPickerData.refName && $selectedComponent !== -1) {
             if ($selectedOverride !== -1) {
-                colorRef = $collection[$selectedComponent].styleOverrides[$selectedOverride].style[$mainColorPickerData.colorRefName]; // there is an overlay, so choose the overlay style
+                colorRef = $collection[$selectedComponent].styleOverrides[$selectedOverride].style[$mainColorPickerData.refName]; // there is an overlay, so choose the overlay style
             } else {
-                colorRef = $collection[$selectedComponent].style[$mainColorPickerData.colorRefName];  // there is no overlay, so choose the root style
+                colorRef = $collection[$selectedComponent].style[$mainColorPickerData.refName];  // there is no overlay, so choose the root style
             }
         } else {
             colorRef = {...colorRef}; // persistence of color even after reference is cleared
         }
     } catch (error) {
         // if there is an error, just reset the overlay because it's probably due to some bad timing between the layers and the picker
-        $mainColorPickerData.colorRefName = undefined;
-        $mainColorPickerData.colorName = "Colors";
+        $mainColorPickerData.refName = undefined;
+        $mainColorPickerData.windowName = "Colors";
     }}
 
     $: hue = !!colorRef ? colorRef.h : hue ?? 0;
@@ -173,7 +173,7 @@
     
     $: alpha = !!colorRef ? colorRef.a : alpha ?? 0;
 
-    $: name = $mainColorPickerData.colorName ?? "Colors";
+    $: name = $mainColorPickerData.windowName ?? "Colors";
 
     // hue + alpha slider tracker
     let hueSlider:HTMLDivElement;

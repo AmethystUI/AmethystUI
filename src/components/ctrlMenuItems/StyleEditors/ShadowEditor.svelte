@@ -80,7 +80,7 @@
     $: if($selectedComponent !== undefined || $selectedOverride !== undefined){
         
         // during initialization, the last state trackers may be undefined. In that case, we do not want the code to execute
-        if((lastSelectedComponent !== $selectedComponent || lastSelectedOverride !== $selectedOverride) && $mainColorPickerData.colorRefName === "muxBoxShadClr"){
+        if((lastSelectedComponent !== $selectedComponent || lastSelectedOverride !== $selectedOverride) && $mainColorPickerData.refName === "muxBoxShadClr"){
             clearColorPickerRef();
         }
 
@@ -123,12 +123,12 @@
     }
 
     // update color picker based on if the shadow is enabled or not
-    $: if(!currentStyle.USESHADOW && $mainColorPickerData.colorRefName === "muxBoxShadClr"){
+    $: if(!currentStyle.USESHADOW && $mainColorPickerData.refName === "muxBoxShadClr"){
         // if the current style doesn't use shadow, clear ref
         clearColorPickerRef();
     }
     // if the picker visible and selects the shadow, we should show the indicator. This is true for all cases
-    $: if((!!$mainOverlayData.visible || !!$mainOverlayData.dragLocked) && $mainColorPickerData.colorRefName === "muxBoxShadClr" && shadows.length > 0){
+    $: if((!!$mainOverlayData.visible || !!$mainOverlayData.dragLocked) && $mainColorPickerData.refName === "muxBoxShadClr" && shadows.length > 0){
         if(!showEditorIndicator) showEditorIndicator = true;
     } else {
         if(showEditorIndicator) showEditorIndicator = false;

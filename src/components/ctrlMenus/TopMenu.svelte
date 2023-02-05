@@ -205,7 +205,7 @@
         </section>
     </section>
 
-    <GeneralAppControl dropdownStatus={dropdownStatus} on:widthChange={appCtrlContWidthChange} on:toggleDropdown={toggleDropdown}  on:forceOpenDropdown={forceOpenDropdown} on:updateCurrentID={updateCurrentID}/>
+    <GeneralAppControl on:widthChange={appCtrlContWidthChange} on:toggleDropdown={toggleDropdown}  on:forceOpenDropdown={forceOpenDropdown} on:updateCurrentID={updateCurrentID}/>
 </main>
 
 <!-- STYLE -->

@@ -336,9 +336,7 @@
         }
     
         .corner-drag{
-            $drag-size: 7px;
-
-            min-width:$drag-size; min-height:$drag-size; max-width:$drag-size; max-height:$drag-size;
+            min-width: 7px; min-height: 7px; max-width: 7px; max-height: 7px;
             background-color: $secondarys6;
             position: absolute;
             z-index: 1;
@@ -347,46 +345,46 @@
             box-shadow: 0 1px 5px hsla(0,0%,0%,75%);
 
             &#corner-tl{
-                top: -$drag-size / 2 + $pad-size;
-                left: -$drag-size / 2 + $pad-size;
+                top: calc(-3.5px / 2) + $pad-size;
+                left: calc(-3.5px / 2) + $pad-size;
                 z-index:2;
                 cursor: nwse-resize;
             }
             &#corner-tm{
-                top: -$drag-size / 2 + $pad-size;
+                top: calc(-3.5px / 2) + $pad-size;
                 cursor: ns-resize;
                 z-index:1
             }
             &#corner-tr{
-                top: -$drag-size / 2 + $pad-size;
-                right: -$drag-size / 2 + $pad-size;
+                top: calc(-3.5px / 2) + $pad-size;
+                right: calc(-3.5px / 2) + $pad-size;
                 z-index:2;
                 cursor: nesw-resize;
             }
             &#corner-ml{
-                left: -$drag-size / 2 + $pad-size;
+                left: calc(-3.5px / 2) + $pad-size;
                 cursor: ew-resize;
                 z-index:1
             }
             &#corner-mr{
-                right: -$drag-size / 2 + $pad-size;
+                right: calc(-3.5px / 2) + $pad-size;
                 cursor: ew-resize;
                 z-index:1
             }
             &#corner-bl{
-                bottom: -$drag-size / 2 + $pad-size;
-                left: -$drag-size / 2 + $pad-size;
+                bottom: calc(-3.5px / 2) + $pad-size;
+                left: calc(-3.5px / 2) + $pad-size;
                 z-index:2;
                 cursor: nesw-resize;
             }
             &#corner-bm{
-                bottom: -$drag-size / 2 + $pad-size;
+                bottom: calc(-3.5px / 2) + $pad-size;
                 cursor: ns-resize;
                 z-index:1
             }
             &#corner-br{
-                bottom: -$drag-size / 2 + $pad-size;
-                right: -$drag-size / 2 + $pad-size;
+                bottom: calc(-3.5px / 2) + $pad-size;
+                right: calc(-3.5px / 2) + $pad-size;
                 z-index:2;
                 cursor: nwse-resize;
             }

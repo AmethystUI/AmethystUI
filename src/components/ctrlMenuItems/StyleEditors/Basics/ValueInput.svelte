@@ -105,10 +105,6 @@
                 -webkit-appearance: none;
                 margin: 0;
             }
-            &[type=number] {
-                appearance: textfield;
-                -moz-appearance: textfield;
-            }
         }
     }
 </style>
