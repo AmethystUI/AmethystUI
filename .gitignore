@@ -104,4 +104,4 @@ dist
 .tern-port
 
 # build files
-build/*
+public/build/**/*
