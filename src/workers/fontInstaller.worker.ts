@@ -32,39 +32,25 @@ type rawFontObjs = {
     files: { [key: string]: string };
 }
 
-self.addEventListener("install", event => {
-    const installEvent = event as ExtendableEvent;
-    // fetch fileURLs from google font
-    console.log("Hi from worker install");
-    installEvent.waitUntil(new Promise((res, rej): void => {
-        // initialize parsed data
+// ============
 
-        // let parsedData: fontURLs[];
+/**
+ * Use the Google Fonts API to fetch avaible font data URLs as well as its correspoding files, and store the TTF font files in an indexedDB.
+ */
+const downloadFonts = async () => {
+    console.debug('Downloading fonts...');
 
-        // make fetch request to google font API to get file URLS and their associated data
-        // fetch("https://www.googleapis.com/webfonts/v1/webfonts?sort=popularity&key=AIzaSyDW3JQmec-yJykfP-FcRYpIujOc6jYa4RQ")
-        // .then(resp => { 
-        //     if(!resp.ok) rej(`Failed to fetch google font list. Response code: ${resp.status}`);
-        //     // Parse the response into JSON
-        //     resp.json()
-        // })
-        // .then(data => {
-        //     const fontObjs: rawFontObjs = data["items"];
-        //     // extract data to parsedData
-            
-        //     console.log(fontObjs);
-        // })
-        res(0);
-    }))
-});
+    // get URL's from Google Fonts
+    let parsedData: fontURLs[];
+    const resp = await fetch("https://www.googleapis.com/webfonts/v1/webfonts?sort=popularity&key=AIzaSyDW3JQmec-yJykfP-FcRYpIujOc6jYa4RQ");
 
-self.addEventListener("activate", event => {
-    console.log("Hi from worker activate");
-})
+    if(!resp.ok) throw new Error(`Unable to fetch font URL's: ${resp.status}`); // if response is broken, throw a new error
+    
+    // Parse the response into JSON
+    const rawData: rawFontObjs[] = await resp.json();
 
-self.addEventListener('fetch', (event) => {
-    console.log('Fetching:', event.request.url);
-});
+    console.log(rawData);
+}
 
 async function openDb() {
     // return new Promise((resolve, reject) => {
@@ -84,3 +70,24 @@ async function openDb() {
     //     };
     // });
 }
+
+// ==========
+
+self.addEventListener("install", event => {
+    const installEvent = event as ExtendableEvent;
+    // fetch fileURLs from google font
+    installEvent.waitUntil(new Promise((res, rej): void => {
+        res(0);
+    }))
+});
+
+self.addEventListener("activate", event => {
+})
+
+self.addEventListener("message", e => {
+    // if the event wants us to start downloading the font
+    if(e.data === "downloadFonts") {
+        // we download em bitches
+        downloadFonts();
+    }
+});
