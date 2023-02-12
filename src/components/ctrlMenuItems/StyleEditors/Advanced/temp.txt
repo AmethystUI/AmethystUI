@@ -1,0 +1,59 @@
+    let focusedTypefaceIndex;
+    let previewLoad = 2000;
+
+        // forceLoad = !!forceLoad; // initialize boolean
+        // let scrollHeight = fontListContainer.scrollTop; // if no scroll height is specified, default to scroll top on the font container
+        // let newFocusdTypefaceIndex = Math.round((scrollHeight + 95) / 35);
+
+        // // we'll only load previews when the difference in scroll is larger than 5 
+        // if(!forceLoad && (newFocusdTypefaceIndex === focusedTypefaceIndex || newFocusdTypefaceIndex < 0 || newFocusdTypefaceIndex > $mainFontPickerData.currentFontContent.length-1)) return;
+        
+        // // if we do want to load, we update the focus index
+        // focusedTypefaceIndex = newFocusdTypefaceIndex;
+        // // console.log($mainFontPickerData.currentFontContent[4]);
+
+        // // load permitted amount of fonts
+        // let newFontCSS:string = "";
+        // for(
+        //         let i = Math.max(focusedTypefaceIndex - previewLoad, 0);
+        //         i < Math.min(focusedTypefaceIndex + previewLoad, $mainFontPickerData.currentFontContent.length-1);
+        //         i++)
+        //     {
+        //     const currentFont:fontObject = $mainFontPickerData.currentFontContent[i];
+
+        //     // if our current font is a web safe font or has already been loaded, we can skip it
+        //     if(currentFont.webSafe) continue;
+
+        //     if(document.querySelector("#custom-font-faces").innerHTML.indexOf(`custom-font${i}`) !== -1){
+        //         // if the font is already loaded on the document, we can skip loading it and assign it directly.
+        //         typefaceNameContainers[i].querySelector("p").style.fontFamily = `'custom-font${i}', Inter, system-ui, sans-serif`;
+        //         continue;
+        //     }
+
+        //     // Find preview variation. Some fonts don't have a 400 style, so we have to find the cloesest match
+        //     let previewVariation = 400;
+        //     if(!currentFont.files[`${previewVariation}`]) {
+        //         // if 400 style doesn't exist, find closest match
+        //         let i = 0;
+        //         for(i; !( currentFont.files[`${previewVariation+i}`] || currentFont.files[`${previewVariation-i}`] ); i+=100);
+
+        //         // after the correct i is found, we assign the new style
+        //         if(!!currentFont.files[`${previewVariation+i}`]){ // if the closest match is bigger, we'll use the thicker font
+        //             previewVariation += i;
+        //         } else { // Otherwise use the thinner one
+        //             previewVariation -= i;
+        //         }
+        //     }
+            
+        //     // Add the HTML required for custom font previewing
+        //     newFontCSS += `
+        //         @font-face {
+        //             font-family: 'custom-font${i}';
+        //             src: url(${currentFont.files[`${previewVariation}`]})
+        //         }
+        //     `;
+        //     // typefaceNameContainers[i].classList.add("preview-loaded");
+        // }
+
+        // // add font css
+        // document.querySelector("#custom-font-faces").innerHTML += newFontCSS;

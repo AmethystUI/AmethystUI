@@ -1,3 +1,4 @@
+import glob from 'glob';
 import svelte from 'rollup-plugin-svelte';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
@@ -30,7 +31,9 @@ function serve() {
 	};
 }
 
-export default {
+const workerFiles = glob.sync('src/workers/**/*.worker.ts'); // worker files
+
+const appConfig = { // Main Svelte App
 	input: 'src/main.ts',
 	output: {
 		sourcemap: true,
@@ -80,4 +83,44 @@ export default {
 	watch: {
 		clearScreen: false
 	}
-};
+}
+
+const workerConfigs = workerFiles.map((workerFile) => ({ // Worker scripts
+	input: workerFile,
+	output: {
+		sourcemap: true,
+		format: 'iife',
+		name: workerFile.replace(/src\/workers\//, '').replace(/\.ts$/, ''),
+		file: workerFile.replace(/src\/workers\//, 'public/workers/').replace(/\.ts$/, '.js')
+	},
+	plugins: [
+		resolve({
+			browser: true,
+			dedupe: ['svelte']
+		}),
+		commonjs(),
+		typescript({
+			sourceMap: !production,
+			inlineSources: !production
+		}),
+
+		// In dev mode, call `npm run start` once
+		// the bundle has been generated
+		!production && serve(),
+
+		// Watch the `public` directory and refresh the
+		// browser on changes when not in production
+		!production && livereload('public'),
+
+		// If we're building for production (npm run build
+		// instead of npm run dev), minify
+		production && terser()
+	],
+	watch: {
+		clearScreen: false
+	}
+}))
+
+const globalConfig = [...workerConfigs, appConfig]
+
+export default globalConfig;

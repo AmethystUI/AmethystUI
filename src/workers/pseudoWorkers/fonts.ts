@@ -1,4 +1,5 @@
 import type { typeCategories } from "../../../src/stores/collection";
+import { fontLimit, fontSorting } from "../configs/fontLoading.config";
 
 /**
  * Represents a single, reduced typeface object returned by the Google Fonts API.
@@ -15,6 +16,7 @@ export interface fontObject {
     family: string,
     version?: string,
     lastModified?: string,
+    fileURLs?: variationURL[], // the URLs asssociated with each fileURL. We'lll use these URLs to access the TTF binaries and convert them to base64
     variations: number[],
     category: typeCategories,
     webSafe: boolean
@@ -98,7 +100,7 @@ export async function loadFonts (web = true): Promise<{fontsLoaded: number}> {
 
         // if we still want to get web fonts
         try{ // attempt to fetch all raw font data from the Google Fonts API
-            response = await fetch("https://www.googleapis.com/webfonts/v1/webfonts?sort=popularity&key=AIzaSyDW3JQmec-yJykfP-FcRYpIujOc6jYa4RQ");
+            response = await fetch(`https://www.googleapis.com/webfonts/v1/webfonts?sort=${fontSorting}&key=AIzaSyDW3JQmec-yJykfP-FcRYpIujOc6jYa4RQ`);
             // NOTE: Change the API key into prod when this is done.
     
             if(!response.ok) { // if there was a problem with the resp, we'll store what we have right now and reject the promise
@@ -114,19 +116,24 @@ export async function loadFonts (web = true): Promise<{fontsLoaded: number}> {
         }
 
         // If there is no error, process the response
-        let rawTypefaceData = (await response.json())["items"]; // convert response to json
+        let rawTypefaceData = (await response.json()).items; // convert response to json
 
-        // DEV: Unfortunately, we have to cut down to the 200 most popular font families as it'll be near impossible to load all 1500 efficienly. If we can figure out a better way to load fonts (such as caching), we can change this function to make it work.
-        rawTypefaceData = rawTypefaceData.slice(0, 200); // cut down to 200 most popular fonts
+        // We have to cut down to the font limit as dictated by our configuartion, as it's almost impossible to load all 1500 fonts efficiently unless we have some really good reason or algorithm to.
+        rawTypefaceData = rawTypefaceData.slice(0, fontLimit); // cut down to the font limit
 
         // interate through every font and process the variant so that it removes all the italic ones, and at the same time add a new attribute called `canItalisize`
         for(let i = 0; i < rawTypefaceData.length; i++) {          
+            // process files to get variation
+            const fileURLs = cleanFiles(rawTypefaceData[i].files);
+            const variants:number[] = fileURLs.map(file => { return file.variation })
+
             // add to final data
             typefaceData.push({
                 family: rawTypefaceData[i].family,
                 version: rawTypefaceData[i].version,
                 lastModified: rawTypefaceData[i].lastModified,
-                variations: getVariations(rawTypefaceData[i].files),
+                fileURLs: fileURLs,
+                variations: variants,
                 category: rawTypefaceData[i].category,
                 webSafe: false
             });
@@ -179,7 +186,7 @@ const storeFontDataToSessionStorage = (fontsData: fontObject[], storageKey: stri
     sessionStorage.setItem(storageKey, JSON.stringify(fontsData));
 }
 
-type fontAttributes = Record<string | number, number | string>;
+type fontAttributes = Record<string | string, number | string>;
 
 /**
  * An array that contains two objects that map font weights to their corresponding names, and vice versa.
@@ -259,23 +266,29 @@ export function getFontNameValue(key: string | number, mode: "name" | "value" | 
 }
 
 /**
+ * Map every variation in a font to a URL
+ */
+export interface variationURL{
+    variation: number,
+    url: string
+}
+/**
  * Removes italic font files from the provided font attributes object and returns the cleaned font attributes object.
  * @param files - The font attributes object to be cleaned.
  * @returns The cleaned font attributes object.
  */
-function getVariations(files: fontAttributes): number[] {
-    let result:number[] = [];
+export function cleanFiles(files: fontAttributes): variationURL[] {
+    let result:variationURL[] = [];
     const fileKeys:string[] = Object.keys(files);
 
-    function insertNewKey(newKey: number): void { // use binary insersion to make sure new file keys are always sorted
+    function addVariation(newKey: variationURL): void { // use binary insersion to make sure new file keys are always sorted
         // the numerical key is like 300 or 400, while the value key is like light or regular. We're comparing numerical keys to make sure they are always sorted, while we only store the value key.
 
-        let left = 0, right = fileKeys.length - 1;
+        let left = 0, right = result.length - 1;
         
-        while (left <= right) {
+        while (left <= right && result.length !== 0) {
             const middle = Math.floor((left + right) / 2);
-
-            if (result[middle] < newKey) left = middle + 1;
+            if (result[middle].variation < newKey.variation) left = middle + 1;
             else right = middle - 1;
         }
         
@@ -290,8 +303,11 @@ function getVariations(files: fontAttributes): number[] {
             continue;
         }
 
-        // add to result
-        insertNewKey(getFontNameValue(key.toLowerCase(), "value") as number);
+        // add variation and its associated URL
+        addVariation({
+            variation: getFontNameValue(key.toLowerCase(), "value") as number,
+            url: files[key] as string
+        });
     }
 
     return result;

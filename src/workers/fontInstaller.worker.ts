@@ -2,15 +2,9 @@
 /// <reference lib="ES2015" />
 /// <reference lib="webworker" />
 
-export {};
-
-const dbName = 'fonts';
-const objectStoreName = 'fontFiles';
-
-interface fontURLs {
-    family: string; // typeface name
-    URLs: Record<number, string>; // URL associated with each variation
-}
+import { IDBPDatabase, openDB } from "idb";
+import { batchSize, fontLimit, fontSorting } from "./configs/fontLoading.config";
+import { cleanFiles, variationURL } from "./pseudoWorkers/fonts";
 
 /**
  * The structure of font data as received from Google Font
@@ -32,43 +26,163 @@ type rawFontObjs = {
     files: { [key: string]: string };
 }
 
+interface fontURLs {
+    family: string, // the record name
+    URLObject: { [key: string]: string } // the thing that'll be stored in indexedDB
+}
+
 // ============
+
+export const fontDBName = "FontDB";
+export const TTFObjectStore = "TTF";
+
+/**
+ * The structure of the content that is stored in IndexedDB. This is used to verfiy the DB integrity as well as making data accessing easier.
+ * 
+ */
+export interface fontBinary{
+    binary: ArrayBuffer, // the raw binary data
+    fileType: string, // file type, e.g. "ttf", "otf", "woff", "woff2"
+    lastModified: number // We can just use Date.now() as the last modified time
+}
 
 /**
  * Use the Google Fonts API to fetch avaible font data URLs as well as its correspoding files, and store the TTF font files in an indexedDB.
  */
 const downloadFonts = async () => {
-    console.debug('Downloading fonts...');
+    // setup indexDB
+    const db = await openDB(fontDBName, 1, {
+        upgrade(db) {
+            db.createObjectStore(TTFObjectStore); // setup db object store. We don't need a keypath as we'll specify it when putting data in
+        },
+    });
 
-    // get URL's from Google Fonts
-    let parsedData: fontURLs[];
-    const resp = await fetch("https://www.googleapis.com/webfonts/v1/webfonts?sort=popularity&key=AIzaSyDW3JQmec-yJykfP-FcRYpIujOc6jYa4RQ");
+    // ================== QUERYING ==================
+
+    // TODO: Change this to production key later
+    const resp = await fetch(`https://www.googleapis.com/webfonts/v1/webfonts?sort=${fontSorting}&key=AIzaSyDW3JQmec-yJykfP-FcRYpIujOc6jYa4RQ`);
 
     if(!resp.ok) throw new Error(`Unable to fetch font URL's: ${resp.status}`); // if response is broken, throw a new error
     
-    // Parse the response into JSON
-    const rawData: rawFontObjs[] = await resp.json();
+    // Get a list of URLs that we should be downloading from. We will download the regular font weights (or whatever is closest to it) 
+    let URLQuery: string[] = []; // it's just a list of URLs that we should be downloading from
+    
+    // We have to cut down to the font limit as dictated by our configuartion, as it's almost impossible to load all 1500 fonts efficiently unless we have some really good reason or algorithm to.
+    const rawData: rawFontObjs[] = (await resp.json()).items.slice(0, fontLimit); // process data & cut down to the font limit
+    
+    // Start creating the download query by looping through every typeface and getting the URL of the regular font
+    for(let i = 0; i < rawData.length; i++) {
+        const font = rawData[i];
 
-    console.log(rawData);
+        const files:variationURL[] = cleanFiles(font.files); // get the raw font files and clean them up
+        const variations:number[] = files.map(e => e.variation);
+        const URLs:string[] = files.map(e => e.url);
+
+        // Find the URL of the regular font, or the closest match of it
+        // We can assume that every typeface is guarenteed to have at least 1 variation, so this while loop will not loop forever
+        let dv = 0; // difference in variation
+        if(!variations.includes(400)){
+            for(dv; !( variations.includes(400-dv) || variations.includes(400+dv) ); dv += 100); // find closest match to 400
+        }
+
+        // after left or right has been found, get the new variation and file
+        let closestVariationToRegular = 400 + (variations.includes(400-dv) ? -1 : 1) * dv;
+
+        // add our URL to the query list
+        URLQuery.push( URLs[ variations.indexOf(closestVariationToRegular) ] );
+    }
+
+    // ================== DOWNLOAD ==================
+
+    // Check if we have any fonts in the database already. If we do, skip download
+    const DBKeyCount = await (await db.getAllKeys(TTFObjectStore)).length;
+    if(DBKeyCount >= fontLimit){ // if the fonts are downloaded right, there should be the same amount of keys in DB as there are font limit.
+        console.debug(`Skipping download as we have ${DBKeyCount}/${fontLimit} fonts downloaded already.`);
+        return;
+    }
+
+    // get the file extension of each file 
+
+    // keyCount might not be 0, so we need to calculate which batch to resume from
+    let startingBatch = Math.floor(DBKeyCount / batchSize); // if there's 5 files, and we loaded 4 files while batch size is 3, then we've loaded 1 batch fully since floor(5/3) = 1
+
+    console.debug("Detected " + DBKeyCount + " fonts already downloaded. Resuming download at batch " + startingBatch);
+
+    // Time the download to see how performant it is.
+    const start = Date.now();
+
+    // Start looping throught the query (as batches) and downloading each batch
+    for(let i = 0; i < URLQuery.length; i += batchSize) {
+        const currectBatch: number = i / batchSize; // guarenteed to be an integer because of math
+        
+        if(currectBatch < startingBatch) continue; // if the current batch is less than the starting batch, skip it. (it's already downloaded)
+
+        const batch: string[] = URLQuery.slice(i, i + batchSize); // get the current batch of URLs
+
+        // fetch batch
+        await downloadFontsFromURLs(db, batch);
+    }
+
+    console.debug(`Download finished! Fetched ${URLQuery.length} fonts in ${Date.now() - start}ms.`);
+    // close db
+    db.close();
 }
 
-async function openDb() {
-    // return new Promise((resolve, reject) => {
-    //     const request = indexedDB.open(dbName, 1);
+/**
+ * Downloads font files from the given URLs and stores them in an IndexedDB database.
+ *
+ * @param {IDBPDatabase} db - The IndexedDB database where the font files will be stored.
+ * @param {string[]} urls - An array of URLs that point to the font files to be downloaded.
+ * @param {boolean} [closeDBAfterFinished=false] - A flag indicating whether the database should be closed after the download operation is finished.
+ */
+export const downloadFontsFromURLs = async (db:IDBPDatabase, urls: string[], closeDBAfterFinished = false) => {
+    // check if the URL is already downloaded in the DB
+    let filteredURL:string[] = [];
+    const allDBKeys: IDBValidKey[] = await db.getAllKeys(TTFObjectStore);
+    for(let i = 0; i < urls.length; i++) {
+        const url:string = urls[i];
+        if(!allDBKeys.includes(url[i])) filteredURL.push(url); // if URL doesn't exist, add it to the filtered query
+    }
+    
+    // compose the url batch into a request
+    const promises:Promise<ArrayBuffer>[] = filteredURL.map(
+        url => fetch(url).then(res => {
+            if(!res.ok){
+                console.warn(`Font download ${url} failed with response code ${res.status}`);
+                return null;
+            }
+            return res.arrayBuffer();
+        })
+    );
+    // submit requests and wait for all to finish
+    let results: ArrayBuffer[] = [];
 
-    //     request.onupgradeneeded = event => {
-    //     const db = event.target.result;
-    //     db.createObjectStore(objectStoreName, { keyPath: 'name' });
-    //     };
+    results = await Promise.all(promises); // raw TTF / OTF binaries
 
-    //     request.onsuccess = event => {
-    //     resolve(event.target.result);
-    //     };
+    const urlFileFormats: string[] = filteredURL.map(url => url.split(".").pop()); // get the file formats of the URLs
 
-    //     request.onerror = event => {
-    //     reject(event.target.error);
-    //     };
-    // });
+    // store the raw binaries and its corresponding file format in indexDB, using the url string as the key
+    const tx = db.transaction(TTFObjectStore, "readwrite");
+    const store = tx.objectStore(TTFObjectStore);
+    
+    for(let i = 0; i < results.length; i++) {
+        if(results[i] === null) continue; // don't store null urls
+        
+        const url: string = filteredURL[i];
+
+        const font: fontBinary = {
+            binary: results[i],
+            fileType: urlFileFormats[i],
+            lastModified: Date.now()
+        };
+        await store.put(font, url);
+    }
+
+    // commit transaction
+    await tx.done;
+
+    // close DB if requested
+    if(closeDBAfterFinished) db.close();
 }
 
 // ==========
@@ -84,10 +198,27 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
 })
 
-self.addEventListener("message", e => {
+self.addEventListener("message", (e: MessageEvent<{command: string, payload: any}>) => {
     // if the event wants us to start downloading the font
-    if(e.data === "downloadFonts") {
+
+    if(e.data.command === "downloadRequiredFonts") {
         // we download em bitches
         downloadFonts();
+    } else if (e.data.command === "downloadURLFont") {
+        // downloading specific URLs and storing them into indexDB
+        const url = e.data.payload;
+        if(!url) throw new Error("No url passed to downloadURLFont");
+        
+        openDB(fontDBName, 1, {
+            upgrade(db) {
+                db.createObjectStore(TTFObjectStore); // setup db object store. We don't need a keypath as we'll specify it when putting data in
+            },
+        }).then(db => {
+            downloadFontsFromURLs(db, url, true);
+        })
     }
 });
+
+self.onerror = (error) => {
+    console.error(error);
+};

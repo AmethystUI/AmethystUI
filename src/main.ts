@@ -17,7 +17,10 @@ window.onload = () => {
 	registerFontInstaller().then((installer: ServiceWorker) => {
 		// download fonts
 		console.debug("Font installer loaded and activated successfully.");
-		installer.postMessage("downloadFonts");
+		installer.postMessage({ command: "downloadRequiredFonts" });
+		
+		installer.postMessage({ command: "downloadURLFont", payload: ["123", "456"] });
+		
 	}).catch(err => {
 		// cannot download web fonts
 		console.error(err);
@@ -44,21 +47,22 @@ const registerFontInstaller = (): Promise<ServiceWorker> => {
 							let timedOut = false;
 							const timeoutId = setTimeout(() => {
 								timedOut = true;
-								return reject(new Error(("Font installer activation timeout")));
+								return reject(new Error("Font installer activation timeout"));
 							}, 5000); // set a timeout of 5 seconds
-						
-							registration.addEventListener("updatefound", () => { // track installation progress
-								const worker = registration.installing; // get worker
-								
-								worker.addEventListener("statechange", () => {
-									setTimeout(() => {
-										if (worker.state === "activated" && !timedOut) { // once it's activated, resolve the promise
-											clearTimeout(timeoutId);
-											return resolve(worker);
-										}
-									}, 6000);
-								});
-							});
+
+							const attemptToResolveWorker = (): void => {
+								if (!!registration.active && registration.active.state === "activated") { // return the service worker
+									clearTimeout(timeoutId);
+									clearInterval(intervalID);
+									return resolve(registration.installing ?? registration.active);
+								}
+							}
+
+							// check every 500ms to see if the worker is active. If it is, resolve the promise with the worker.
+							let intervalID = setInterval(attemptToResolveWorker, 500)
+
+							// do an initial check to see if the worker is active anyways
+							attemptToResolveWorker();
 						});
 
 						workerPromise.then(worker => {
