@@ -4,7 +4,7 @@
 
 import { IDBPDatabase, openDB } from "idb";
 import { batchSize, fontLimit, fontSorting } from "./configs/fontLoading.config";
-import { cleanFiles, variationURL } from "./pseudoWorkers/fonts";
+import { cleanFiles, getClosestVariation, variationURL } from "./pseudoWorkers/fonts";
 
 /**
  * The structure of font data as received from Google Font
@@ -49,7 +49,9 @@ export interface fontBinary{
 /**
  * Use the Google Fonts API to fetch avaible font data URLs as well as its correspoding files, and store the TTF font files in an indexedDB.
  */
-const downloadFonts = async () => {
+const downloadRequiredFonts = async () => {
+    console.debug(`Downloading required fonts...`);
+
     // setup indexDB
     const db = await openDB(fontDBName, 1, {
         upgrade(db) {
@@ -59,10 +61,16 @@ const downloadFonts = async () => {
 
     // ================== QUERYING ==================
 
-    // TODO: Change this to production key later
-    const resp = await fetch(`https://www.googleapis.com/webfonts/v1/webfonts?sort=${fontSorting}&key=AIzaSyDW3JQmec-yJykfP-FcRYpIujOc6jYa4RQ`);
+    let resp: Response; // the response that our request has
+    try{
+        // TODO: Change this to production key later
+        resp = await fetch(`https://www.googleapis.com/webfonts/v1/webfonts?sort=${fontSorting}&key=AIzaSyDW3JQmec-yJykfP-FcRYpIujOc6jYa4RQ`);
+        
+        if(!resp.ok) throw new Error(`Unable to fetch font URL's: ${resp.status}`); // if response is broken, throw a new error
+    } catch (err) {
+        throw new Error("Failed to reach Google Fonts API. Are you connected to the internet?")
+    }
 
-    if(!resp.ok) throw new Error(`Unable to fetch font URL's: ${resp.status}`); // if response is broken, throw a new error
     
     // Get a list of URLs that we should be downloading from. We will download the regular font weights (or whatever is closest to it) 
     let URLQuery: string[] = []; // it's just a list of URLs that we should be downloading from
@@ -78,18 +86,8 @@ const downloadFonts = async () => {
         const variations:number[] = files.map(e => e.variation);
         const URLs:string[] = files.map(e => e.url);
 
-        // Find the URL of the regular font, or the closest match of it
-        // We can assume that every typeface is guarenteed to have at least 1 variation, so this while loop will not loop forever
-        let dv = 0; // difference in variation
-        if(!variations.includes(400)){
-            for(dv; !( variations.includes(400-dv) || variations.includes(400+dv) ); dv += 100); // find closest match to 400
-        }
-
-        // after left or right has been found, get the new variation and file
-        let closestVariationToRegular = 400 + (variations.includes(400-dv) ? -1 : 1) * dv;
-
         // add our URL to the query list
-        URLQuery.push( URLs[ variations.indexOf(closestVariationToRegular) ] );
+        URLQuery.push( URLs[ variations.indexOf(getClosestVariation(400, variations)) ] );
     }
 
     // ================== DOWNLOAD ==================
@@ -120,7 +118,7 @@ const downloadFonts = async () => {
         const batch: string[] = URLQuery.slice(i, i + batchSize); // get the current batch of URLs
 
         // fetch batch
-        await downloadFontsFromURLs(db, batch);
+        await downloadFontFromURLs(db, batch);
     }
 
     console.debug(`Download finished! Fetched ${URLQuery.length} fonts in ${Date.now() - start}ms.`);
@@ -130,12 +128,14 @@ const downloadFonts = async () => {
 
 /**
  * Downloads font files from the given URLs and stores them in an IndexedDB database.
+ * 
+ * @
  *
  * @param {IDBPDatabase} db - The IndexedDB database where the font files will be stored.
  * @param {string[]} urls - An array of URLs that point to the font files to be downloaded.
  * @param {boolean} [closeDBAfterFinished=false] - A flag indicating whether the database should be closed after the download operation is finished.
  */
-export const downloadFontsFromURLs = async (db:IDBPDatabase, urls: string[], closeDBAfterFinished = false) => {
+export const downloadFontFromURLs = async (db:IDBPDatabase, urls: string[], closeDBAfterFinished = false) => {    
     // check if the URL is already downloaded in the DB
     let filteredURL:string[] = [];
     const allDBKeys: IDBValidKey[] = await db.getAllKeys(TTFObjectStore);
@@ -203,7 +203,7 @@ self.addEventListener("message", (e: MessageEvent<{command: string, payload: any
 
     if(e.data.command === "downloadRequiredFonts") {
         // we download em bitches
-        downloadFonts();
+        downloadRequiredFonts();
     } else if (e.data.command === "downloadURLFont") {
         // downloading specific URLs and storing them into indexDB
         const url = e.data.payload;
@@ -214,7 +214,7 @@ self.addEventListener("message", (e: MessageEvent<{command: string, payload: any
                 db.createObjectStore(TTFObjectStore); // setup db object store. We don't need a keypath as we'll specify it when putting data in
             },
         }).then(db => {
-            downloadFontsFromURLs(db, url, true);
+            downloadFontFromURLs(db, url, true);
         })
     }
 });

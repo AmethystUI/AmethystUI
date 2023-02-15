@@ -2,15 +2,17 @@ import { writable, get } from "svelte/store";
 import type { fontObject } from "../workers/pseudoWorkers/fonts";
 
 /**
- * Represents data for the color picker.
- * @property {string} fontRefName - The name of the font reference.
- * @property {string} fontName - The name of the font.
+ * Represents data for the font picker.
+ *
+ * @property {string} refName - The name of the font reference.
+ * @property {string} windowName - The name of the window.
+ * @property {string} searchQuery - The current search query used by the picker.
+ * @property {boolean} fontLoadFailed - Indicates if loading fonts has failed.
  */
 export interface pickerData {
     refName : string,
     windowName : string,
     searchQuery : string // Don't forget to clear this regularly
-    currentFontContent : fontObject[], // cached in ram
     fontLoadFailed : boolean,
 }
 
@@ -21,7 +23,6 @@ export let mainFontPickerData = writable<pickerData>({
     refName : undefined,
     windowName : "Typography",
     searchQuery : "",
-    currentFontContent : [],
     fontLoadFailed : false,
 });
 

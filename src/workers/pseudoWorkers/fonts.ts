@@ -11,63 +11,99 @@ import { fontLimit, fontSorting } from "../configs/fontLoading.config";
  * @property {string} lastModified - The date when the font was last modified.
  * @property {string[]} files - An array of file paths to the font files. The keys also shows what weights this font supports.
  * @property {string} category - The category of the font.
+ * @property {string} transcribed - Whether or not the font has been transcribed into base64.
  */
 export interface fontObject {
     family: string,
+    appearedName?: string,
     version?: string,
     lastModified?: string,
     fileURLs?: variationURL[], // the URLs asssociated with each fileURL. We'lll use these URLs to access the TTF binaries and convert them to base64
     variations: number[],
     category: typeCategories,
-    webSafe: boolean
+    webSafe: boolean,
+    transcribed: boolean,
 }
 
 /**
  * A list of web safe fonts that can be used. Not that web safe fonts only support normal and bold variations
  */
-const webSafeFonts: fontObject[] = [ // these websafe fonts don't need files
+const webSafeFonts: fontObject[] = [
     { family: "Arial",
         category: "sans-serif",
         variations: [400, 700],
         webSafe: true,
+        transcribed: true,
     }, { family: "Verdana",
         category: "sans-serif",
         variations: [400, 700],
         webSafe: true,
+        transcribed: true,
     }, { family: "Tahoma",
         category: "sans-serif",
         variations: [400, 700],
         webSafe: true,
+        transcribed: true,
     }, { family: "Trebuchet MS",
         category: "sans-serif",
         variations: [400, 700],
         webSafe: true,
+        transcribed: true,
     }, { family: "Times New Roman",
         category: "serif",
         variations: [400, 700],
         webSafe: true,
+        transcribed: true,
     }, { family: "Georgia",
         category: "serif",
         variations: [400, 700],
         webSafe: true,
+        transcribed: true,
     }, { family: "Garamond",
         category: "serif",
         variations: [400, 700],
         webSafe: true,
+        transcribed: true,
     }, { family: "Courier New",
         category: "monospace",
         variations: [400, 700],
         webSafe: true,
+        transcribed: true,
     }, { family: "Brush Script MT",
         category: "handwriting",
         variations: [400, 700],
         webSafe: true,
-    }, { family: "System UI", // this one is special and we have to do some post processing
+        transcribed: true,
+    }, { family: "system-ui",
+        appearedName: "System UI",
         category: "sans-serif",
         variations: [400, 700],
         webSafe: true,
+        transcribed: true,
+    },
+];
+
+/**
+ * A conversion chart that converts the font extension to the font format used by CSS.
+ */
+export const fontExtensionToFormats = (format: string): string => {
+    switch (format) {
+        case "woff":
+            return "woff";
+        case "woff2":
+            return "woff2";
+        case "ttf":
+            return "truetype";
+        case "otf":
+            return "opentype";
+        case "eot":
+            return "embedded-opentype";
+        case "svg":
+            return "svg";
+        default:
+            return "";
     }
-]
+};
 
 /**
  * @summary
@@ -79,10 +115,13 @@ const webSafeFonts: fontObject[] = [ // these websafe fonts don't need files
  * @remarks
  * Fun fact: This is the first file in the entire codebase to get a proper documentation... I know, I'm not proud of myself either.
  */
-export async function loadFonts (web = true): Promise<{fontsLoaded: number}> {
+export const loadFonts = async (web = true): Promise<{fontsLoaded: number}> => {
     let typefaceData: fontObject[] = []; let response: Response;
 
     return new Promise(async (res, rej) => {
+        // only store font if there is nothing in local storage
+        if(!!localStorage.getItem("fonts")) return;
+
         // add web safe fonts
         for(let i = 0; i < webSafeFonts.length; i++) {
             typefaceData.push(webSafeFonts[i]);
@@ -90,7 +129,7 @@ export async function loadFonts (web = true): Promise<{fontsLoaded: number}> {
 
         // if we're not adding web fonts, we can just store everything in session right now
         if(!web){
-            storeFontDataToSessionStorage(typefaceData, "fonts");
+            storeFontDataToLocalStorage(typefaceData, "fonts");
 
             const endTime = performance.now();
             res({
@@ -104,13 +143,13 @@ export async function loadFonts (web = true): Promise<{fontsLoaded: number}> {
             // NOTE: Change the API key into prod when this is done.
     
             if(!response.ok) { // if there was a problem with the resp, we'll store what we have right now and reject the promise
-                storeFontDataToSessionStorage(typefaceData, "fonts");
+                storeFontDataToLocalStorage(typefaceData, "fonts");
                 
                 return rej(response.status);
             }
         } catch (err) {
             // If there's an error, store what we have right now
-            storeFontDataToSessionStorage(typefaceData, "fonts");
+            storeFontDataToLocalStorage(typefaceData, "fonts");
 
             return rej(err);
         }
@@ -135,17 +174,15 @@ export async function loadFonts (web = true): Promise<{fontsLoaded: number}> {
                 fileURLs: fileURLs,
                 variations: variants,
                 category: rawTypefaceData[i].category,
-                webSafe: false
+                webSafe: false,
+                transcribed: false
             });
         }
         // drop large data from memory
         rawTypefaceData = null;
 
         // store the processed font data into session storage
-        storeFontDataToSessionStorage(typefaceData, "fonts");
-
-        // time the process time just for debugging purposes
-        const endTime = performance.now();
+        storeFontDataToLocalStorage(typefaceData, "fonts");
 
         // resolve promise
         res({
@@ -162,11 +199,11 @@ export const searchFontIndex = async (fonts: fontObject[], match: string) => {
         const middle = Math.floor((left + right) / 2);
         const font = fonts[middle];
         
-        if (font.family === match) {
+        if (font.family.toLowerCase() === match.toLowerCase()) {
             return middle;
         }
         
-        if (font.family < match) {
+        if (font.family.toLowerCase() < match.toLowerCase()) {
             left = middle + 1;
         } else {
             right = middle - 1;
@@ -176,14 +213,28 @@ export const searchFontIndex = async (fonts: fontObject[], match: string) => {
     return -1;
 }
 
-const storeFontDataToSessionStorage = (fontsData: fontObject[], storageKey: string) => {
+export const getClosestVariation = (targetVariation: number, variations: number[]): number => {
+    // Find the URL of the regular font, or the closest match of it
+    // We can assume that every typeface is guarenteed to have at least 1 variation, so this while loop will not loop forever
+    let dv = 0; // difference in variation
+    if(!variations.includes(targetVariation)){
+        for(dv; !( variations.includes(targetVariation - dv) || variations.includes(targetVariation + dv) ); dv += 100); // find closest match to 400
+    }
+
+    // after left or right has been found, get the new variation and file
+    return targetVariation + (variations.includes(targetVariation - dv) ? -1 : 1) * dv;
+}
+
+const storeFontDataToLocalStorage = (fontsData: fontObject[], storageKey: string) => {
+    if(localStorage.getItem(storageKey) != undefined) return; // already stored. No need to store again.
+
     fontsData.sort((a: fontObject, b: fontObject) => {
-        if (a.family < b.family) return -1;
-        if (a.family > b.family) return 1;
+        if (a.family.toLowerCase() < b.family.toLowerCase()) return -1;
+        if (a.family.toLowerCase() > b.family.toLowerCase()) return 1;
         return 0;
     });
     // set to session storage
-    sessionStorage.setItem(storageKey, JSON.stringify(fontsData));
+    localStorage.setItem(storageKey, JSON.stringify(fontsData));
 }
 
 type fontAttributes = Record<string | string, number | string>;

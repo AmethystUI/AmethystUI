@@ -62,7 +62,7 @@
     let clr:color = {type:"hsl", r:10, g:10, b:10, h:0, s:0, l:4, a:100, hex:"0a0a0a"} // default text color
 
     let fontRef: typographyStyle = {
-        typeface: "System UI",
+        typeface: "system-ui",
         variation: 400,
         textDecorations: [],
         casing: "mix",

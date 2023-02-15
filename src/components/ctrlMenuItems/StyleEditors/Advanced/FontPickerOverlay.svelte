@@ -4,7 +4,8 @@
 <script lang="ts" context="module">
     import { openOverlayFrame } from "./Overlay.svelte";
     import { mainFontPickerData } from "../../../../stores/fontPickerStat";
-    import { beautifiedFontName, fontObject, getFontNameValue, searchFontIndex } from "../../../../workers/pseudoWorkers/fonts";
+    import { storedFontData } from "../../../../stores/fontStorageStat";
+    import { beautifiedFontName, fontExtensionToFormats, fontObject, getClosestVariation, getFontNameValue, searchFontIndex } from "../../../../workers/pseudoWorkers/fonts";
 
     const componentID = crypto.randomUUID();
 
@@ -41,30 +42,34 @@
         openOverlayFrame(trackTarget, updateOverlaySize, componentID, props.trackContinuously, FontPickerOverlay);        
     }
 
-    // attempt to load the fonts from Session storage
+    // attempt to load the fonts from local storage
     const processFonts = (storageKey: string): Promise<void> => {
         // reset fontFailure in main font picker data
         mainFontPickerData.update(pickerDat => { pickerDat.fontLoadFailed = false; return pickerDat });
 
         return new Promise(async (res, rej) => {
-            let rawFontData = sessionStorage.getItem(storageKey);
+            let rawFontData = localStorage.getItem(storageKey);
+
             // Try to fetch the font data up to 6 times with a 500ms interval each time (3s)
             for (let i = 0; i < 6 && !rawFontData; i++) {
                 await new Promise((res) => setTimeout(res, 500));
-                rawFontData = sessionStorage.getItem(storageKey);
+                rawFontData = localStorage.getItem(storageKey);
             }
-            // Reject the promise if the font data is still not fetched after 20 attempts
+            // Reject the promise if the font data is still not fetched after 6 attempts
             if (!rawFontData) {
                 // set fontFailure in main font picker data to true
                 mainFontPickerData.update(pickerDat => { pickerDat.fontLoadFailed = true; return pickerDat });
 
-                return rej(new Error("Cannot fetch font data from cache."));
+                return rej(new Error("Cannot fetch font data from local storage cache."));
             }
             // Try to parse the fetched font data as JSON and resolve the promise on success
             try {
                 // update currentFontContent in main font picker data
                 mainFontPickerData.update(pickerDat => {
-                    pickerDat.currentFontContent = JSON.parse(rawFontData);
+                    storedFontData.update(data => {
+                        data.currentFontContent = JSON.parse(rawFontData);
+                        return data;
+                    }); // update currentFontContent in main font picker data
                     return pickerDat;
                 });
 
@@ -206,6 +211,9 @@
 
     import LoadingSpinner from "../../../ui/LoadingSpinner.svelte";
     import { onMount } from "svelte";
+    import { downloadFontFromURLs, fontBinary, fontDBName, TTFObjectStore } from "../../../../workers/fontInstaller.worker";
+    import { IDBPDatabase, openDB as openDBWithIDB } from "idb";
+    import { base64ArrayBuffer } from "../../../../helpers/base64ArrayBuffer";
 
     $: name = $mainFontPickerData.windowName ?? "Fonts";
     $: fontsItalisized = !!fontRef ? fontRef.textDecorations.includes("italicize") : false;
@@ -235,85 +243,106 @@
 
     // ====================== ON MOUNT ======================
 
-    let currentFontIndex = 0;
-    let typefaceNameContainers: HTMLDivElement[];
+    let selectedFontIndex = 0;
+    let focusedTypefaceIndex;
 
     onMount(async () => {
         // search for font first
-        currentFontIndex = await searchFontIndex($mainFontPickerData.currentFontContent, fontRef.typeface);
+        focusedTypefaceIndex = selectedFontIndex = await searchFontIndex($storedFontData.currentFontContent, fontRef.typeface);
 
         // set the scroll position to the selection in the font pickers
-        if(!!fontListContainer) fontListContainer.scrollTop = currentFontIndex * 35 - 95;
-
-        // start loading in the font previews
-        typefaceNameContainers = Array.from( fontListContainer.getElementsByTagName("div") );
+        if(!!fontListContainer) fontListContainer.scrollTop = selectedFontIndex * 35 - 95;
 
         // Increase preview loading load after the first render is complete
-        // setTimeout(() => {
-        //     previewLoad = 10;
-        //     loadTypefacePreview(true);
-        // }, 200)
+        loadTypefacePreview(true);
     })
 
-    let focusedTypefaceIndex;
-    let previewLoad = 2000;
-    const loadTypefacePreview = async (forceLoad?:boolean) => {
-        // forceLoad = !!forceLoad; // initialize boolean
-        // let scrollHeight = fontListContainer.scrollTop; // if no scroll height is specified, default to scroll top on the font container
-        // let newFocusdTypefaceIndex = Math.round((scrollHeight + 95) / 35);
+    /**
+     * Lazy transcribing of the font preview list into base64 so that we can actually see the preview
+     * 
+     * @param forceLoad - whether or not to force the transcription
+     */
+    const loadTypefacePreview = async (forceLoad?:boolean, previewLoad = 50) => {
+        forceLoad = !!forceLoad; // initialize boolean
 
-        // // we'll only load previews when the difference in scroll is larger than 5 
-        // if(!forceLoad && (newFocusdTypefaceIndex === focusedTypefaceIndex || newFocusdTypefaceIndex < 0 || newFocusdTypefaceIndex > $mainFontPickerData.currentFontContent.length-1)) return;
+        // open the index DB connection if it's not already open
+        await openDB();
         
-        // // if we do want to load, we update the focus index
-        // focusedTypefaceIndex = newFocusdTypefaceIndex;
-        // // console.log($mainFontPickerData.currentFontContent[4]);
+        let scrollHeight = fontListContainer.scrollTop; // if no scroll height is specified, default to scroll top on the font container
+        let newFocusdTypefaceIndex = Math.round((scrollHeight + 95) / 35); // get the index of the font that is currently looked at (the center one)
+        
+        // we'll only load previews when the difference in scroll is larger than 5 
+        const dIndex = Math.abs(newFocusdTypefaceIndex - focusedTypefaceIndex);
+        if(!forceLoad && (dIndex === previewLoad || newFocusdTypefaceIndex < 0 || newFocusdTypefaceIndex > $storedFontData.currentFontContent.length-1)) return; // only update the preview if it's different from the last one, or if force load is set to true
 
-        // // load permitted amount of fonts
-        // let newFontCSS:string = "";
-        // for(
-        //         let i = Math.max(focusedTypefaceIndex - previewLoad, 0);
-        //         i < Math.min(focusedTypefaceIndex + previewLoad, $mainFontPickerData.currentFontContent.length-1);
-        //         i++)
-        //     {
-        //     const currentFont:fontObject = $mainFontPickerData.currentFontContent[i];
+        // if we should transcribe, we first update the focus index
+        focusedTypefaceIndex = newFocusdTypefaceIndex;
+        
+        let newFontObjectPromises: Promise<void>[] = [];
 
-        //     // if our current font is a web safe font or has already been loaded, we can skip it
-        //     if(currentFont.webSafe) continue;
+        // get the list of fonts we need to trancribe into base64
+        for(let i = focusedTypefaceIndex - previewLoad; i <= focusedTypefaceIndex + previewLoad; i++) {
+            // detect if the font has already been transcribed, or is websafe
+            if(!$storedFontData.currentFontContent[i] || $storedFontData.currentFontContent[i].transcribed || $storedFontData.currentFontContent[i].webSafe){
+                continue;
+            }
 
-        //     if(document.querySelector("#custom-font-faces").innerHTML.indexOf(`custom-font${i}`) !== -1){
-        //         // if the font is already loaded on the document, we can skip loading it and assign it directly.
-        //         typefaceNameContainers[i].querySelector("p").style.fontFamily = `'custom-font${i}', Inter, system-ui, sans-serif`;
-        //         continue;
-        //     }
+            // transcribe the font into base64 and then create & store a promise that adds the processed base64 to a list. This way we can add them all at the same time
+            newFontObjectPromises.push(new Promise<void>(async (res, rej) =>{
+                // get URL key based on variation closest to 400
+                const variation = getClosestVariation(400, $storedFontData.currentFontContent[i].variations);
+                const variationIndex = $storedFontData.currentFontContent[i].variations.indexOf(variation);
+                const URLkey = $storedFontData.currentFontContent[i].fileURLs[variationIndex].url;
+                
+                // if URL key does not exist or the variation do not match, do not proceed with the loading
+                if(!URLkey || $storedFontData.currentFontContent[i].fileURLs[variationIndex].variation !== variation) return;
 
-        //     // Find preview variation. Some fonts don't have a 400 style, so we have to find the cloesest match
-        //     let previewVariation = 400;
-        //     if(!currentFont.files[`${previewVariation}`]) {
-        //         // if 400 style doesn't exist, find closest match
-        //         let i = 0;
-        //         for(i; !( currentFont.files[`${previewVariation+i}`] || currentFont.files[`${previewVariation-i}`] ); i+=100);
+                // attempt to extract binary data from indexDB
+                // const rawFontBinary: ArrayBuffer = (await db.get(TTFObjectStore, URLkey) as fontBinary).binary;
+                let fontBinaryObject = await db.get(TTFObjectStore, URLkey) as fontBinary;
 
-        //         // after the correct i is found, we assign the new style
-        //         if(!!currentFont.files[`${previewVariation+i}`]){ // if the closest match is bigger, we'll use the thicker font
-        //             previewVariation += i;
-        //         } else { // Otherwise use the thinner one
-        //             previewVariation -= i;
-        //         }
-        //     }
-            
-        //     // Add the HTML required for custom font previewing
-        //     newFontCSS += `
-        //         @font-face {
-        //             font-family: 'custom-font${i}';
-        //             src: url(${currentFont.files[`${previewVariation}`]})
-        //         }
-        //     `;
-        //     // typefaceNameContainers[i].classList.add("preview-loaded");
-        // }
+                // if the object is undefined, do not proceed with the loading. The font has not been loaded yet.
+                if(!fontBinaryObject){
+                    // TODO: Do some error handling here
+                    console.warn(`Could not load font ${URLkey} from IndexDB. Loading it now...`);
+                    await downloadFontFromURLs(db, [URLkey], false);
+                    // reload
+                    fontBinaryObject = await db.get(TTFObjectStore, URLkey) as fontBinary;
+                }
 
-        // // add font css
-        // document.querySelector("#custom-font-faces").innerHTML += newFontCSS;
+                const fuck = fontExtensionToFormats(fontBinaryObject.fileType);
+                const shitter = new Blob([fontBinaryObject.binary], { type: `font/${fontBinaryObject.fileType}` });
+                const kys = URL.createObjectURL(shitter);
+
+                // what the fuck is this indent bruh
+                document.querySelector("#custom-font-faces").innerHTML +=
+`
+@font-face {
+    font-family: "${$storedFontData.currentFontContent[i].family}";
+    src: url(${kys}) format("${fuck}");
+}
+`;
+                $storedFontData.currentFontContent[i].transcribed = true; // set transcribed to true so that we don't load it again
+                res();
+            }));
+        }
+
+        await Promise.all(newFontObjectPromises);
+    }
+
+    // openDB and stuff
+    let db:IDBPDatabase;
+
+    let openDB = async () => {
+        // check if the DB is already open by seeing if it holds a value
+        if(!!db) return;
+
+        // open the DB and store it to db;
+        db = await openDBWithIDB(fontDBName, 1, {
+            upgrade(db) {
+                db.createObjectStore(TTFObjectStore); // setup db object store. We don't need a keypath as we'll specify it when putting data in
+            },
+        })
     }
 
     // ====================== UPDATE FUNCTIONS ======================
@@ -344,29 +373,19 @@
 
     const updateTypeface = (newIndex: number) => {
         // update selected font index
-        currentFontIndex = newIndex;
+        selectedFontIndex = newIndex;
         
         // fetch the typeface name from the index
-        const newFontObject: fontObject = $mainFontPickerData.currentFontContent[newIndex];
+        const newFontObject: fontObject = $storedFontData.currentFontContent[newIndex];
         const newTypefaceName:string = newFontObject.family;
         fontRef.typeface = newTypefaceName; // set the new typeface name
         
         // check to see if the new typeface supports the current variation. If not, switch variation to the closest match
-        const newTypefaceVariations:number[] = newFontObject.variations;
-        const currentVariation:number = fontRef.variation; // not every font supports a regular variant, so we have to find the closest match
+        const newTypefaceVariations:number[] = newFontObject.variations; // the variations of the new typeface
+        const currentVariation:number = fontRef.variation; // the variation on the last typeface selection
             
-        // We can assume that every typeface is guarenteed to have at least 1 variation, so this while loop will not loop forever
-        let i = 0;
-        if(!newTypefaceVariations.includes(currentVariation)){
-            for(i; !( newTypefaceVariations.includes(currentVariation-i) || newTypefaceVariations.includes(currentVariation+i) ); i+=100); // find closest match
-        }
-
-        // after left or right has been found, set the new variation
-        if(newTypefaceVariations.includes(currentVariation-i)){ // if the closest match is smaller, we'll use the thinner font
-            fontRef.variation = currentVariation - i;
-        } else { // Otherwise use the thicker one
-            fontRef.variation = currentVariation + i;
-        }
+        // not every font supports a regular variant, so we have to find the closest match
+        fontRef.variation = getClosestVariation(currentVariation, newTypefaceVariations);
 
         // update collection so that svelte can update the associated components
         $collection = $collection;
@@ -408,15 +427,15 @@
         <!-- font selection container -->
         <section id="font-selection-container">
             <!-- Only show fonts if it's not an empty list -->
-            {#if $mainFontPickerData.currentFontContent.length > 0}
+            {#if $storedFontData.currentFontContent.length > 0}
                 <!-- first section for all the main fonts -->
                 <section bind:this={fontListContainer} id="font-list-container" on:scroll={() => loadTypefacePreview()}>
                     <!-- iterate through every font there is -->
-                    {#each $mainFontPickerData.currentFontContent as fontObj, i (i)}
+                    {#each $storedFontData.currentFontContent as fontObj, i (i)}
                         <div class="text-container {fontRef.typeface === fontObj.family ? "selected" : ""}"
                             on:click={() => updateTypeface(i)}>                            
-                            <p class="no-drag">
-                                {fontObj.family}
+                            <p class="no-drag" style="font-family: '{fontObj.family}', 'Times New Roman'">
+                                {fontObj.appearedName ?? fontObj.family}
                             </p>
                         </div>
                     {/each}
@@ -426,7 +445,7 @@
                 <!-- section section for all the font variations avaiable -->
                 <section bind:this={variationListContainer} id="variation-list-container">
                     <!-- Iterate through every variation for the chosen font -->
-                    {#each $mainFontPickerData.currentFontContent[currentFontIndex].variations as variation}
+                    {#each $storedFontData.currentFontContent[selectedFontIndex].variations as variation}
                         <div class="text-container {fontRef.variation === variation ? "selected" : ""}"
                             on:click={() => updateVariation(variation)}
                             style="font-weight: {variation}; font-style: {fontsItalisized ? "italic" : ""}">

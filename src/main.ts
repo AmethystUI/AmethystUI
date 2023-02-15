@@ -17,10 +17,7 @@ window.onload = () => {
 	registerFontInstaller().then((installer: ServiceWorker) => {
 		// download fonts
 		console.debug("Font installer loaded and activated successfully.");
-		installer.postMessage({ command: "downloadRequiredFonts" });
-		
-		installer.postMessage({ command: "downloadURLFont", payload: ["123", "456"] });
-		
+		installer.postMessage({ command: "downloadRequiredFonts" });		
 	}).catch(err => {
 		// cannot download web fonts
 		console.error(err);
