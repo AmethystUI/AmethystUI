@@ -4,7 +4,7 @@
 <script lang="ts" context="module">
     import { openOverlayFrame } from "./Overlay.svelte";
     import { mainFontPickerData } from "../../../../stores/fontPickerStat";
-    import { storedFontData } from "../../../../stores/fontStorageStat";
+    import { initializeMainFontPickerData, storedFontData } from "../../../../stores/fontStorageStat";
     import { beautifiedFontName, fontExtensionToFormats, fontObject, getClosestVariation, getFontNameValue, searchFontIndex } from "../../../../workers/pseudoWorkers/fonts";
 
     const componentID = crypto.randomUUID();
@@ -26,62 +26,23 @@
     export function openFontPicker(propertyRef:string, propertyName:string, trackTarget: HTMLElement | Element, props={
         trackContinuously: true
     }){
-        // setColorPickerRef(propertyRef); // set the color reference
+        // setColorPickerRef(propertyRef); // set the font reference
         mainFontPickerData.update(pickerDat => { // update the picker
-            pickerDat.refName = propertyRef; // update color reference
-            pickerDat.windowName = propertyName; // update color name
+            pickerDat.refName = propertyRef; // update font reference
+            pickerDat.windowName = propertyName; // update font name
             return pickerDat;
         });
 
-        // fetch font files (only if there is no font file)
-        processFonts(sessionStorageKey).catch(err => {
-            console.error("Failed to cache and load font > ", err);
-        });
-        
+        // fetch font files (only if there is no font file). DO NOT REMOVE THE IF STATEMENT! OTHERWISE THE DATA WILL RESET!!!
+        if(get(storedFontData).currentFontContent.length === 0 || get(storedFontData) === undefined){
+            initializeMainFontPickerData(sessionStorageKey).catch(err => {
+                console.error("Failed to cache and load font > ", err);
+            });
+        }
+
         // open the overlay frame
-        openOverlayFrame(trackTarget, updateOverlaySize, componentID, props.trackContinuously, FontPickerOverlay);        
+        openOverlayFrame(trackTarget, updateOverlaySize, componentID, props.trackContinuously, FontPickerOverlay);  
     }
-
-    // attempt to load the fonts from local storage
-    const processFonts = (storageKey: string): Promise<void> => {
-        // reset fontFailure in main font picker data
-        mainFontPickerData.update(pickerDat => { pickerDat.fontLoadFailed = false; return pickerDat });
-
-        return new Promise(async (res, rej) => {
-            let rawFontData = localStorage.getItem(storageKey);
-
-            // Try to fetch the font data up to 6 times with a 500ms interval each time (3s)
-            for (let i = 0; i < 6 && !rawFontData; i++) {
-                await new Promise((res) => setTimeout(res, 500));
-                rawFontData = localStorage.getItem(storageKey);
-            }
-            // Reject the promise if the font data is still not fetched after 6 attempts
-            if (!rawFontData) {
-                // set fontFailure in main font picker data to true
-                mainFontPickerData.update(pickerDat => { pickerDat.fontLoadFailed = true; return pickerDat });
-
-                return rej(new Error("Cannot fetch font data from local storage cache."));
-            }
-            // Try to parse the fetched font data as JSON and resolve the promise on success
-            try {
-                // update currentFontContent in main font picker data
-                mainFontPickerData.update(pickerDat => {
-                    storedFontData.update(data => {
-                        data.currentFontContent = JSON.parse(rawFontData);
-                        return data;
-                    }); // update currentFontContent in main font picker data
-                    return pickerDat;
-                });
-
-                res();
-            } catch (err) {
-                // set fontFailure in main font picker data to true
-                mainFontPickerData.update(pickerDat => { pickerDat.fontLoadFailed = true; return pickerDat });
-                // Reject the promise if the fetched font data is not valid JSON
-                rej(`JSON parse error > \n${err}`);
-            }
-        });
-    };
 
 
     // ======================== NON EXPORTABLES ========================
@@ -210,7 +171,7 @@
     import UnitInput from "../Basics/UnitInput.svelte";
 
     import LoadingSpinner from "../../../ui/LoadingSpinner.svelte";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import { downloadFontFromURLs, fontBinary, fontDBName, TTFObjectStore } from "../../../../workers/fontInstaller.worker";
     import { IDBPDatabase, openDB as openDBWithIDB } from "idb";
     import { base64ArrayBuffer } from "../../../../helpers/base64ArrayBuffer";
@@ -257,12 +218,17 @@
         loadTypefacePreview(true);
     })
 
+    onDestroy(() => {
+        // kill DB connection
+        db.close();
+    })
+
     /**
      * Lazy transcribing of the font preview list into base64 so that we can actually see the preview
      * 
      * @param forceLoad - whether or not to force the transcription
      */
-    const loadTypefacePreview = async (forceLoad?:boolean, previewLoad = 50) => {
+    const loadTypefacePreview = async (forceLoad?:boolean, previewLoad = 10) => {
         forceLoad = !!forceLoad; // initialize boolean
 
         // open the index DB connection if it's not already open
@@ -283,11 +249,13 @@
         // get the list of fonts we need to trancribe into base64
         for(let i = focusedTypefaceIndex - previewLoad; i <= focusedTypefaceIndex + previewLoad; i++) {
             // detect if the font has already been transcribed, or is websafe
-            if(!$storedFontData.currentFontContent[i] || $storedFontData.currentFontContent[i].transcribed || $storedFontData.currentFontContent[i].webSafe){
+            if(!$storedFontData.currentFontContent[i] || $storedFontData.currentFontContent[i].transcribed || $storedFontData.currentFontContent[i].webSafe) {    
                 continue;
             }
 
-            // transcribe the font into base64 and then create & store a promise that adds the processed base64 to a list. This way we can add them all at the same time
+            $storedFontData.currentFontContent[i].transcribed = true; // set transcribed to true so that we don't load it again
+
+            // transcribe the font into url and use the blob url to set the font idfk it's 2am
             newFontObjectPromises.push(new Promise<void>(async (res, rej) =>{
                 // get URL key based on variation closest to 400
                 const variation = getClosestVariation(400, $storedFontData.currentFontContent[i].variations);
@@ -322,7 +290,6 @@
     src: url(${kys}) format("${fuck}");
 }
 `;
-                $storedFontData.currentFontContent[i].transcribed = true; // set transcribed to true so that we don't load it again
                 res();
             }));
         }
@@ -466,7 +433,7 @@
                 <section id="font-load-err-container">
                     <!-- Could not load font for some reason -->
                     <p>Failed to load fonts</p>
-                    <button on:click={() => processFonts(sessionStorageKey)}>
+                    <button on:click={() => initializeMainFontPickerData(sessionStorageKey)}>
                         Retry
                     </button>
                 </section>

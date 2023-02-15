@@ -6,6 +6,7 @@
     import MainDisplay from "./components/display/MainDisplay.svelte";
     import { addComponent, collection, focusedComponent, focusedOverride, layerBlurLock, selectedComponent, selectedOverride } from "./stores/collection"
     import { mainFontPickerData } from "./stores/fontPickerStat";
+    import { storedFontData } from "./stores/fontStorageStat";
 
     let leftMenuWidth = 260;
     const leftMenuWidthChange = (evt:CustomEvent<any>):void => {
