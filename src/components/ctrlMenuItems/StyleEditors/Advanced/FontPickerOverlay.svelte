@@ -174,7 +174,6 @@
     import { onDestroy, onMount } from "svelte";
     import { downloadFontFromURLs, fontBinary, fontDBName, TTFObjectStore } from "../../../../workers/fontInstaller.worker";
     import { IDBPDatabase, openDB as openDBWithIDB } from "idb";
-    import { base64ArrayBuffer } from "../../../../helpers/base64ArrayBuffer";
 
     $: name = $mainFontPickerData.windowName ?? "Fonts";
     $: fontsItalisized = !!fontRef ? fontRef.textDecorations.includes("italicize") : false;
