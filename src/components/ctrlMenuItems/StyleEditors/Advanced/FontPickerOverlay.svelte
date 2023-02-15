@@ -177,6 +177,7 @@
 
     $: name = $mainFontPickerData.windowName ?? "Fonts";
     $: fontsItalisized = !!fontRef ? fontRef.textDecorations.includes("italicize") : false;
+    $: ready = false;
 
     let fontRef:typographyStyle;
 
@@ -210,11 +211,20 @@
         // search for font first
         focusedTypefaceIndex = selectedFontIndex = await searchFontIndex($storedFontData.currentFontContent, fontRef.typeface);
 
-        // set the scroll position to the selection in the font pickers
-        if(!!fontListContainer) fontListContainer.scrollTop = selectedFontIndex * 35 - 95;
-
         // Increase preview loading load after the first render is complete
-        loadTypefacePreview(true);
+        await loadTypefacePreview(true, 20, selectedFontIndex);
+
+        let intID = setInterval(() => {
+            // set ready to true
+            ready = true;
+            
+            // set the scroll position to the selection in the font pickers. The conatiner might not come instantly, so we need to wait for it to be ready
+            if(!!fontListContainer){
+                fontListContainer.scrollTop = selectedFontIndex * 35 - 95;
+                // cancel interval
+                clearInterval(intID);
+            }
+        }, 1);
     })
 
     onDestroy(() => {
@@ -227,18 +237,25 @@
      * 
      * @param forceLoad - whether or not to force the transcription
      */
-    const loadTypefacePreview = async (forceLoad?:boolean, previewLoad = 10) => {
+    const loadTypefacePreview = async (forceLoad?:boolean, loadLimit = 20, updateFromIndex:number = -1) => {
         forceLoad = !!forceLoad; // initialize boolean
 
         // open the index DB connection if it's not already open
         await openDB();
         
-        let scrollHeight = fontListContainer.scrollTop; // if no scroll height is specified, default to scroll top on the font container
-        let newFocusdTypefaceIndex = Math.round((scrollHeight + 95) / 35); // get the index of the font that is currently looked at (the center one)
+        let scrollHeight: number;
+        let newFocusdTypefaceIndex:number;
+
+        if(updateFromIndex === -1 && !!fontListContainer) { // if we don't have a specific index to update from OR if the parent doesn't exist yet, then we'll dynamically update based off of scroll position
+            scrollHeight = fontListContainer.scrollTop; // if no scroll height is specified, default to scroll top on the font container
+            newFocusdTypefaceIndex = Math.round((scrollHeight + 95) / 35); // get the index of the font that is currently looked at (the center one)
+        } else {
+            newFocusdTypefaceIndex = selectedFontIndex; // get the index of the font that is currently looked at (the center one)
+        }
         
         // we'll only load previews when the difference in scroll is larger than 5 
         const dIndex = Math.abs(newFocusdTypefaceIndex - focusedTypefaceIndex);
-        if(!forceLoad && (dIndex === previewLoad || newFocusdTypefaceIndex < 0 || newFocusdTypefaceIndex > $storedFontData.currentFontContent.length-1)) return; // only update the preview if it's different from the last one, or if force load is set to true
+        if(!forceLoad && (dIndex === loadLimit || newFocusdTypefaceIndex < 0 || newFocusdTypefaceIndex > $storedFontData.currentFontContent.length-1)) return; // only update the preview if it's different from the last one, or if force load is set to true
 
         // if we should transcribe, we first update the focus index
         focusedTypefaceIndex = newFocusdTypefaceIndex;
@@ -246,7 +263,7 @@
         let newFontObjectPromises: Promise<void>[] = [];
 
         // get the list of fonts we need to trancribe into base64
-        for(let i = focusedTypefaceIndex - previewLoad; i <= focusedTypefaceIndex + previewLoad; i++) {
+        for(let i = Math.max(0, focusedTypefaceIndex - loadLimit); i <= Math.min($storedFontData.currentFontContent.length-1, focusedTypefaceIndex + loadLimit); i++) {
             // detect if the font has already been transcribed, or is websafe
             if(!$storedFontData.currentFontContent[i] || $storedFontData.currentFontContent[i].transcribed || $storedFontData.currentFontContent[i].webSafe) {    
                 continue;
@@ -277,23 +294,32 @@
                     fontBinaryObject = await db.get(TTFObjectStore, URLkey) as fontBinary;
                 }
 
-                const fuck = fontExtensionToFormats(fontBinaryObject.fileType);
-                const shitter = new Blob([fontBinaryObject.binary], { type: `font/${fontBinaryObject.fileType}` });
-                const kys = URL.createObjectURL(shitter);
+                // Get the font format based on the file type
+                const fontFormat = fontExtensionToFormats(fontBinaryObject.fileType);
 
-                // what the fuck is this indent bruh
+                // Create a Blob from the binary data with the specified type
+                const fontBlob = new Blob([fontBinaryObject.binary], { type: `font/${fontBinaryObject.fileType}` });
+
+                // Create an object URL from the Blob
+                const fontObjectURL = URL.createObjectURL(fontBlob);
+
+                // Append the @font-face rule to the custom font faces stylesheet
                 document.querySelector("#custom-font-faces").innerHTML +=
-`
-@font-face {
-    font-family: "${$storedFontData.currentFontContent[i].family}";
-    src: url(${kys}) format("${fuck}");
-}
-`;
+                `
+                @font-face {
+                    font-family: "${$storedFontData.currentFontContent[i].family}";
+                    src: url(${fontObjectURL}) format("${fontFormat}");
+                }
+                `;
+                
+                // resolve promise
                 res();
             }));
         }
 
         await Promise.all(newFontObjectPromises);
+
+        return;
     }
 
     // openDB and stuff
@@ -393,14 +419,14 @@
         <!-- font selection container -->
         <section id="font-selection-container">
             <!-- Only show fonts if it's not an empty list -->
-            {#if $storedFontData.currentFontContent.length > 0}
+            {#if $storedFontData.currentFontContent.length > 0 && ready}
                 <!-- first section for all the main fonts -->
                 <section bind:this={fontListContainer} id="font-list-container" on:scroll={() => loadTypefacePreview()}>
                     <!-- iterate through every font there is -->
                     {#each $storedFontData.currentFontContent as fontObj, i (i)}
                         <div class="text-container {fontRef.typeface === fontObj.family ? "selected" : ""}"
                             on:click={() => updateTypeface(i)}>                            
-                            <p class="no-drag" style="font-family: '{fontObj.family}', 'Times New Roman'">
+                            <p class="no-drag" style="font-family: '{fontObj.family}', 'Inter', 'system-ui', 'Tahoma', 'sans-serif'">
                                 {fontObj.appearedName ?? fontObj.family}
                             </p>
                         </div>

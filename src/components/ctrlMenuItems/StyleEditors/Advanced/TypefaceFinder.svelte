@@ -78,6 +78,13 @@
     }
     const unFocusInput = () => {
         preventNullV(); // prevent null value input
+
+        // deselect all text
+        let selection = window.getSelection();
+        if (selection) {
+            selection.removeAllRanges();
+        }
+
         // clear search query in fontPickDat.
         $mainFontPickerData.searchQuery = "";
         
