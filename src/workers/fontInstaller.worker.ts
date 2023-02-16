@@ -176,7 +176,10 @@ export const downloadFontFromURLs = async (db:IDBPDatabase, urls: string[], clos
             fileType: urlFileFormats[i],
             lastModified: Date.now()
         };
-        await store.put(font, url);
+        await store.put(font, url); // put our processed data into the indexDB
+
+        // we will also store a map into local storage for faster access. It basically maps every URLKey to a local URL that points to our binary blob
+        
     }
 
     // commit transaction

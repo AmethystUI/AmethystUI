@@ -19,6 +19,7 @@ export interface fontObject {
     version?: string,
     lastModified?: string,
     fileURLs?: variationURL[], // the URLs asssociated with each fileURL. We'lll use these URLs to access the TTF binaries and convert them to base64
+    localURLs?: variationURL[],
     variations: number[],
     category: typeCategories,
     webSafe: boolean,
