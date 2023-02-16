@@ -211,8 +211,11 @@
         // search for font first
         focusedTypefaceIndex = selectedFontIndex = await searchFontIndex($storedFontData.currentFontContent, fontRef.typeface);
 
+        // open DB first
+        await openDB();
+
         // Increase preview loading load after the first render is complete
-        await loadTypefacePreview(true, 20, selectedFontIndex);
+        await loadNecessaryFontPreview(true, 15, selectedFontIndex);
 
         let intID = setInterval(() => {
             // set ready to true
@@ -232,17 +235,19 @@
         db.close();
     })
 
+    let currentRequests = 0;
+
     /**
      * Lazy transcribing of the font preview list into base64 so that we can actually see the preview
      * 
      * @param forceLoad - whether or not to force the transcription
      */
-    const loadTypefacePreview = async (forceLoad?:boolean, loadLimit = 20, updateFromIndex:number = -1) => {
+    const loadNecessaryFontPreview = async (forceLoad?:boolean, loadLimit = 15, updateFromIndex:number = -1) => {
         forceLoad = !!forceLoad; // initialize boolean
 
-        // open the index DB connection if it's not already open
-        await openDB();
-        
+        currentRequests ++; // increment the number of current processing requests
+
+        let myRequestID = currentRequests;
         let scrollHeight: number;
         let newFocusdTypefaceIndex:number;
 
@@ -255,70 +260,70 @@
         
         // we'll only load previews when the difference in scroll is larger than 5 
         const dIndex = Math.abs(newFocusdTypefaceIndex - focusedTypefaceIndex);
-        if(!forceLoad && (dIndex === loadLimit || newFocusdTypefaceIndex < 0 || newFocusdTypefaceIndex > $storedFontData.currentFontContent.length-1)) return; // only update the preview if it's different from the last one, or if force load is set to true
+        if(!forceLoad && (dIndex === 0 || newFocusdTypefaceIndex < 0 || newFocusdTypefaceIndex > $storedFontData.currentFontContent.length-1)) return; // only update the preview if it's different from the last one, or if force load is set to true
 
         // if we should transcribe, we first update the focus index
         focusedTypefaceIndex = newFocusdTypefaceIndex;
         
         let newFontObjectPromises: Promise<void>[] = [];
+        let CSSFontObjectQuery = "";
 
         // get the list of fonts we need to trancribe into base64
         for(let i = Math.max(0, focusedTypefaceIndex - loadLimit); i <= Math.min($storedFontData.currentFontContent.length-1, focusedTypefaceIndex + loadLimit); i++) {
-            // detect if the font has already been transcribed, or is websafe
-            if(!$storedFontData.currentFontContent[i] || $storedFontData.currentFontContent[i].transcribed || $storedFontData.currentFontContent[i].webSafe) {    
+            /*
+             * There are a few cases where we don't want to load the font:
+             *  - The font is undefined
+             *  - The font has already been loaded (trancribed)
+             *  - The font is web safe
+             *  - The font is our system font (Inter) 
+             */
+            if(!$storedFontData.currentFontContent[i] || $storedFontData.currentFontContent[i].transcribed || $storedFontData.currentFontContent[i].webSafe || $storedFontData.currentFontContent[i].family === "Inter") {    
                 continue;
             }
 
             $storedFontData.currentFontContent[i].transcribed = true; // set transcribed to true so that we don't load it again
 
-            // transcribe the font into url and use the blob url to set the font idfk it's 2am
-            newFontObjectPromises.push(new Promise<void>(async (res, rej) =>{
-                // get URL key based on variation closest to 400
-                const variation = getClosestVariation(400, $storedFontData.currentFontContent[i].variations);
-                const variationIndex = $storedFontData.currentFontContent[i].variations.indexOf(variation);
-                const URLkey = $storedFontData.currentFontContent[i].fileURLs[variationIndex].url;
-                
-                // if URL key does not exist or the variation do not match, do not proceed with the loading
-                if(!URLkey || $storedFontData.currentFontContent[i].fileURLs[variationIndex].variation !== variation) return;
+            // get URL key based on variation closest to 400
+            const variation = getClosestVariation(400, $storedFontData.currentFontContent[i].variations);
+            const variationIndex = $storedFontData.currentFontContent[i].variations.indexOf(variation);
+            const URLkey = $storedFontData.currentFontContent[i].fileURLs[variationIndex].url;
+            
+            // if URL key does not exist or the variation do not match, do not proceed with the loading
+            if(!URLkey || $storedFontData.currentFontContent[i].fileURLs[variationIndex].variation !== variation) return;
 
-                // attempt to extract binary data from indexDB
-                // const rawFontBinary: ArrayBuffer = (await db.get(TTFObjectStore, URLkey) as fontBinary).binary;
-                let fontBinaryObject = await db.get(TTFObjectStore, URLkey) as fontBinary;
+            // attempt to extract binary data from indexDB
+            // const rawFontBinary: ArrayBuffer = (await db.get(TTFObjectStore, URLkey) as fontBinary).binary;
+            let fontBinaryObject = await db.get(TTFObjectStore, URLkey) as fontBinary;
 
-                // if the object is undefined, do not proceed with the loading. The font has not been loaded yet.
-                if(!fontBinaryObject){
-                    // TODO: Do some error handling here
-                    console.warn(`Could not load font ${URLkey} from IndexDB. Loading it now...`);
-                    await downloadFontFromURLs(db, [URLkey], false);
-                    // reload
-                    fontBinaryObject = await db.get(TTFObjectStore, URLkey) as fontBinary;
-                }
+            // if the object is undefined, do not proceed with the loading. The font has not been loaded yet.
+            if(!fontBinaryObject){
+                console.warn(`Could not load font ${URLkey} from IndexDB. Loading it now...`);
+                await downloadFontFromURLs(db, [URLkey], false);
+                // reload
+                fontBinaryObject = await db.get(TTFObjectStore, URLkey) as fontBinary;
+            }
 
-                // Get the font format based on the file type
-                const fontFormat = fontExtensionToFormats(fontBinaryObject.fileType);
+            // Get the font format based on the file type
+            const fontFormat = fontExtensionToFormats(fontBinaryObject.fileType);
 
-                // Create a Blob from the binary data with the specified type
-                const fontBlob = new Blob([fontBinaryObject.binary], { type: `font/${fontBinaryObject.fileType}` });
+            // Create an object URL from the Blob
+            const fontObjectURL = URL.createObjectURL(fontBinaryObject.binary);
 
-                // Create an object URL from the Blob
-                const fontObjectURL = URL.createObjectURL(fontBlob);
+            // Append the @font-face rule to the custom font faces stylesheet
+            CSSFontObjectQuery =
+            `
+            @font-face {
+                font-family:"${$storedFontData.currentFontContent[i].family}";
+                src:url(${fontObjectURL}) format("${fontFormat}");
+            }
+            `;
 
-                // Append the @font-face rule to the custom font faces stylesheet
-                document.querySelector("#custom-font-faces").innerHTML +=
-                `
-                @font-face {
-                    font-family: "${$storedFontData.currentFontContent[i].family}";
-                    src: url(${fontObjectURL}) format("${fontFormat}");
-                }
-                `;
-                
-                // resolve promise
-                res();
-            }));
+            document.querySelector("#custom-font-faces").innerHTML += CSSFontObjectQuery;
+
+            if(currentRequests - myRequestID > 10) return; // if we have more than 10 requests in concurrency, we break out to prevent the browser from dying. Fuck you firefox.
         }
 
-        await Promise.all(newFontObjectPromises);
-
+        
         return;
     }
 
@@ -421,7 +426,7 @@
             <!-- Only show fonts if it's not an empty list -->
             {#if $storedFontData.currentFontContent.length > 0 && ready}
                 <!-- first section for all the main fonts -->
-                <section bind:this={fontListContainer} id="font-list-container" on:scroll={() => loadTypefacePreview()}>
+                <section bind:this={fontListContainer} id="font-list-container" on:scroll={() => loadNecessaryFontPreview()}>
                     <!-- iterate through every font there is -->
                     {#each $storedFontData.currentFontContent as fontObj, i (i)}
                         <div class="text-container {fontRef.typeface === fontObj.family ? "selected" : ""}"

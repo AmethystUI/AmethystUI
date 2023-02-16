@@ -41,7 +41,7 @@ export const TTFObjectStore = "TTF";
  * 
  */
 export interface fontBinary{
-    binary: ArrayBuffer, // the raw binary data
+    binary: Blob, // the raw binary data
     fileType: string, // file type, e.g. "ttf", "otf", "woff", "woff2"
     lastModified: number // We can just use Date.now() as the last modified time
 }
@@ -169,9 +169,10 @@ export const downloadFontFromURLs = async (db:IDBPDatabase, urls: string[], clos
         if(results[i] === null) continue; // don't store null urls
         
         const url: string = filteredURL[i];
+        const fontBlob:Blob = new Blob([results[i]], { type: `font/${urlFileFormats[i]}` });
 
         const font: fontBinary = {
-            binary: results[i],
+            binary: fontBlob,
             fileType: urlFileFormats[i],
             lastModified: Date.now()
         };

@@ -27,7 +27,7 @@ export const fontSorting: SortBy = SortBy.Popularity;
  * 
  * @type {number}
  */
-export const fontLimit: number = 300;
+export const fontLimit: number = 100;
 
 /**
  * The amountt of simultaneous call to Google Fonts
