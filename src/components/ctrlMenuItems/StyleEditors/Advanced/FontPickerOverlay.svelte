@@ -78,7 +78,8 @@
     import type {
         textAlignment as textAlignmentType,
         textCasing as textCasingType,
-        textDecoration as textDecorationType
+        textDecoration as textDecorationType,
+        typeCategories
     } from "../../../../stores/collection";
 
     /**
@@ -177,7 +178,10 @@
 
     $: name = $mainFontPickerData.windowName ?? "Fonts";
     $: fontsItalisized = !!fontRef ? fontRef.textDecorations.includes("italicize") : false;
-    $: ready = false;
+    $: fontsUnderlined = !!fontRef ? fontRef.textDecorations.includes("underline") : false;
+    $: fontsStriked = !!fontRef ? fontRef.textDecorations.includes("strike") : false;
+    
+    let ready = false;
     let fontRef:typographyStyle;
 
     // This try catch tries to retrieve the specified color reference from $collection.
@@ -206,9 +210,12 @@
     let selectedFontIndex = 0;
     let focusedTypefaceIndex;
 
+    // We'll be mainly using the filtered font content
+    let filteredFontContent: fontObject[] = $storedFontData.currentFontContent;
+
     onMount(async () => {
         // search for font first
-        focusedTypefaceIndex = selectedFontIndex = await searchFontIndex($storedFontData.currentFontContent, fontRef.typeface);
+        focusedTypefaceIndex = selectedFontIndex = await searchFontIndex(filteredFontContent, fontRef.typeface);
 
         // open DB first
         await openDB();
@@ -262,7 +269,7 @@
         const dIndex = Math.abs(newFocusdTypefaceIndex - focusedTypefaceIndex);
         
         // only update the preview if it's significantly different from the last one or close to the edge, or if force load is set to true
-        if(!forceLoad && (dIndex < 5 && (newFocusdTypefaceIndex < $storedFontData.currentFontContent.length-30 && newFocusdTypefaceIndex > 30))) return;
+        if(!forceLoad && (dIndex < 5 && (newFocusdTypefaceIndex < filteredFontContent.length-30 && newFocusdTypefaceIndex > 30))) return;
 
         // if we should transcribe, we first update the focus index
         focusedTypefaceIndex = newFocusdTypefaceIndex;
@@ -272,7 +279,7 @@
         let currentIterFontObj: fontObject // the font object that we're currently iterating over
 
         // Fetch the font keys that still need to be loaded into CSS.
-        for(let i = Math.max(0, focusedTypefaceIndex - loadLimit); i < Math.min($storedFontData.currentFontContent.length, focusedTypefaceIndex + loadLimit); i++) {
+        for(let i = Math.max(0, focusedTypefaceIndex - loadLimit); i < Math.min(filteredFontContent.length, focusedTypefaceIndex + loadLimit); i++) {
             /*
              * There are a few cases where we don't want to load the font:
              *  - The font is undefined
@@ -280,7 +287,7 @@
              *  - The font is web safe
              *  - The font is our system font (Inter, Plus Jakarta Sans, Poppins, Fira Code)
              */
-            currentIterFontObj = $storedFontData.currentFontContent[i];
+            currentIterFontObj = filteredFontContent[i];
             if(!currentIterFontObj || currentIterFontObj.webSafe) continue;
 
             // if the font is valid for loading, get URL key based on variation closest to 400
@@ -359,6 +366,13 @@
         return;
     }
 
+    /**
+     * Downloads and loads font variations into the stylesheet for the specified font object.
+     * 
+     * @param {fontObject} fontObj - The font object to load variations for.
+     * 
+     * @returns {void}
+     */
     const loadFontVariationPreview = async (fontObj: fontObject) => {
         if(fontObj === undefined || fontObj.webSafe) return; // if the font object is undefined or websafe, we don't need to do anything
 
@@ -474,7 +488,6 @@
     }
 
     const updateDecoration = (e:CustomEvent) => {
-        const vals:textDecorationType[] = e.detail.values;
         // set the value of the decorations accordingly
         fontRef.textDecorations = e.detail.values;
         // update collection so that svelte can update the associated components
@@ -486,7 +499,7 @@
         selectedFontIndex = newIndex;
         
         // fetch the typeface name from the index
-        const newFontObject: fontObject = $storedFontData.currentFontContent[newIndex];
+        const newFontObject: fontObject = filteredFontContent[newIndex];
         const newTypefaceName:string = newFontObject.family;
         fontRef.typeface = newTypefaceName; // set the new typeface name
         
@@ -519,6 +532,18 @@
         $collection = $collection;
     }
 
+    const updateTypeFilter = async (e: CustomEvent) => {
+        const filter = e.detail.values;
+        
+        // set the real filter
+        filteredFontContent = filter.length > 0 ? $storedFontData.currentFontContent.filter(fontObj => filter.includes(fontObj.category)) : $storedFontData.currentFontContent;
+        
+        // find new scroll position
+        selectedFontIndex = await searchFontIndex(filteredFontContent, fontRef.typeface);
+
+        // set the scroll position
+        fontListContainer.scrollTop = selectedFontIndex * 35 - 95;
+    }
 </script>
 
 <!-- Accessories -->
@@ -536,17 +561,19 @@
         <!-- font filter cotainer -->
         <section style="transform: translate3d(0px,-5px,0px)">
             <MultiSelect elements={typeFilters} alignedHorizontally={false} align={"left"} showAlt={true}
-            name={""} sub={true} width={130} height={231} radius={6} iconSize={24} iconMargin={12}/>
+            name={""} sub={true} width={130} height={231} radius={6} iconSize={24} iconMargin={12}
+            on:valueChange = {updateTypeFilter}
+        />
         </section>
 
         <!-- font selection container -->
         <section id="font-selection-container">
             <!-- Only show fonts if it's not an empty list -->
-            {#if $storedFontData.currentFontContent.length > 0 && ready}
+            {#if !!filteredFontContent && ready}
                 <!-- first section for all the main fonts -->
                 <section bind:this={fontListContainer} id="font-list-container" on:scroll={() => loadNecessaryFontPreview()}>
                     <!-- iterate through every font there is -->
-                    {#each $storedFontData.currentFontContent as fontObj, i (i)}
+                    {#each filteredFontContent as fontObj, i (i)}
                         <div class="text-container {fontRef.typeface === fontObj.family ? "selected" : ""}"
                             on:click={() => updateTypeface(i)}>                            
                             <p class="no-drag" style="font-family: '{fontObj.family}', 'Inter', 'system-ui', 'Tahoma', 'sans-serif'">
@@ -559,14 +586,14 @@
 
                 <!-- section section for all the font variations avaiable -->
                 <section bind:this={variationListContainer} id="variation-list-container">
-                    {#if !!$storedFontData.currentFontContent[selectedFontIndex] && !!$storedFontData.currentFontContent[selectedFontIndex]["variations"]}
+                    {#if !!filteredFontContent[selectedFontIndex] && !!filteredFontContent[selectedFontIndex]["variations"]}
                         <!-- Iterate through every variation for the chosen font -->
-                        {#each $storedFontData.currentFontContent[selectedFontIndex].variations as variation}
+                        {#each filteredFontContent[selectedFontIndex].variations as variation}
                             <div class="text-container {fontRef.variation === variation ? "selected" : ""}"
                                 on:click={() => updateVariation(variation)}>
 
                                 <p class="no-drag"
-                                    style="font-family: '{$storedFontData.currentFontContent[selectedFontIndex].family}', 'Inter', 'system-ui', 'Tahoma', 'sans-serif'; font-weight:{variation}; font-style: {fontsItalisized ? "italic" : ""}"
+                                    style="font-family: '{filteredFontContent[selectedFontIndex].family}', 'Inter', 'system-ui', 'Tahoma', 'sans-serif'; font-weight:{variation}; font-style: {fontsItalisized ? "italic" : ""}; {fontsUnderlined || fontsStriked ? "text-decoration: " : ""} {fontsUnderlined ? "underline" : ""} {fontsStriked ? "line-through" : ""};"
                                 >
                                     {beautifiedFontName[getFontNameValue(variation, "name")]}
                                 </p>
