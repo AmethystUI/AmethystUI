@@ -141,7 +141,7 @@ export const downloadFontFromURLs = async (db:IDBPDatabase, urls: string[], clos
     const allDBKeys: IDBValidKey[] = await db.getAllKeys(TTFObjectStore);
     for(let i = 0; i < urls.length; i++) {
         const url:string = urls[i];
-        if(!allDBKeys.includes(url[i])) filteredURL.push(url); // if URL doesn't exist, add it to the filtered query
+        if(!allDBKeys.includes(url[i])) filteredURL.push(url); // we'll only download the font if it's not already in the DB
     }
     
     // compose the url batch into a request
@@ -179,7 +179,7 @@ export const downloadFontFromURLs = async (db:IDBPDatabase, urls: string[], clos
         await store.put(font, url); // put our processed data into the indexDB
 
         // we will also store a map into local storage for faster access. It basically maps every URLKey to a local URL that points to our binary blob
-        
+
     }
 
     // commit transaction

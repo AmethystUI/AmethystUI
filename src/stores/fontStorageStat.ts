@@ -9,6 +9,7 @@ import { mainFontPickerData } from "./fontPickerStat";
  */
 interface storedFontData {
     currentFontContent : fontObject[], // the font objects summary that currenly lives inside indexDB
+    transcribedFonts : Map<string, null> // keep track of which fonts have been transcribed
 }
 
 /**
@@ -16,6 +17,7 @@ interface storedFontData {
  */
 export let storedFontData = writable<storedFontData>({
     currentFontContent : [],
+    transcribedFonts : new Map()
 });
 
 // attempt to load the fonts from local storage

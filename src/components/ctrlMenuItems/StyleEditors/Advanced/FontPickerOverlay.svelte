@@ -5,7 +5,7 @@
     import { openOverlayFrame } from "./Overlay.svelte";
     import { mainFontPickerData } from "../../../../stores/fontPickerStat";
     import { initializeMainFontPickerData, storedFontData } from "../../../../stores/fontStorageStat";
-    import { beautifiedFontName, fontExtensionToFormats, fontObject, getClosestVariation, getFontNameValue, searchFontIndex } from "../../../../workers/pseudoWorkers/fonts";
+    import { beautifiedFontName, fontExtensionToFormats, fontObject, getClosestVariation, getFontNameValue, searchFontIndex, variationURL } from "../../../../workers/pseudoWorkers/fonts";
 
     const componentID = crypto.randomUUID();
 
@@ -178,8 +178,6 @@
     $: name = $mainFontPickerData.windowName ?? "Fonts";
     $: fontsItalisized = !!fontRef ? fontRef.textDecorations.includes("italicize") : false;
     $: ready = false;
-    $: statusMessage = "";
-
     let fontRef:typographyStyle;
 
     // This try catch tries to retrieve the specified color reference from $collection.
@@ -216,7 +214,7 @@
         await openDB();
 
         // Increase preview loading load after the first render is complete
-        await loadNecessaryFontPreview(true, 15);
+        await loadNecessaryFontPreview(true, 15, selectedFontIndex);
 
         let intID = setInterval(() => {
             // set ready to true
@@ -236,23 +234,24 @@
         db.close();
     })
 
-    let currentRequests = 0;
-
     /**
-     * Lazy transcribing of the font preview list into base64 so that we can actually see the preview
+     * Loads the necessary font preview based on the current scroll position, or from a specific index if specified.
      * 
-     * @param forceLoad - whether or not to force the transcription
+     * @param {boolean} [forceLoad=false] Whether to force load the font preview, regardless of the current difference in scroll position.
+     * @param {number} [loadLimit=15] The number of fonts to be loaded on either side of the focused font.
+     * @param {number} [updateFromIndex=-1] The index of the font to update the preview from. If set to -1, the preview will be updated dynamically based on the current scroll position.
+     * 
+     * @returns {void}
      */
-    const loadNecessaryFontPreview = async (forceLoad?:boolean, loadLimit = 15) => {
-        forceLoad = !!forceLoad; // initialize boolean
+    const loadNecessaryFontPreview = async (forceLoad?:boolean, loadLimit = 15, updateFromIndex:number = -1) => {
+        // DEV: ChatGPT says this code needs more error handling, but it works for now. It might be an issue in the future, so keep an eye out
 
-        currentRequests ++; // increment the number of current processing requests
+        forceLoad = !!forceLoad;
 
-        let myRequestID = currentRequests;
         let scrollHeight: number;
         let newFocusdTypefaceIndex:number;
 
-        if(!!fontListContainer) { // if we don't have a specific index to update from OR if the parent doesn't exist yet, then we'll dynamically update based off of scroll position
+        if(updateFromIndex === -1 && !!fontListContainer) { // if we don't have a specific index to update from OR if the parent doesn't exist yet, then we'll dynamically update based off of scroll position
             scrollHeight = fontListContainer.scrollTop; // if no scroll height is specified, default to scroll top on the font container
             newFocusdTypefaceIndex = Math.round((scrollHeight + 95) / 35); // get the index of the font that is currently looked at (the center one)
         } else {
@@ -265,18 +264,12 @@
         // only update the preview if it's significantly different from the last one or close to the edge, or if force load is set to true
         if(!forceLoad && (dIndex < 5 && (newFocusdTypefaceIndex < $storedFontData.currentFontContent.length-30 && newFocusdTypefaceIndex > 30))) return;
 
-        statusMessage = "Loading previews..."; // set a status message so users can see it's being loaded
-
         // if we should transcribe, we first update the focus index
         focusedTypefaceIndex = newFocusdTypefaceIndex;
         
-        let urlCursorKeys: string[] = []; // array of URL keys to retrieve
-        let urlKeyToObject: Record<string, fontObject> = {}; // map of URL key to family name
-        let undownloadedURLs: string[] = []; // array of URLs that are not yet downloaded
-
-        // open DB transaction
-        let tx = db.transaction(TTFObjectStore, "readonly");
-        let store = tx.objectStore(TTFObjectStore);
+        let URLKeys: string[] = []; // array of URL keys to retrieve
+        let URLKeyToObject: Record<string, fontObject> = {}; // map of URL key to family name
+        let currentIterFontObj: fontObject // the font object that we're currently iterating over
 
         // Fetch the font keys that still need to be loaded into CSS.
         for(let i = Math.max(0, focusedTypefaceIndex - loadLimit); i < Math.min($storedFontData.currentFontContent.length, focusedTypefaceIndex + loadLimit); i++) {
@@ -285,52 +278,44 @@
              *  - The font is undefined
              *  - The font has already been loaded (trancribed)
              *  - The font is web safe
-             *  - The font is our system font (Inter) 
-             *  - the font family name exist in the stylesheet
+             *  - The font is our system font (Inter, Plus Jakarta Sans, Poppins, Fira Code)
              */
-
-            if(!$storedFontData.currentFontContent[i] || $storedFontData.currentFontContent[i].transcribed || $storedFontData.currentFontContent[i].webSafe || $storedFontData.currentFontContent[i].family === "Inter") {    
-                continue;
-            }
+            currentIterFontObj = $storedFontData.currentFontContent[i];
+            if(!currentIterFontObj || currentIterFontObj.webSafe) continue;
 
             // if the font is valid for loading, get URL key based on variation closest to 400
-            const variation = getClosestVariation(400, $storedFontData.currentFontContent[i].variations);
-            const variationIndex = $storedFontData.currentFontContent[i].variations.indexOf(variation); // get the index of the variation closest to 400
-            const URLkey = $storedFontData.currentFontContent[i].fileURLs[variationIndex].url; // get the URL key for the variation closest to 400
+            const variation = getClosestVariation(400, currentIterFontObj.variations);
+            const variationIndex = currentIterFontObj.variations.indexOf(variation); // get the index of the variation closest to 400
+            const URLkey = currentIterFontObj.fileURLs[variationIndex].url; // get the URL key for the variation closest to 400
 
-            urlCursorKeys.push(URLkey); // add the URL key to the array of URL keys to retrieve
-            urlKeyToObject[URLkey] = $storedFontData.currentFontContent[i]; // add the family name to the map of URL key to family name
-
-            // check if the URL has been downloaded. If not, add it to the array of URLs that are not yet downloaded so we can download them
-            if(!(await store.getKey(URLkey))) undownloadedURLs.push(URLkey);
-
+            if(
+                $storedFontData.transcribedFonts.has(URLkey) || 
+                ["Inter", "Plus Jakarta Sans", "Poppins", "Fira Code"].indexOf(currentIterFontObj.family) !== -1
+            ){
+                continue;
+            }
+            
             // set transcribed to true so we dont retranscribe this shit
+            $storedFontData.transcribedFonts.set(URLkey, null);
 
-            $storedFontData.currentFontContent[i].transcribed = true;
+            URLKeys.push(URLkey); // add the URL key to the array of URL keys to retrieve
+            URLKeyToObject[URLkey] = currentIterFontObj; // add the family name to the map of URL key to family name
         }
 
         // download any fonts that are not yet downloaded
-        if(undownloadedURLs.length > 0){
-            console.warn(`${undownloadedURLs.length} fonts are missing from cache. Downloading them now...`);
-            
-            const time = performance.now();
-
-            await downloadFontFromURLs(db, undownloadedURLs);
-
-            // reopen the store cuz this closes the connection for some reason
-            tx = db.transaction(TTFObjectStore, "readonly");
-            store = tx.objectStore(TTFObjectStore);
-
-            console.debug(`${undownloadedURLs.length} fonts downloaded in ${performance.now() - time}ms!`);
-        }
+        await downloadFontFromURLs(db, URLKeys);
         
+        // open DB transaction so we can start loading the font data into DOM
+        let tx = db.transaction(TTFObjectStore, "readonly");
+        let store = tx.objectStore(TTFObjectStore);
+
         let fontFaceCSS = ""; // the css code
 
         // Loop through the keys and load the data into CSS
-        for (let i = 0; i < urlCursorKeys.length; i++) {
-            const URLkey = urlCursorKeys[i]; // get the URL key
-            const fontObject = urlKeyToObject[URLkey]; // get the family name
-            const variation = getClosestVariation(400, $storedFontData.currentFontContent[i].variations);
+        for (let i = 0; i < URLKeys.length; i++) {
+            const URLkey = URLKeys[i]; // get the URL key
+            const fontObject = URLKeyToObject[URLkey]; // get the family name
+            const variation = getClosestVariation(400, currentIterFontObj.variations);
             const fontBinaryObj = (await store.get(URLkey) as fontBinary); // get the blob object for the key;
 
             let blobURL: string;
@@ -354,15 +339,16 @@
 
             const blobFormat = fontExtensionToFormats(fontBinaryObj.fileType); // get the file format;
 
-            // if(currentRequests - myRequestID > 1) return; // Don't try to run more than 1 of these functions at a time because it's very resource intensive and we don't the browser to crash (Fuck you firefox).
-
-            // do a final check and add the URL to the stylesheet
-            fontFaceCSS += `
-            @font-face {
-                font-family:"${fontObject.family}";
-                src:url(${blobURL}) format("${blobFormat}");
+            // Add the URL to the stylesheet. We have to do a final check here because there might be many instances of this function running at the same time, and we don't want to add the same URL multiple times.
+            if(document.querySelector("#custom-font-faces").innerHTML.indexOf(URLkey) === -1){
+                fontFaceCSS += `
+                @font-face {
+                    font-family:"${fontObject.family}";
+                    font-weight:${variation};
+                    src:url(${blobURL}) format("${blobFormat}");
+                }
+                `;
             }
-            `;
         }
 
         document.querySelector("#custom-font-faces").innerHTML += fontFaceCSS;
@@ -370,9 +356,86 @@
         // finish tx
         await tx.done;
 
-        setTimeout(() => {
-            statusMessage = ""; // set a status message so users can see it's being loaded
-        }, 1000);
+        return;
+    }
+
+    const loadFontVariationPreview = async (fontObj: fontObject) => {
+        if(fontObj === undefined || fontObj.webSafe) return; // if the font object is undefined or websafe, we don't need to do anything
+
+        let loadURLs: variationURL[] = [];
+
+        // loop through the files and add whatever needs to be loaded into our array
+        for(let i = 0; i < fontObj.fileURLs.length; i++){
+            /*
+             * There are a few cases where we don't want to load the variations:
+             *  - The variation has already been loaded (trancribed)
+             *  - The variation is part of a family that is web safe
+             *  - The variation is part of our system font (Inter, Plus Jakarta Sans, Poppins, Fira Code)
+             */
+
+            const currentVariation: variationURL = fontObj.fileURLs[i];
+
+            if(
+                $storedFontData.transcribedFonts.has(currentVariation.url) ||
+                ["Inter", "Plus Jakarta Sans", "Poppins", "Fira Code"].indexOf(fontObj.family) !== -1
+            ){
+                continue; // do not this variation
+            }
+
+            loadURLs.push(currentVariation); // add the URL to the array of URLs to retrieve
+            $storedFontData.transcribedFonts.set(currentVariation.url, null); // record this URL in our map so we don't retranscribe it
+        }
+
+        // download any variations necessary
+        await downloadFontFromURLs(db, loadURLs.map(variation => variation.url));
+
+        // load variations into the stylesheet
+        const tx = db.transaction(TTFObjectStore, "readonly"); // open db transaction first
+        const store = tx.objectStore(TTFObjectStore); // get the object store
+
+        let fontFaceCSS = ""; // the css code
+
+        // Loop through the keys and load the data into CSS
+        for (let i = 0; i < loadURLs.length; i++) {
+            const currentVariation = loadURLs[i]; // get the URL key
+            const fontBinaryObj = (await store.get(currentVariation.url) as fontBinary); // get the blob object for the key;
+
+            let blobURL: string;
+            // see if we already have a local URL stored
+            if(!!fontObj.localURLs){ // check if we have this list at all first
+                blobURL = !!fontObj.localURLs[currentVariation.variation] ? fontObj.localURLs[currentVariation.variation].url : URL.createObjectURL(fontBinaryObj.binary);
+                // update the local URLs object if we had to generate a new one
+                if(!fontObj.localURLs[currentVariation.variation]) fontObj.localURLs[currentVariation.variation] = {
+                    variation: currentVariation.variation,
+                    url: blobURL
+                }
+            } else { // if this list doesn't exist, initialize it and create a new local URLs object
+                blobURL = URL.createObjectURL(fontBinaryObj.binary);
+                // initialize localURLs
+                fontObj.localURLs = [];
+                fontObj.localURLs[currentVariation.variation] = {
+                    variation: currentVariation.variation,
+                    url: blobURL
+                }
+            }
+
+            const blobFormat = fontExtensionToFormats(fontBinaryObj.fileType); // get the file format
+            // Add the URL to the stylesheet. We don't have to do a final check here because there's probably not gonna be many instances of this function running at the same time.
+
+            fontFaceCSS += `
+            @font-face {
+                font-family:"${fontObj.family}";
+                src:url(${blobURL}) format("${blobFormat}");
+                font-weight:${currentVariation.variation};
+            }
+            `;
+        }
+
+        // Append the CSS to the DOM
+        document.querySelector("#custom-font-faces").innerHTML += fontFaceCSS;
+
+        // finish tx
+        await tx.done;
 
         return;
     }
@@ -427,6 +490,9 @@
         const newTypefaceName:string = newFontObject.family;
         fontRef.typeface = newTypefaceName; // set the new typeface name
         
+        // load preview for this new variation
+        loadFontVariationPreview(newFontObject);
+
         // check to see if the new typeface supports the current variation. If not, switch variation to the closest match
         const newTypefaceVariations:number[] = newFontObject.variations; // the variations of the new typeface
         const currentVariation:number = fontRef.variation; // the variation on the last typeface selection
@@ -440,6 +506,7 @@
 
     const updateVariation = (newVariation: number) => {
         fontRef.variation = newVariation;
+
         // update collection so that svelte can update the associated components
         $collection = $collection;
     }
@@ -451,6 +518,7 @@
         // update collection so that svelte can update the associated components
         $collection = $collection;
     }
+
 </script>
 
 <!-- Accessories -->
@@ -495,10 +563,13 @@
                         <!-- Iterate through every variation for the chosen font -->
                         {#each $storedFontData.currentFontContent[selectedFontIndex].variations as variation}
                             <div class="text-container {fontRef.variation === variation ? "selected" : ""}"
-                                on:click={() => updateVariation(variation)}
-                                style="font-weight: {variation}; font-style: {fontsItalisized ? "italic" : ""}">
+                                on:click={() => updateVariation(variation)}>
 
-                                <p class="no-drag">{beautifiedFontName[getFontNameValue(variation, "name")]}</p>
+                                <p class="no-drag"
+                                    style="font-family: '{$storedFontData.currentFontContent[selectedFontIndex].family}', 'Inter', 'system-ui', 'Tahoma', 'sans-serif'; font-weight:{variation}; font-style: {fontsItalisized ? "italic" : ""}"
+                                >
+                                    {beautifiedFontName[getFontNameValue(variation, "name")]}
+                                </p>
                             </div>
                         {/each}
                     {/if}
@@ -563,13 +634,9 @@
         </section>
     </section>
     <p id="copyright-msg" class="no-drag">
-        {#if !statusMessage}
-            Web fonts provided by Google Fonts
-            &ensp;⎸&ensp;
-            <a href="https://developers.google.com/fonts/faq/privacy" target="_blank">Privacy</a>
-        {:else}
-            {statusMessage}
-        {/if}
+        Web fonts provided by Google Fonts
+        &ensp;⎸&ensp;
+        <a href="https://developers.google.com/fonts/faq/privacy" target="_blank">Privacy</a>
         </p>
 </main>
 
