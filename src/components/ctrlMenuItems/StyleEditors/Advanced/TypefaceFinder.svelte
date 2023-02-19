@@ -9,7 +9,7 @@
     export let alignTitle: string = "left";
     export let widthGrowPerc = 0;
 
-    import { createEventDispatcher } from 'svelte';
+    import { createEventDispatcher, onMount } from 'svelte';
     import flipAnimate from '../../../../helpers/flipAnimate';
     import type { typographyStyle } from '../../../../stores/collection';
     import { mainFontPickerData } from '../../../../stores/fontPickerStat';
@@ -24,10 +24,10 @@
     let dispatchLocked = true;
     let colorPreviewSquare: HTMLDivElement; // the square that previews the text color
     
-    let initialValue: string = typeface.typeface; // the input will reset to this value if there is nothing, or if there is an error. This must be recorded every time the input is focused.
+    let initialValue: string = typeface.fontObj.family; // the input will reset to this value if there is nothing, or if there is an error. This must be recorded every time the input is focused.
 
     const preventNullV = () => {
-        if (!typeface) typeface.typeface = initialValue;
+        if (!typeface) typeface.fontObj.family = initialValue;
         dispatchLocked = true;
         disp("blurred");
 
@@ -47,8 +47,9 @@
         }
     }
 
-    // dispatch value changes if v changes
+    // This function should update the search query when necessary and dispatch back the new query
     $: if(typeface !== null && !dispatchLocked){ // do not send null
+        // dispatch value changes if v changes just because why not
         disp("updateValue", {
             v:typeface
         })
@@ -79,14 +80,14 @@
     const unFocusInput = () => {
         preventNullV(); // prevent null value input
 
+        // lock the search lock to prevent further input
+        $mainFontPickerData.searchLocked = false;
+
         // deselect all text
         let selection = window.getSelection();
         if (selection) {
             selection.removeAllRanges();
         }
-
-        // clear search query in fontPickDat.
-        $mainFontPickerData.searchQuery = "";
         
         flipAnimate(inputText, () => {
             inputText.style.removeProperty("left");
@@ -95,22 +96,9 @@
         searchIcon.style.opacity = "0";
     }
 
-    // TODO: Implement font injection
-    // setTimeout(() => {
-    //     const style = document.createElement('style');
-    //     style.innerHTML = `
-    //         @font-face {
-    //             font-family: 'MyFont';
-    //             src: url(http://fonts.gstatic.com/s/fraunces/v24/6NUh8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7hzFUPJH58nib1603gg7S2nfgRYIc6RujDvTShUtWNg.ttf)
-    //         }
-    //     `;
-    //     inputTextContainer.appendChild(style);
-
-
-    //     inputText.style.fontFamily = `'MyFont', Inter`;
-    // }, 1000);
-
-    function updateSearchQuery() {
+    const updateSearchQuery = () => {
+        // disable search lock so we can start entering a new query
+        $mainFontPickerData.searchLocked = false;
         $mainFontPickerData.searchQuery = inputText.textContent.toLowerCase();
     }
 </script>
@@ -122,7 +110,7 @@
         <!-- Search text -->
         <p bind:this={inputText} class="preview-text" contenteditable={true} spellcheck={false}
         on:keydown={checkEnterPress} on:focus={focusInput} on:blur={unFocusInput} on:mousedown={keepOpenOverlay} on:input={updateSearchQuery}
-        style="font-family: {typeface.typeface}, Inter">{typeface.typeface}</p>
+        style="font-family: '{typeface.fontObj.family}', 'Inter', 'system-ui', 'Tahoma', 'sans-serif'">{typeface.fontObj.appearedName}</p>
 
         <!-- Search icon -->
         <img bind:this={searchIcon} id="search-icon" src="./assets/icons/search.svg" alt="">

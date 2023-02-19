@@ -279,6 +279,17 @@ export const beautifiedFontName: fontAttributes = {
     "extrabold" : "Extrabold",
     "black" : "Black",    
 }
+export const standardizedFontName: fontAttributes = {
+    "Thin" : "thin",
+    "Extralight" : "extralight",
+    "Light" : "light",
+    "Regular" : "regular",
+    "Medium" : "medium",
+    "Semibold" : "semibold",
+    "Bold" : "bold",
+    "Extrabold" : "extrabold",
+    "Black" : "black",
+}
 
 /**
  * @summary A dictionary referrer for all your font name needs.

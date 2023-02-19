@@ -211,11 +211,12 @@
     let focusedTypefaceIndex;
 
     // We'll be mainly using the filtered font content
-    let filteredFontContent: fontObject[] = $storedFontData.currentFontContent;
+    let roughFilteredFontContent: fontObject[] = $storedFontData.currentFontContent; // for processing type categories
+    let fineFilteredFontContent: fontObject[] = $storedFontData.currentFontContent;  // for processing font queries
 
     onMount(async () => {
         // search for font first
-        focusedTypefaceIndex = selectedFontIndex = await searchFontIndex(filteredFontContent, fontRef.typeface);
+        focusedTypefaceIndex = selectedFontIndex = await searchFontIndex(fineFilteredFontContent, fontRef.fontObj.family);
 
         // open DB first
         await openDB();
@@ -250,7 +251,7 @@
      * 
      * @returns {void}
      */
-    const loadNecessaryFontPreview = async (forceLoad?:boolean, loadLimit = 15, updateFromIndex:number = -1) => {
+    const loadNecessaryFontPreview = async (forceLoad?:boolean, loadLimit = 30, updateFromIndex:number = -1) => {
         // DEV: ChatGPT says this code needs more error handling, but it works for now. It might be an issue in the future, so keep an eye out
 
         forceLoad = !!forceLoad;
@@ -269,7 +270,7 @@
         const dIndex = Math.abs(newFocusdTypefaceIndex - focusedTypefaceIndex);
         
         // only update the preview if it's significantly different from the last one or close to the edge, or if force load is set to true
-        if(!forceLoad && (dIndex < 5 && (newFocusdTypefaceIndex < filteredFontContent.length-30 && newFocusdTypefaceIndex > 30))) return;
+        if(!forceLoad && (dIndex < 5 && (newFocusdTypefaceIndex < fineFilteredFontContent.length-30 && newFocusdTypefaceIndex > 30))) return;
 
         // if we should transcribe, we first update the focus index
         focusedTypefaceIndex = newFocusdTypefaceIndex;
@@ -279,7 +280,7 @@
         let currentIterFontObj: fontObject // the font object that we're currently iterating over
 
         // Fetch the font keys that still need to be loaded into CSS.
-        for(let i = Math.max(0, focusedTypefaceIndex - loadLimit); i < Math.min(filteredFontContent.length, focusedTypefaceIndex + loadLimit); i++) {
+        for(let i = Math.max(0, focusedTypefaceIndex - loadLimit); i < Math.min(fineFilteredFontContent.length, focusedTypefaceIndex + loadLimit); i++) {
             /*
              * There are a few cases where we don't want to load the font:
              *  - The font is undefined
@@ -287,7 +288,7 @@
              *  - The font is web safe
              *  - The font is our system font (Inter, Plus Jakarta Sans, Poppins, Fira Code)
              */
-            currentIterFontObj = filteredFontContent[i];
+            currentIterFontObj = fineFilteredFontContent[i];
             if(!currentIterFontObj || currentIterFontObj.webSafe) continue;
 
             // if the font is valid for loading, get URL key based on variation closest to 400
@@ -499,12 +500,12 @@
         selectedFontIndex = newIndex;
         
         // fetch the typeface name from the index
-        const newFontObject: fontObject = filteredFontContent[newIndex];
-        const newTypefaceName:string = newFontObject.family;
-        fontRef.typeface = newTypefaceName; // set the new typeface name
+        const newFontObject: fontObject = fineFilteredFontContent[newIndex];
+        fontRef.fontObj = newFontObject; // set the new typeface name
         
         // load preview for this new variation
         loadFontVariationPreview(newFontObject);
+        console.log(newFontObject);
 
         // check to see if the new typeface supports the current variation. If not, switch variation to the closest match
         const newTypefaceVariations:number[] = newFontObject.variations; // the variations of the new typeface
@@ -532,17 +533,42 @@
         $collection = $collection;
     }
 
+    // ========================== QUERY FILTERS ==========================
+
+    let fontCategoryFilter: typeCategories[] = [];
+
+    // Updating the filter set by the multi-selector
     const updateTypeFilter = async (e: CustomEvent) => {
-        const filter = e.detail.values;
+        fontCategoryFilter = e.detail.values;
         
         // set the real filter
-        filteredFontContent = filter.length > 0 ? $storedFontData.currentFontContent.filter(fontObj => filter.includes(fontObj.category)) : $storedFontData.currentFontContent;
-        
-        // find new scroll position
-        selectedFontIndex = await searchFontIndex(filteredFontContent, fontRef.typeface);
+        roughFilteredFontContent = fontCategoryFilter.length > 0 ? $storedFontData.currentFontContent.filter(fontObj => fontCategoryFilter.includes(fontObj.category)) : $storedFontData.currentFontContent;
+    }
 
-        // set the scroll position
-        fontListContainer.scrollTop = selectedFontIndex * 35 - 95;
+    const fuzzySearch = (fontList: fontObject[], query: string): fontObject[] => {
+        return fontList.filter(font => {
+            const fontFamily = font.family;
+            const pattern = query.split("").reduce((a, b) => a + ".*" + b);
+            const regex = new RegExp(pattern, "i");
+            return fontFamily.match(regex);
+        });
+    };
+
+    // Updating the filter set by the search query
+    $: if(!$mainFontPickerData.searchLocked || !!roughFilteredFontContent){
+        fineFilteredFontContent = roughFilteredFontContent;
+
+        // filter font content based on search query
+        if($mainFontPickerData.searchQuery.length > 0){
+            fineFilteredFontContent = fuzzySearch(roughFilteredFontContent, $mainFontPickerData.searchQuery);
+        }
+
+        // find new scroll position
+        searchFontIndex(fineFilteredFontContent, fontRef.fontObj.family).then(newSelectedFontIndex => {
+            // set the scroll position
+            if(!!fontListContainer) fontListContainer.scrollTop = newSelectedFontIndex * 35 - 95;
+            selectedFontIndex = newSelectedFontIndex;
+        });
     }
 </script>
 
@@ -569,31 +595,40 @@
         <!-- font selection container -->
         <section id="font-selection-container">
             <!-- Only show fonts if it's not an empty list -->
-            {#if !!filteredFontContent && ready}
+            {#if fineFilteredFontContent !== undefined && ready}
                 <!-- first section for all the main fonts -->
                 <section bind:this={fontListContainer} id="font-list-container" on:scroll={() => loadNecessaryFontPreview()}>
-                    <!-- iterate through every font there is -->
-                    {#each filteredFontContent as fontObj, i (i)}
-                        <div class="text-container {fontRef.typeface === fontObj.family ? "selected" : ""}"
-                            on:click={() => updateTypeface(i)}>                            
-                            <p class="no-drag" style="font-family: '{fontObj.family}', 'Inter', 'system-ui', 'Tahoma', 'sans-serif'">
-                                {fontObj.appearedName ?? fontObj.family}
-                            </p>
-                        </div>
-                    {/each}
-                    <div style="height: 11px"></div>
+                    
+                    {#if fineFilteredFontContent.length > 0}
+                        <!-- iterate through every font there is -->
+                        {#each fineFilteredFontContent as fontObj, i (i)}
+                            <div class="text-container {fontRef.fontObj.family === fontObj.family ? "selected" : ""}"
+                                on:click={() => updateTypeface(i)}>                            
+                                <p class="no-drag" style="font-family: '{fontObj.family}', 'Inter', 'system-ui', 'Tahoma', 'sans-serif'">
+                                    {fontObj.appearedName ?? fontObj.family}
+                                </p>
+                            </div>
+                        {/each}
+                        <div style="height: 11px"></div>
+                    {:else}
+                        <p class="no-drag no-result">
+                            <span>No results for</span>
+                            "{$mainFontPickerData.searchQuery}"
+                        </p>
+                    {/if}
+
                 </section>
 
                 <!-- section section for all the font variations avaiable -->
                 <section bind:this={variationListContainer} id="variation-list-container">
-                    {#if !!filteredFontContent[selectedFontIndex] && !!filteredFontContent[selectedFontIndex]["variations"]}
+                    {#if !!fineFilteredFontContent[selectedFontIndex] && !!fineFilteredFontContent[selectedFontIndex]["variations"]}
                         <!-- Iterate through every variation for the chosen font -->
-                        {#each filteredFontContent[selectedFontIndex].variations as variation}
+                        {#each fineFilteredFontContent[selectedFontIndex].variations as variation}
                             <div class="text-container {fontRef.variation === variation ? "selected" : ""}"
                                 on:click={() => updateVariation(variation)}>
 
                                 <p class="no-drag"
-                                    style="font-family: '{filteredFontContent[selectedFontIndex].family}', 'Inter', 'system-ui', 'Tahoma', 'sans-serif'; font-weight:{variation}; font-style: {fontsItalisized ? "italic" : ""}; {fontsUnderlined || fontsStriked ? "text-decoration: " : ""} {fontsUnderlined ? "underline" : ""} {fontsStriked ? "line-through" : ""};"
+                                    style="font-family: '{fineFilteredFontContent[selectedFontIndex].family}', 'Inter', 'system-ui', 'Tahoma', 'sans-serif'; font-weight:{variation}; font-style: {fontsItalisized ? "italic" : ""}; {fontsUnderlined || fontsStriked ? "text-decoration: " : ""} {fontsUnderlined ? "underline" : ""} {fontsStriked ? "line-through" : ""};"
                                 >
                                     {beautifiedFontName[getFontNameValue(variation, "name")]}
                                 </p>
@@ -686,6 +721,18 @@
                 #font-list-container{
                     border-right: 4px solid hsla(0deg, 0%, 0%, 30%);
                     height: 100%; min-width: 200px; max-width: 200px; width: 200px;
+
+                    .no-result{
+                        color: $secondarys5;
+                        font-size: 14px;
+                        width: calc(100% - 20px); height: calc(100% - 20px);
+                        padding: 10px; text-align: center;
+                        display: flex; justify-content: center; align-items: center; flex-direction: column;
+
+                        span{
+                            margin-bottom: 10px;
+                        }
+                    }
                 }
                 #variation-list-container{
                     height: 100%; width:100%; margin:0; // fill up the rest of the space

@@ -56,13 +56,19 @@
 
     // document components
     let colorPreviewSquare:HTMLDivElement;
-    let fontPicker:HTMLDivElement;
+    let fontPickerTracker:HTMLDivElement;
 
     // these variables just make the code look nicer
     let clr:color = {type:"hsl", r:10, g:10, b:10, h:0, s:0, l:4, a:100, hex:"0a0a0a"} // default text color
 
     let fontRef: typographyStyle = {
-        typeface: "system-ui",
+        fontObj: {
+            family: "system-ui",
+            appearedName: "System UI",
+            category: "sans-serif",
+            variations: [400, 700],
+            webSafe: true,
+        },
         variation: 400,
         textDecorations: [],
         casing: "mix",
@@ -120,6 +126,8 @@
         textCasing as textCasingType,
         textDecoration as textDecorationType
     } from "../../../stores/collection";
+    import { beautifiedFontName, getFontNameValue, standardizedFontName } from "../../../workers/pseudoWorkers/fonts";
+    import { keepOpenOverlay } from "./Advanced/Overlay.svelte";
 
     const updateAlignment = (e:CustomEvent) => {
         const val = e.detail.value;
@@ -138,7 +146,6 @@
     }
     
     const updateDecoration = (e:CustomEvent) => {
-        const vals:textDecorationType[] = e.detail.values;
         // set the value of the decorations accordingly
         fontRef.textDecorations = e.detail.values;
         // update collection so that svelte can update the associated components
@@ -149,6 +156,13 @@
     const updateTextSizing = (att: sizeAttribute, e: CustomEvent) => { // used for font size, tracking and line height only.
         fontRef[att].v = e.detail.v;
         fontRef[att].u = e.detail.u;
+        // update collection so that svelte can update the associated components
+        $collection = $collection;
+    }
+
+    const updateTextWeighting = (e:CustomEvent) => {
+        // set the value of the weight accordingly
+        fontRef.variation = getFontNameValue(standardizedFontName[e.detail.v], "value") as number;
         // update collection so that svelte can update the associated components
         $collection = $collection;
     }
@@ -178,16 +192,23 @@
     <!-- Appearance -->
     <Title name="Typography & Appearance"></Title>
     <!-- Text style and font chooser -->
-    <section>
+    <section on:mousedown={keepOpenOverlay}>
         <!-- Color picker -->
         <div bind:this={colorPreviewSquare}
             class="preview-square" style="background-color: hsla({clr.h}deg, {clr.s}%, {clr.l}%, {clr.a}%);"
             on:mousedown={openColorOverlay}></div>
         <!-- Font finder -->
-        <div bind:this={fontPicker}></div>
+        <div bind:this={fontPickerTracker}></div>
         <TypefaceFinder name="Typeface" typeface={fontRef} hasMargin={true} sub={true} minWidth={""} widthGrowPerc={176} on:focused={openFontOverlay}/>
         <!-- Weight -->
-        <Dropdown name="Font" v={"Regular"} possibleValues={["Thin", "Regular", "Bold"]} sub={true} hasMargin={false}/>
+        <Dropdown
+            name="Weight"
+            v={ beautifiedFontName[getFontNameValue(fontRef.variation, "name")] }
+            possibleValues={ fontRef.fontObj.variations.map(v => beautifiedFontName[getFontNameValue(v, "name")]) }
+            sub={true}
+            hasMargin={false}
+            on:updateValue={ updateTextWeighting }
+            />
     </section>
     
     <div class="spacer"></div>

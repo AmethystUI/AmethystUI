@@ -1,4 +1,5 @@
 import { writable, get } from 'svelte/store';
+import type { fontObject } from '../workers/pseudoWorkers/fonts';
 
 export type HTMLtag = "A" | "BODY" | "BUTTON" | "CANVAS" | "DIV" | "H1" | "H2" | "H3" | "H4" | "H5" | "H6" | "HR" | "INPUT" | "LABEL" | "OL" | "UL" | "PROGRESS" | "P" | "SECTION" | "SPAN" | "TEXTAREA";
 export type units = "px" | "pt" | "pc" | "em" | "rem" | "vw" | "vh" | "%" | "fit-content";
@@ -64,7 +65,7 @@ export interface shadow{
 }
 
 export interface typographyStyle{
-    typeface : string, // same as font family name
+    fontObj : fontObject, // the font object that contains most of the information we need
     variation : number, // basically the weight
     
     textDecorations: textDecoration[],
