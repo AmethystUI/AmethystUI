@@ -51,7 +51,7 @@
     
         <!-- text editor -->
         <TextEditor currentParentWidth={currentWidth}/>
-        
+
         <!-- appearance editor -->
         <AppearanceEditor currentParentWidth={currentWidth}/>
         

@@ -34,6 +34,7 @@
         
         // for closing
         document.addEventListener("mouseup", closeUnitSel);
+        document.addEventListener("keydown", closeUnitSelOnKey);
 
         // add resize listener for window
         trackingDir = true
@@ -52,6 +53,10 @@
         if(trackingDir) requestAnimationFrame(updateSelectionDirection);
     }
 
+    const closeUnitSelOnKey = (e: KeyboardEvent) => {
+        if(e.key === "Escape") closeUnitSel();
+    }
+
     const closeUnitSel = () => {
         setTimeout(() => {
             unitSelOpen = false;
@@ -64,6 +69,7 @@
 
             // remove listener
             document.removeEventListener("mouseup", closeUnitSel);
+            document.removeEventListener("keydown", closeUnitSelOnKey);
             window.removeEventListener("resize", updateSelectionDirection);
         }, 0);
     }

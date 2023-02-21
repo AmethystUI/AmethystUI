@@ -138,6 +138,7 @@ export interface elementStyle{
     outlineStyle? : borderOutlineStyle, // done
     outlineOffset? : unitedAttr<number>, // done
 
+    USETEXT? : boolean,
     content? : string,
     placeholder? : string,
     typeStyle? : typographyStyle, // we have to condense all of these stuff into a single attribute because we have an overlay controlling it. And that requires a single, condensed attr.

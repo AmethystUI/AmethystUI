@@ -128,6 +128,14 @@
     import { beautifiedFontName, getFontNameValue, standardizedFontName } from "../../../workers/pseudoWorkers/fonts";
     import { keepOpenOverlay } from "./Advanced/Overlay.svelte";
 
+    const toggleUseText = () => {
+        if($selectedOverride !== -1){ // if no override is selected
+            $collection[$selectedComponent].styleOverrides[$selectedOverride].style.USETEXT = !$collection[$selectedComponent].styleOverrides[$selectedOverride].style.USETEXT
+        } else {
+            $collection[$selectedComponent].style.USETEXT = !$collection[$selectedComponent].style.USETEXT
+        }
+    }
+
     const updateAlignment = (e:CustomEvent) => {
         const val = e.detail.value;
         // set the value of the alignment to the collection value
@@ -165,97 +173,98 @@
         // update collection so that svelte can update the associated components
         $collection = $collection;
     }
-
-    // DEBUG: bruh
-    onMount(() => {
-        setTimeout(() => {
-            openFontOverlay();
-        }, 100);
-    })
 </script>
 
 <main class="no-drag">
     <!-- title of the editor -->
     <section id="title-container">
         <h1>Text</h1>
+
+        <section id="check-container">
+            <input type="checkbox" checked={currentStyle.USETEXT} on:click={toggleUseText}>
+            <img src="./assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USETEXT ? "1" : "0"}">
+        </section>
     </section>
 
-    <!-- Content -->
-    <TextAreaInput name={"Content"} placeHolder={"Lorem ipsum dolor sit amet."} v={""} hasMargin={false} sub={false} currentParenteWidth={currentParentWidth}/>
-    <div class="spacer"></div>
-    <!-- Placeholder -->
-    <TextAreaInput name={"Placeholder"} placeHolder={"Lorem ipsum dolor sit amet."} v={""} hasMargin={false} sub={false} currentParenteWidth={currentParentWidth}/>
+    <!-- only show editing panel if text is enabled -->
+    {#if currentStyle.USETEXT}
+        <!-- Content -->
+        <TextAreaInput name={"Content"} placeHolder={"Lorem ipsum dolor sit amet."} v={""} hasMargin={false} sub={false} currentParenteWidth={currentParentWidth}/>
+        <div class="spacer"></div>
+        <!-- Placeholder -->
+        <TextAreaInput name={"Placeholder"} placeHolder={"Lorem ipsum dolor sit amet."} v={""} hasMargin={false} sub={false} currentParenteWidth={currentParentWidth}/>
 
-    <div class="spacer"></div>
+        <div class="spacer"></div>
 
-    <!-- Appearance -->
-    <Title name="Typography & Appearance"></Title>
-    <!-- Text style and font chooser -->
-    <section on:mousedown={keepOpenOverlay}>
-        <!-- Color picker -->
-        <div bind:this={colorPreviewSquare}
-            class="preview-square" style="background-color: hsla({clr.h}deg, {clr.s}%, {clr.l}%, {clr.a}%);"
-            on:mousedown={openColorOverlay}></div>
-        <!-- Font finder -->
-        <div bind:this={fontPickerTracker}></div>
-        <TypefaceFinder name="Typeface" typeface={fontRef} hasMargin={true} sub={true} minWidth={""} widthGrowPerc={176} on:focused={openFontOverlay}/>
-        <!-- Weight -->
-        <Dropdown
-            name="Weight"
-            v={ beautifiedFontName[getFontNameValue(fontRef.variation, "name")] }
-            possibleValues={ fontRef.fontObj.variations.map(v => beautifiedFontName[getFontNameValue(v, "name")]) }
-            sub={true}
-            hasMargin={false}
-            on:updateValue={ updateTextWeighting }
-            />
-    </section>
-    
-    <div class="spacer"></div>
-    
-    <!-- Sizing control -->
-    <section>
-        <UnitInput name={"Size"} sub={true} v={fontRef.size.v} u={fontRef.size.u} hasMargin={true} on:updateValue={e => {
-            updateTextSizing("size", e)
-        }}/>
+        <!-- Appearance -->
+        <Title name="Typography & Appearance"></Title>
+        <!-- Text style and font chooser -->
+        <section on:mousedown={keepOpenOverlay}>
+            <!-- Color picker -->
+            <div bind:this={colorPreviewSquare}
+                class="preview-square" style="background-color: hsla({clr.h}deg, {clr.s}%, {clr.l}%, {clr.a}%);"
+                on:mousedown={openColorOverlay}></div>
+            <!-- Font finder -->
+            <div bind:this={fontPickerTracker}></div>
+            <TypefaceFinder name="Typeface" typeface={fontRef} hasMargin={true} sub={true} minWidth={""} widthGrowPerc={176} on:focused={openFontOverlay}/>
+            <!-- Weight -->
+            <Dropdown
+                name="Weight"
+                v={ beautifiedFontName[getFontNameValue(fontRef.variation, "name")] }
+                possibleValues={ fontRef.fontObj.variations.map(v => beautifiedFontName[getFontNameValue(v, "name")]) }
+                sub={true}
+                hasMargin={false}
+                on:updateValue={ updateTextWeighting }
+                />
+        </section>
         
-        <div style="min-height: 2px"></div>
+        <div class="spacer"></div>
         
-        <UnitInput name={"Tracking"} minVal={-100} sub={true} v={fontRef.tracking.v} u={fontRef.tracking.u} hasMargin={true} on:updateValue={e => {
-            updateTextSizing("tracking", e)
-        }}/>
-        
-        <div style="min-height: 2px"></div>
+        <!-- Sizing control -->
+        <section>
+            <UnitInput name={"Size"} sub={true} v={fontRef.size.v} u={fontRef.size.u} hasMargin={true} on:updateValue={e => {
+                updateTextSizing("size", e)
+            }}/>
+            
+            <div style="min-height: 2px"></div>
+            
+            <UnitInput name={"Tracking"} minVal={-100} sub={true} v={fontRef.tracking.v} u={fontRef.tracking.u} hasMargin={true} on:updateValue={e => {
+                updateTextSizing("tracking", e)
+            }}/>
+            
+            <div style="min-height: 2px"></div>
 
-        <UnitInput name={"Line Height"} minVal={-100} sub={true} v={fontRef.lineHeight.v} u={fontRef.lineHeight.u} hasMargin={false} on:updateValue={e => {
-            updateTextSizing("lineHeight", e)
-        }}/>
+            <UnitInput name={"Line Height"} minVal={-100} sub={true} v={fontRef.lineHeight.v} u={fontRef.lineHeight.u} hasMargin={false} on:updateValue={e => {
+                updateTextSizing("lineHeight", e)
+            }}/>
 
-        <!-- Add later for variable fonts -->
-        <!-- <ValueInput name={"Weight"} v={0} sub={true} hasMargin={false} align={"center"} alignTitle={"left"}/> -->
-    </section>
+            <!-- Add later for variable fonts -->
+            <!-- <ValueInput name={"Weight"} v={0} sub={true} hasMargin={false} align={"center"} alignTitle={"left"}/> -->
+        </section>
 
-    <div class="spacer"></div>
+        <div class="spacer"></div>
 
-    <!-- Alignment control -->
-    <MultiToggle elements={textAlignment} selection={alignmentIndices[fontRef.alignment]}
-        name={"Alignment"} sub={true} width={currentParentWidth-27} height={25} radius={4} iconSize={18}
-        on:valueChange={updateAlignment}/>
+        <!-- Alignment control -->
+        <MultiToggle elements={textAlignment} selection={alignmentIndices[fontRef.alignment]}
+            name={"Alignment"} sub={true} width={currentParentWidth-27} height={25} radius={4} iconSize={18}
+            on:valueChange={updateAlignment}/>
 
-    <div class="spacer"></div>
+        <div class="spacer"></div>
 
-    <!-- Casing control -->
-    <MultiToggle elements={textCasing} selection={casingIndices[fontRef.casing]}
-        name={"Text Casing"} sub={true} width={currentParentWidth-27} height={25} radius={4} iconSize={18}
-        on:valueChange={updateCasing}/>
+        <!-- Casing control -->
+        <MultiToggle elements={textCasing} selection={casingIndices[fontRef.casing]}
+            name={"Text Casing"} sub={true} width={currentParentWidth-27} height={25} radius={4} iconSize={18}
+            on:valueChange={updateCasing}/>
 
-    <div class="spacer"></div>
+        <div class="spacer"></div>
 
-    <!-- Decor control -->
-    <MultiSelect elements={textDecoration} selections={fontRef.textDecorations.map(i => decorationIndices[i])}
-        name={"Decoration"} sub={true} width={currentParentWidth-27} height={25} radius={4} iconSize={18}
-        on:valueChange={updateDecoration}/>
+        <!-- Decor control -->
+        <MultiSelect elements={textDecoration} selections={fontRef.textDecorations.map(i => decorationIndices[i])}
+            name={"Decoration"} sub={true} width={currentParentWidth-27} height={25} radius={4} iconSize={18}
+            on:valueChange={updateDecoration}/>
 
-    <div style="height:17px"></div>
+        <div style="height:17px"></div>
+    {/if}
 </main>
 
 <style lang="scss">
@@ -281,6 +290,37 @@
                 color: 1px solid $secondarys2;
                 user-select: none; -webkit-user-select: none;
             }
+
+            #check-container{
+                display:flex; align-items:center; height:100%; transform: translateY(-0.5px);
+                margin:0;
+                position: relative;
+
+                img{
+                    position:absolute;
+                    height:75%; width:75%;
+                    top:calc(50% + 0.75px); left:calc(50% + 7.25px); transform: translate(-50%, -50%);
+                    pointer-events: none;
+                }
+
+                input{
+                    /* hide default style */
+                    -webkit-appearance: none;
+                    appearance: none;
+                    background: $primaryl1;
+                    
+                    height:15px; width:15px;
+                    border-radius: 3px;
+        
+                    margin: 2px 0px 0px 15px;
+                    border: 1.5px solid $primaryl5;
+        
+                    &:checked{
+                        background: $accent;
+                        border:none;
+                    }
+                }
+            }
         }
 
         section{
@@ -289,6 +329,10 @@
 
         .spacer{
             height:7px;
+        }
+
+        img{
+            filter: invert(1); opacity: 1;
         }
     }
 </style>
