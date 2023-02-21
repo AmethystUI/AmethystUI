@@ -24,16 +24,25 @@
     let dispatchLocked = true;
     let colorPreviewSquare: HTMLDivElement; // the square that previews the text color
     
-    let initialValue: string = typeface.fontObj.family; // the input will reset to this value if there is nothing, or if there is an error. This must be recorded every time the input is focused.
+    let initialValue: string = typeface.fontObj.appearedName ?? typeface.fontObj.family; // the input will reset to this value if there is nothing, or if there is an error. This must be recorded every time the input is focused.
 
     const preventNullV = () => {
-        if (!typeface) typeface.fontObj.family = initialValue;
+        const newTypeface:string = typeface.fontObj.appearedName ?? typeface.fontObj.family;
         dispatchLocked = true;
         disp("blurred");
 
-        // hard checking to see if the innerHTML is empty
-        if(inputText.textContent.length === 0) inputText.textContent = initialValue;
+        // hard checking to see if the innerHTML is empty. If it is, replace it with whatever is selected right now.
+        if(inputText.textContent.length === 0) inputText.innerHTML = typeface.fontObj.appearedName ?? typeface.fontObj.family;
+
+        // check if the initial value is the same a the new value. If so, nothing is changed and we have to reset the input
+        // if(newTypeface === initialValue){
+        //     inputText.textContent = initialValue;
+        // } else {
+        //     initialValue = newTypeface;
+        // }
     }
+
+    $: if(!!inputText && $mainFontPickerData.searchLocked) inputText.innerHTML = typeface.fontObj.appearedName ?? typeface.fontObj.family;
 
     const checkEnterPress = (e:KeyboardEvent) => {
         dispatchLocked = false;
@@ -56,9 +65,7 @@
     }
 
     let focused = false;
-    const focusInput = () => {
-        initialValue = inputTextContainer.textContent;
-        
+    const focusInput = () => {        
         flipAnimate(inputText, () => {
             inputText.style.left = "30px";
         }, 300);
@@ -99,7 +106,7 @@
     const updateSearchQuery = () => {
         // disable search lock so we can start entering a new query
         $mainFontPickerData.searchLocked = false;
-        $mainFontPickerData.searchQuery = inputText.textContent.toLowerCase();
+        $mainFontPickerData.searchQuery = inputText.textContent;
     }
 </script>
 
@@ -110,7 +117,7 @@
         <!-- Search text -->
         <p bind:this={inputText} class="preview-text" contenteditable={true} spellcheck={false}
         on:keydown={checkEnterPress} on:focus={focusInput} on:blur={unFocusInput} on:mousedown={keepOpenOverlay} on:input={updateSearchQuery}
-        style="font-family: '{typeface.fontObj.family}', 'Inter', 'system-ui', 'Tahoma', 'sans-serif'">{typeface.fontObj.appearedName}</p>
+        style="font-family: '{typeface.fontObj.family}', 'Inter', 'system-ui', 'Tahoma', 'sans-serif'"></p>
 
         <!-- Search icon -->
         <img bind:this={searchIcon} id="search-icon" src="./assets/icons/search.svg" alt="">

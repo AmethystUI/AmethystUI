@@ -11,7 +11,6 @@ import { fontLimit, fontSorting } from "../configs/fontLoading.config";
  * @property {string} lastModified - The date when the font was last modified.
  * @property {string[]} files - An array of file paths to the font files. The keys also shows what weights this font supports.
  * @property {string} category - The category of the font.
- * @property {string} transcribed - Whether or not the font has been transcribed into base64.
  */
 export interface fontObject {
     family: string,

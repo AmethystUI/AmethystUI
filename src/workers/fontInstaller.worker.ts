@@ -136,14 +136,23 @@ const downloadRequiredFonts = async () => {
  * @param {boolean} [closeDBAfterFinished=false] - A flag indicating whether the database should be closed after the download operation is finished.
  */
 export const downloadFontFromURLs = async (db:IDBPDatabase, urls: string[], closeDBAfterFinished = false) => {    
+    // do a sanity check to see if DB is undefined first
+    if(!db){
+        console.warn("Tried to access a DB that is undefined or unopened. Font installer cannot download font files at the moment.");
+        return;
+    }
+    
     // check if the URL is already downloaded in the DB
     let filteredURL:string[] = [];
     const allDBKeys: IDBValidKey[] = await db.getAllKeys(TTFObjectStore);
+    
     for(let i = 0; i < urls.length; i++) {
         const url:string = urls[i];
-        if(!allDBKeys.includes(url[i])) filteredURL.push(url); // we'll only download the font if it's not already in the DB
+        if(!allDBKeys.includes(url)) filteredURL.push(url); // we'll only download the font if it's not already in the DB
     }
-    
+
+    if(filteredURL.length === 0) return;
+
     // compose the url batch into a request
     const promises:Promise<ArrayBuffer>[] = filteredURL.map(
         url => fetch(url).then(res => {
@@ -154,6 +163,7 @@ export const downloadFontFromURLs = async (db:IDBPDatabase, urls: string[], clos
             return res.arrayBuffer();
         })
     );
+
     // submit requests and wait for all to finish
     let results: ArrayBuffer[] = [];
 
@@ -164,7 +174,7 @@ export const downloadFontFromURLs = async (db:IDBPDatabase, urls: string[], clos
     // store the raw binaries and its corresponding file format in indexDB, using the url string as the key
     const tx = db.transaction(TTFObjectStore, "readwrite");
     const store = tx.objectStore(TTFObjectStore);
-    
+
     for(let i = 0; i < results.length; i++) {
         if(results[i] === null) continue; // don't store null urls
         
@@ -177,9 +187,6 @@ export const downloadFontFromURLs = async (db:IDBPDatabase, urls: string[], clos
             lastModified: Date.now()
         };
         await store.put(font, url); // put our processed data into the indexDB
-
-        // we will also store a map into local storage for faster access. It basically maps every URLKey to a local URL that points to our binary blob
-
     }
 
     // commit transaction

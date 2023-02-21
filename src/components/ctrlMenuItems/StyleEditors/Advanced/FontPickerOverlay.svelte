@@ -174,7 +174,7 @@
     import LoadingSpinner from "../../../ui/LoadingSpinner.svelte";
     import { onDestroy, onMount } from "svelte";
     import { downloadFontFromURLs, fontBinary, fontDBName, TTFObjectStore } from "../../../../workers/fontInstaller.worker";
-    import { IDBPDatabase, IDBPObjectStore, openDB as openDBWithIDB } from "idb";
+    import { IDBPDatabase, IDBPObjectStore, IDBPTransaction, openDB as openDBWithIDB } from "idb";
 
     $: name = $mainFontPickerData.windowName ?? "Fonts";
     $: fontsItalisized = !!fontRef ? fontRef.textDecorations.includes("italicize") : false;
@@ -211,8 +211,8 @@
     let focusedTypefaceIndex;
 
     // We'll be mainly using the filtered font content
-    let roughFilteredFontContent: fontObject[] = $storedFontData.currentFontContent; // for processing type categories
-    let fineFilteredFontContent: fontObject[] = $storedFontData.currentFontContent;  // for processing font queries
+    let roughFilteredFontContent: fontObject[] = [...$storedFontData.currentFontContent]; // for processing type categories
+    let fineFilteredFontContent: fontObject[] = [...roughFilteredFontContent];  // for processing font queries
 
     onMount(async () => {
         // search for font first
@@ -238,6 +238,9 @@
     })
 
     onDestroy(() => {
+        $mainFontPickerData.searchLocked = true;
+        $mainFontPickerData.searchQuery = "";
+
         // kill DB connection
         db.close();
     })
@@ -259,18 +262,18 @@
         let scrollHeight: number;
         let newFocusdTypefaceIndex:number;
 
-        if(updateFromIndex === -1 && !!fontListContainer) { // if we don't have a specific index to update from OR if the parent doesn't exist yet, then we'll dynamically update based off of scroll position
+        if(updateFromIndex === -1 && !!fontListContainer) { // if we don't have a specific index to update from AND if the parent doesn't exist yet, then we'll dynamically update based off of scroll position
             scrollHeight = fontListContainer.scrollTop; // if no scroll height is specified, default to scroll top on the font container
             newFocusdTypefaceIndex = Math.round((scrollHeight + 95) / 35); // get the index of the font that is currently looked at (the center one)
-        } else {
-            newFocusdTypefaceIndex = selectedFontIndex; // get the index of the font that is currently looked at (the center one)
+        } else { // otherwise, we'll just the preview from the specified index
+            newFocusdTypefaceIndex = updateFromIndex; // get the index of the font that is currently looked at (the center one)
         }
         
         // we'll only load previews when the difference in scroll is larger than 5 
         const dIndex = Math.abs(newFocusdTypefaceIndex - focusedTypefaceIndex);
         
         // only update the preview if it's significantly different from the last one or close to the edge, or if force load is set to true
-        if(!forceLoad && (dIndex < 5 && (newFocusdTypefaceIndex < fineFilteredFontContent.length-30 && newFocusdTypefaceIndex > 30))) return;
+        if(!forceLoad && (dIndex < 10 && (newFocusdTypefaceIndex < fineFilteredFontContent.length-10 && newFocusdTypefaceIndex > 10))) return;
 
         // if we should transcribe, we first update the focus index
         focusedTypefaceIndex = newFocusdTypefaceIndex;
@@ -314,10 +317,19 @@
         await downloadFontFromURLs(db, URLKeys);
         
         // open DB transaction so we can start loading the font data into DOM
-        let tx = db.transaction(TTFObjectStore, "readonly");
-        let store = tx.objectStore(TTFObjectStore);
+        let tx: IDBPTransaction<unknown, ["TTF"], "readonly">;
+        let store: IDBPObjectStore<unknown, ["TTF"], "TTF", "readonly">;
 
-        let fontFaceCSS = ""; // the css code
+        try{
+            tx = db.transaction(TTFObjectStore, "readonly");
+            store = tx.objectStore(TTFObjectStore);
+        } catch (error) {
+            console.warn("Tried to update DB while DB is closing.");
+            return;
+        }
+
+        // let fontFaceCSS = ""; // the css code
+        let newStyle = document.createElement("style");
 
         // Loop through the keys and load the data into CSS
         for (let i = 0; i < URLKeys.length; i++) {
@@ -347,19 +359,20 @@
 
             const blobFormat = fontExtensionToFormats(fontBinaryObj.fileType); // get the file format;
 
-            // Add the URL to the stylesheet. We have to do a final check here because there might be many instances of this function running at the same time, and we don't want to add the same URL multiple times.
-            if(document.querySelector("#custom-font-faces").innerHTML.indexOf(URLkey) === -1){
-                fontFaceCSS += `
-                @font-face {
-                    font-family:"${fontObject.family}";
-                    font-weight:${variation};
-                    src:url(${blobURL}) format("${blobFormat}");
-                }
-                `;
+            // Add fontface definition again
+
+            newStyle.appendChild(document.createTextNode(`
+            @font-face {
+                font-family:"${fontObject.family}";
+                font-weight:${variation};
+                src:url(${blobURL}) format("${blobFormat}");
             }
+            `));
+
         }
 
-        document.querySelector("#custom-font-faces").innerHTML += fontFaceCSS;
+        // document.querySelector("#custom-font-faces").innerHTML += fontFaceCSS;
+        document.head.appendChild(newStyle);
 
         // finish tx
         await tx.done;
@@ -498,6 +511,9 @@
     const updateTypeface = (newIndex: number) => {
         // update selected font index
         selectedFontIndex = newIndex;
+
+        // lock search query and update query name
+        $mainFontPickerData.searchLocked = true;
         
         // fetch the typeface name from the index
         const newFontObject: fontObject = fineFilteredFontContent[newIndex];
@@ -505,7 +521,6 @@
         
         // load preview for this new variation
         loadFontVariationPreview(newFontObject);
-        console.log(newFontObject);
 
         // check to see if the new typeface supports the current variation. If not, switch variation to the closest match
         const newTypefaceVariations:number[] = newFontObject.variations; // the variations of the new typeface
@@ -535,40 +550,91 @@
 
     // ========================== QUERY FILTERS ==========================
 
-    let fontCategoryFilter: typeCategories[] = [];
-
-    // Updating the filter set by the multi-selector
-    const updateTypeFilter = async (e: CustomEvent) => {
-        fontCategoryFilter = e.detail.values;
-        
-        // set the real filter
-        roughFilteredFontContent = fontCategoryFilter.length > 0 ? $storedFontData.currentFontContent.filter(fontObj => fontCategoryFilter.includes(fontObj.category)) : $storedFontData.currentFontContent;
+    const levenshteinDistance = (a:string, b:string): number => {
+        const m = a.length;
+        const n = b.length;
+        const dp = new Array(m + 1);
+    
+        for (let i = 0; i <= m; i++) {
+            dp[i] = new Array(n + 1);
+            dp[i][0] = i;
+        }
+    
+        for (let j = 1; j <= n; j++) {
+            dp[0][j] = j;
+        }
+    
+        for (let i = 1; i <= m; i++) {
+            for (let j = 1; j <= n; j++) {
+                if (a[i - 1] === b[j - 1]) {
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else {
+                    dp[i][j] = Math.min(dp[i - 1][j - 1] + 1, dp[i - 1][j] + 1, dp[i][j - 1] + 1);
+                }
+            }
+        }
+    
+        return dp[m][n];
     }
 
     const fuzzySearch = (fontList: fontObject[], query: string): fontObject[] => {
-        return fontList.filter(font => {
-            const fontFamily = font.family;
+        // clean up query first for safety
+        query = query.replace(/\\/g, "/").toLowerCase();
+
+        return fontList.sort((a, b) => {
+            const aName = a.appearedName ? a.appearedName.toLowerCase() : a.family.toLowerCase();
+            const bName = b.appearedName ? b.appearedName.toLowerCase() : b.family.toLowerCase();
+
+            // We'll also take into account of the position of the query. The more infront it is, the smaller the weight
+            const scoreA = levenshteinDistance(aName, query) + (aName.indexOf(query) !== -1 ? aName.indexOf(query) : 999);
+            const scoreB = levenshteinDistance(bName, query) + (bName.indexOf(query) !== -1 ? bName.indexOf(query) : 999);
+            return scoreA - scoreB;
+        }).filter(item => {
+            const itemName = item.appearedName ? item.appearedName.toLowerCase() : item.family.toLowerCase();
+
             const pattern = query.split("").reduce((a, b) => a + ".*" + b);
             const regex = new RegExp(pattern, "i");
-            return fontFamily.match(regex);
+            return itemName.match(regex);
         });
     };
 
-    // Updating the filter set by the search query
-    $: if(!$mainFontPickerData.searchLocked || !!roughFilteredFontContent){
-        fineFilteredFontContent = roughFilteredFontContent;
+    // Updating the filter set by the multi-selector
+    const updateTypeFilter = async (e: CustomEvent) => {
+        // lock search query
+        // $mainFontPickerData.searchLocked = true;
 
-        // filter font content based on search query
-        if($mainFontPickerData.searchQuery.length > 0){
-            fineFilteredFontContent = fuzzySearch(roughFilteredFontContent, $mainFontPickerData.searchQuery);
+        const fontCategoryFilter = e.detail.values;
+        
+        // set the real filter
+        if(fontCategoryFilter.length > 0){
+            roughFilteredFontContent = [...$storedFontData.currentFontContent.filter(fontObj => fontCategoryFilter.includes(fontObj.category))];
+        } else {
+            roughFilteredFontContent = [...$storedFontData.currentFontContent];
         }
+    }
 
-        // find new scroll position
-        searchFontIndex(fineFilteredFontContent, fontRef.fontObj.family).then(newSelectedFontIndex => {
-            // set the scroll position
-            if(!!fontListContainer) fontListContainer.scrollTop = newSelectedFontIndex * 35 - 95;
-            selectedFontIndex = newSelectedFontIndex;
-        });
+    /**
+     * Essentially, this function updates the fine filter (the filter that filters based off of search queries) based on this when rough filter is changed (clicked on filters) AND when the search query lock is off (when users are allowed to search).
+     *  From these two conditions, we can deduce that this function will only be called when the user is typing something in, or when the filter is updated while the user is typing in the query.
+     * 
+     */
+    $: if(!!roughFilteredFontContent || !$mainFontPickerData.searchLocked){
+        // filter font content based on search query
+        if($mainFontPickerData.searchQuery.length > 0){ // this should run when the query is changing
+            fontListContainer.scrollTop = 0;
+            fineFilteredFontContent = fuzzySearch([...roughFilteredFontContent], $mainFontPickerData.searchQuery);
+        } else if (fineFilteredFontContent.length !== roughFilteredFontContent.length) { // this should run when the filter is changing. Not when different shit is being selected
+            fineFilteredFontContent = [...roughFilteredFontContent];
+            // find new scroll position
+            searchFontIndex(fineFilteredFontContent, fontRef.fontObj.family).then(newSelectedFontIndex => {
+                // set the scroll position
+                if(!!fontListContainer) fontListContainer.scrollTop = newSelectedFontIndex * 35 - 95;
+                selectedFontIndex = newSelectedFontIndex;
+
+                // load font previews
+                loadNecessaryFontPreview(true, 20, 0);
+            });
+        }
     }
 </script>
 
