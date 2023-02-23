@@ -3,11 +3,12 @@
     
     import ColorPicker from "./Advanced/ColorPicker.svelte";
     import { clearColorPickerRef, mainColorPickerData } from "../../../stores/colorPickerStat";
+    import { initializeColorFromHSLA } from "../../../helpers/colorMaths";
     
     // reactive
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent].style : $collection[$selectedComponent].styleOverrides[$selectedOverride].style;
 
-    let clr:color = {type:"hsl", r:255, g:255, b:255, h:0, s:0, l:100, a:100, hex:"ffffff"}
+    let clr:color = initializeColorFromHSLA(0, 0, 100, 100);
 
     $: if(!!currentStyle){ // these variables just make the code look nicer
         // use background

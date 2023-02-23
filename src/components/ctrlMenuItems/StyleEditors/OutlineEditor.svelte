@@ -6,6 +6,7 @@
     import ColorPicker from "./Advanced/ColorPicker.svelte";
     import Dropdown from "./Basics/Dropdown.svelte";
     import { clearColorPickerRef, mainColorPickerData } from "../../../stores/colorPickerStat";
+    import { initializeColorFromHSLA } from "../../../helpers/colorMaths";
     
     export let currentParentWidth = 360;
     
@@ -20,8 +21,8 @@
     let cBRB = 0; let cBRBu:units = "px"; // cBR = current outline radius
     let cBRL = 0; let cBRLu:units = "px"; // cBR = current outline radius
     let cBRAvg = 0;
-
-    let clr:color = {type:"hsl", r:58, g:101, b:243, h:226, s:88, l:59, a:100, hex:"3a65f3"}
+    
+    let clr:color = initializeColorFromHSLA(226, 88, 59, 100);
 
     // this has to be a subset of the borderOutlineStyle type set in $collection
     const possibleStyles:borderOutlineStyle[] = ["dotted", "dashed", "solid", "double", "groove", "ridge", "inset", "hidden"];
@@ -77,18 +78,18 @@
 
     const updateOutlineWidth = (evt:CustomEvent<any>) => {
         if($selectedOverride !== -1){ // if no override is selected
-            let unit = evt.detail.u ?? $collection[$selectedComponent].styleOverrides[$selectedOverride].style["outlineWidth"].u;
-            $collection[$selectedComponent].styleOverrides[$selectedOverride].style["outlineWidth"] = {v: evt.detail.v, u: unit}
+            let unit = evt.detail.u ?? $collection[$selectedComponent].styleOverrides[$selectedOverride].style.outlineWidth.u;
+            $collection[$selectedComponent].styleOverrides[$selectedOverride].style.outlineWidth = {v: evt.detail.v, u: unit}
         } else {
-            let unit = evt.detail.u ?? $collection[$selectedComponent].style["outlineWidth"].u;
-            $collection[$selectedComponent].style["outlineWidth"] = {v: evt.detail.v, u: unit}
+            let unit = evt.detail.u ?? $collection[$selectedComponent].style.outlineWidth.u;
+            $collection[$selectedComponent].style.outlineWidth = {v: evt.detail.v, u: unit}
         }
 
         updateGeneralAppearance();
     }
     const updateOutlineOffset = (evt:CustomEvent<any>) => {
         if($selectedOverride !== -1){ // if no override is selected
-            let unit = evt.detail.u ?? $collection[$selectedComponent].styleOverrides[$selectedOverride].style["outlineOffset"].u;
+            let unit = evt.detail.u ?? $collection[$selectedComponent].styleOverrides[$selectedOverride].style.outlineOffset.u;
             $collection[$selectedComponent].styleOverrides[$selectedOverride].style["outlineOffset"] = {v: evt.detail.v, u: unit}
         } else {
             let unit = evt.detail.u ?? $collection[$selectedComponent].style["outlineOffset"].u;

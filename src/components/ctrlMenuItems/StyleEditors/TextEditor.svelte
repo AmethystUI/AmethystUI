@@ -59,7 +59,9 @@
     let fontPickerTracker:HTMLDivElement;
 
     // these variables just make the code look nicer
-    let clr:color = {type:"hsl", r:10, g:10, b:10, h:0, s:0, l:4, a:100, hex:"0a0a0a"} // default text color
+    // let clr:color = {type:"hsl", r:10, g:10, b:10, h:0, s:0, l:4, a:100, hex:"0a0a0a"} // default text color
+    const initialColor = {h:0, s:0, l:4}
+    let clr:color = initializeColorFromHSLA(0, 0, 100, 100); // default text color
 
     let fontRef: typographyStyle = {
         fontObj: {
@@ -84,22 +86,20 @@
         }
     }
 
+    let content: string = "Hello World!";
+
     $: if(!!currentStyle){ // Variable update listener. If the current style changes, then update the variables accordingly
         // text color
-        if(!currentStyle["color"]) currentStyle["color"] = clr;
+        if(!currentStyle.color) currentStyle.color = clr;
         clr = currentStyle["color"];
 
         // typeface
-        if(!currentStyle["typeStyle"]) currentStyle["typeStyle"] = fontRef;
-        fontRef = currentStyle["typeStyle"];
-    }
+        if(!currentStyle.typeStyle) currentStyle.typeStyle = fontRef;
+        fontRef = currentStyle.typeStyle;
 
-    const updateStyle = (evt:CustomEvent<any>) => {
-        if($selectedOverride !== -1){ // if no override is selected
-            $collection[$selectedComponent].styleOverrides[$selectedOverride].style["outlineStyle"] = evt.detail.v;
-        } else {
-            $collection[$selectedComponent].style["outlineStyle"] = evt.detail.v;
-        }
+        // initial text
+        if(!currentStyle.content) currentStyle.content = content;
+        fontRef = currentStyle.typeStyle;
     }
 
     // open the color picker
@@ -127,6 +127,7 @@
     } from "../../../stores/collection";
     import { beautifiedFontName, getFontNameValue, standardizedFontName } from "../../../workers/pseudoWorkers/fonts";
     import { keepOpenOverlay } from "./Advanced/Overlay.svelte";
+    import { hslToRgb, initializeColorFromHSLA } from "../../../helpers/colorMaths";
 
     const toggleUseText = () => {
         if($selectedOverride !== -1){ // if no override is selected
@@ -173,6 +174,22 @@
         // update collection so that svelte can update the associated components
         $collection = $collection;
     }
+
+    const updateTextContent = (evt:CustomEvent<any>) => {
+        if($selectedOverride !== -1){ // if no override is selected
+            $collection[$selectedComponent].styleOverrides[$selectedOverride].style.content = evt.detail.v;
+        } else {
+            $collection[$selectedComponent].style.content = evt.detail.v;
+        }
+    }
+
+    const updatePlaceholder = (evt:CustomEvent<any>) => {
+        if($selectedOverride !== -1){ // if no override is selected
+            $collection[$selectedComponent].styleOverrides[$selectedOverride].style.placeholder = evt.detail.v;
+        } else {
+            $collection[$selectedComponent].style.placeholder = evt.detail.v;
+        }
+    }
 </script>
 
 <main class="no-drag">
@@ -189,10 +206,10 @@
     <!-- only show editing panel if text is enabled -->
     {#if currentStyle.USETEXT}
         <!-- Content -->
-        <TextAreaInput name={"Content"} placeHolder={"Lorem ipsum dolor sit amet."} v={""} hasMargin={false} sub={false} currentParenteWidth={currentParentWidth}/>
+        <TextAreaInput name={"Content"} placeHolder={"Lorem ipsum dolor sit amet."} v={content} hasMargin={false} sub={false} currentParenteWidth={currentParentWidth} on:updateValue={updateTextContent}/>
         <div class="spacer"></div>
         <!-- Placeholder -->
-        <TextAreaInput name={"Placeholder"} placeHolder={"Lorem ipsum dolor sit amet."} v={""} hasMargin={false} sub={false} currentParenteWidth={currentParentWidth}/>
+        <TextAreaInput name={"Placeholder"} placeHolder={"Lorem ipsum dolor sit amet."} v={""} hasMargin={false} sub={false} currentParenteWidth={currentParentWidth} on:updateValue={updatePlaceholder}/>
 
         <div class="spacer"></div>
 

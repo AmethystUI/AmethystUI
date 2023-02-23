@@ -1,3 +1,5 @@
+import type { color } from "../stores/collection";
+
 export type colorType = "HEX" | "RGB" | "HSL";
 
 /**
@@ -81,6 +83,34 @@ export const hexToRgba = (hex:string):number[] => {
         return [parseInt(hex.substring(0,2), 16), parseInt(hex.substring(2,4), 16), parseInt(hex.substring(4,6), 16), 100];
     } else if (hex.length == 8){ // 8 form hex: 2 letter per channel
         return [parseInt(hex.substring(0,2), 16), parseInt(hex.substring(2,4), 16), parseInt(hex.substring(4,6), 16), Math.round(parseInt(hex.substring(6,8), 16))];
+    }
+}
+
+export const initializeColorFromHSLA = (h:number, s:number, l:number, a:number): color => {
+    return {
+        type: "hsl",
+        r: hslToRgb(h, s, l)[0],
+        g: hslToRgb(h, s, l)[1],
+        b: hslToRgb(h, s, l)[2],
+        h: h,
+        s: s,
+        l: l,
+        a: a,
+        hex: rgbaToHex(hslToRgb(h, s, l)[0], hslToRgb(h, s, l)[1], hslToRgb(h, s, l)[2], a)
+    }
+}
+
+export const initializeColorFromRGBA = (r:number, g:number, b:number, a:number): color => {
+    return {
+        type: "rgb",
+        r: r,
+        g: g,
+        b: b,
+        h: rgbToHsl(r, g, b)[0],
+        s: rgbToHsl(r, g, b)[1],
+        l: rgbToHsl(r, g, b)[2],
+        a: a,
+        hex: rgbaToHex(r, g, b, a)
     }
 }
 

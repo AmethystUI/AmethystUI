@@ -96,7 +96,7 @@
             border-radius: 5px;
             padding:0.5px;
             animation: dash 0.5s linear infinite;
-            pointer-events: none;
+            overflow: visible;
         }
 
         @keyframes dash {

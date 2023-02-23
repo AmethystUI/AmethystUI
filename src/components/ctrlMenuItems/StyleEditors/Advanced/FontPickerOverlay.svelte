@@ -578,9 +578,6 @@
     }
 
     const fuzzySearch = (fontList: fontObject[], query: string): fontObject[] => {
-        // clean up query first for safety
-        query = query.replace(/\\/g, "/").toLowerCase();
-
         return fontList.sort((a, b) => {
             const aName = a.appearedName ? a.appearedName.toLowerCase() : a.family.toLowerCase();
             const bName = b.appearedName ? b.appearedName.toLowerCase() : b.family.toLowerCase();
@@ -592,9 +589,13 @@
         }).filter(item => {
             const itemName = item.appearedName ? item.appearedName.toLowerCase() : item.family.toLowerCase();
 
-            const pattern = query.split("").reduce((a, b) => a + ".*" + b);
-            const regex = new RegExp(pattern, "i");
-            return itemName.match(regex);
+            try{
+                const pattern = query.split("").reduce((a, b) => a + ".*" + b);
+                const regex = new RegExp(pattern, "i");
+                return itemName.match(regex);
+            } catch(err) { // if there's a problem with the regex, just return undefined to not filter anything
+                return undefined;
+            }
         });
     };
 

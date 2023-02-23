@@ -37,17 +37,27 @@
 
     const updateOpacity = (evt:CustomEvent<any>) => {
         if($selectedOverride !== -1){ // if no override is selected
-            $collection[$selectedComponent].styleOverrides[$selectedOverride].style["opacity"] = evt.detail.v;
+            $collection[$selectedComponent].styleOverrides[$selectedOverride].style.opacity = evt.detail.v;
         } else {
-            $collection[$selectedComponent].style["opacity"] = evt.detail.v;
+            $collection[$selectedComponent].style.opacity = evt.detail.v;
         }
     }
 
     const updateOverflow = (evt:CustomEvent<any>, axis:string) => {
         if($selectedOverride !== -1){ // if no override is selected
-            $collection[$selectedComponent].styleOverrides[$selectedOverride].style[`overflow${axis}`] = evt.detail.v;
+            if(evt.detail.v === "visible"){ // if the user wants to set overflow visible, set both to make it work properly
+                $collection[$selectedComponent].styleOverrides[$selectedOverride].style.overflowX = evt.detail.v;
+                $collection[$selectedComponent].styleOverrides[$selectedOverride].style.overflowY = evt.detail.v;
+            } else {
+                $collection[$selectedComponent].styleOverrides[$selectedOverride].style[`overflow${axis}`] = evt.detail.v;
+            }
         } else {
-            $collection[$selectedComponent].style[`overflow${axis}`] = evt.detail.v;
+            if(evt.detail.v === "visible"){ // if the user wants to set overflow visible, set both to make it work properly
+                $collection[$selectedComponent].style.overflowX = evt.detail.v;
+                $collection[$selectedComponent].style.overflowY = evt.detail.v;
+            } else {
+                $collection[$selectedComponent].style[`overflow${axis}`] = evt.detail.v;
+            }
         }
     }
 
@@ -68,7 +78,10 @@
     <div class="spacer"></div>
 
     <!-- Overflow -->
-    <Title name="Overflow"/>
+    <section>
+        <Title name="Overflow"/>
+        hi
+    </section>
     <section>
         <Dropdown name="Horizontal" sub={true} hasMargin={true} v={overflowX} possibleValues={possibleOverflowStyles} on:updateValue={e => updateOverflow(e, "X")}/>
         <Dropdown name="Vertical" sub={true} hasMargin={true} v={overflowY} possibleValues={possibleOverflowStyles} on:updateValue={e => updateOverflow(e, "Y")}/>

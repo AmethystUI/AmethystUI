@@ -7,6 +7,8 @@
     let ih = 0; // initial target height
     let dragLocked = true; // prevent dragging on accident
     const dragThreshold = -1; // disable if -1
+    let hovered = false; // whether the mouse is overring over the resize zone
+
     let rX = false; let rY = false;
     let cX = true; let cY = true;
 
@@ -278,31 +280,55 @@
 
 <main>
     <!-- size handlers -->
-    <div class="corner-drag" id="corner-tl" on:mousedown={e => startCornerDrag(e, false, false, true, true)}></div>
-    <div class="corner-drag" id="corner-tm" on:mousedown={e => startCornerDrag(e, false, false, false, true)}></div>
-    <div class="corner-drag" id="corner-tr" on:mousedown={e => startCornerDrag(e, true, false, true, true)}></div>
-    <div class="corner-drag" id="corner-ml" on:mousedown={e => startCornerDrag(e, false, false, true, false)}></div>
-    <div class="corner-drag" id="corner-mr" on:mousedown={e => startCornerDrag(e, true, false, true, false)}></div>
-    <div class="corner-drag" id="corner-bl" on:mousedown={e => startCornerDrag(e, false, true, true, true)}></div>
-    <div class="corner-drag" id="corner-bm" on:mousedown={e => startCornerDrag(e, false, true, false, true)}></div>
-    <div class="corner-drag" id="corner-br" on:mousedown={e => startCornerDrag(e, true, true, true, true)}></div>
+    <div class="corner-drag {hovered ? "visible" : ""}"
+        id="corner-tl"
+        style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
+        on:mousedown={e => startCornerDrag(e, false, false, true, true)}></div>
+    <div class="corner-drag {hovered ? "visible" : ""}"
+        id="corner-tm"
+        style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
+        on:mousedown={e => startCornerDrag(e, false, false, false, true)}></div>
+    <div class="corner-drag {hovered ? "visible" : ""}"
+        id="corner-tr"
+        style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
+        on:mousedown={e => startCornerDrag(e, true, false, true, true)}></div>
+    <div class="corner-drag {hovered ? "visible" : ""}"
+        id="corner-ml"
+        style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
+        on:mousedown={e => startCornerDrag(e, false, false, true, false)}></div>
+    <div class="corner-drag {hovered ? "visible" : ""}"
+        id="corner-mr"
+        style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
+        on:mousedown={e => startCornerDrag(e, true, false, true, false)}></div>
+    <div class="corner-drag {hovered ? "visible" : ""}"
+        id="corner-bl"
+        style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
+        on:mousedown={e => startCornerDrag(e, false, true, true, true)}></div>
+    <div class="corner-drag {hovered ? "visible" : ""}"
+        id="corner-bm"
+        style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
+        on:mousedown={e => startCornerDrag(e, false, true, false, true)}></div>
+    <div class="corner-drag {hovered ? "visible" : ""}"
+        id="corner-br"
+        style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
+        on:mousedown={e => startCornerDrag(e, true, true, true, true)}></div>
 
     <!-- margin resizers -->
     <!-- top -->
     <div class="vert-margins" id="top" style={`
-        transform: translate3d(0,calc(${-cMT}${cMTu} + ${-cBT}${cBTu}),0); min-width:min(${cML}${cMLu}, ${cMR}${cMRu}); opacity:${cMT < 1 ? 0 : 0.2}
+        transform: translate3d(0,calc(${-cMT}${cMTu} + ${-cBT}${cBTu}),0); min-width:min(${cML}${cMLu}, ${cMR}${cMRu}); opacity:${cMT < 1 ? 0 : 0.2}; cursor: ${cMT > 0 ? "ns-resize" : "n-resize"}
         `} on:mousedown={startMTDrag}><div></div></div>
     <!-- right -->
     <div class="hori-margins" id="right" style={`
-        transform: translate3d(calc(${cMR}${cMRu} + ${cBR}${cBRu}),0,0); min-height:min(${cMT}${cMTu}, ${cMB}${cMBu}); opacity:${cMR < 1 ? 0 : 0.2}
+        transform: translate3d(calc(${cMR}${cMRu} + ${cBR}${cBRu}),0,0); min-height:min(${cMT}${cMTu}, ${cMB}${cMBu}); opacity:${cMR < 1 ? 0 : 0.2}; cursor: ${cMT > 0 ? "ew-resize" : "e-resize"}
         `} on:mousedown={startMRDrag}><div></div></div>
     <!-- bottom -->
     <div class="vert-margins" id="bottom" style={`
-        transform: translate3d(0,calc(${cMB}${cMBu} + ${cBB}${cBBu}),0); min-width:min(${cML}${cMLu}, ${cMR}${cMRu}); opacity:${cMB < 1 ? 0 : 0.2}
+        transform: translate3d(0,calc(${cMB}${cMBu} + ${cBB}${cBBu}),0); min-width:min(${cML}${cMLu}, ${cMR}${cMRu}); opacity:${cMB < 1 ? 0 : 0.2}; cursor: ${cMT > 0 ? "ns-resize" : "s-resize"}
         `} on:mousedown={startMBDrag}><div></div></div>
     <!-- left -->
     <div class="hori-margins" id="left" style={`
-        transform: translate3d(calc(${-cML}${cMLu} + ${-cBL}${cBLu}),0,0); min-height:min(${cMT}${cMTu}, ${cMB}${cMBu}); opacity:${cML < 1 ? 0 : 0.2}
+        transform: translate3d(calc(${-cML}${cMLu} + ${-cBL}${cBLu}),0,0); min-height:min(${cMT}${cMTu}, ${cMB}${cMBu}); opacity:${cML < 1 ? 0 : 0.2}; cursor: ${cMT > 0 ? "ew-resize" : "w-resize"}
         `} on:mousedown={startMLDrag}><div></div></div>
 </main>
 
@@ -310,16 +336,15 @@
     @import "../../../../public/guideline";
 
     main{
-        $pad-size: 40px;
+        $corner-offset: -1.5px;
 
         width:100%; height:100%;
         position: absolute;
         background: none;
         display:flex; flex-direction: column; justify-content: center; align-items: center;
-        padding: $pad-size;
-        transform: translate3d(-$pad-size, -$pad-size, 0);
-        pointer-events: all;
-        z-index: 100;
+        padding: 0px;
+        pointer-events: none;
+        z-index: 1000;
 
         &:active{
             .vert-margins, .hori-margins{
@@ -328,71 +353,107 @@
             }
         }
 
-        &:hover, &:active{
+        &:active{
+            .corner-drag{
+                background-color: $accent !important;
+                opacity: 1;
+            }
+        }
+        &:hover{
             .corner-drag{
                 opacity: 1;
             }
-            // background-color: hsla(200,5%,8%,70%);
         }
     
         .corner-drag{
-            min-width: 7px; min-height: 7px; max-width: 7px; max-height: 7px;
-            background-color: $secondarys6;
+            width: 7px; height: 7px;
+            border-radius: 100%;            
             position: absolute;
             z-index: 1;
             opacity: 0;
             transition: opacity ease 100ms;
-            box-shadow: 0 1px 5px hsla(0,0%,0%,75%);
+
+            box-shadow: 1px 1px 4px hsla(0,0,0,70%);
+
+            &::before{
+                content:"";
+                width: 30px; height:30px;
+                position:absolute;
+                pointer-events: all;
+                
+                // FOR DEBUGGING ONLY
+                // border: 2px solid blue;
+            }
+
+            &:hover, &:active{
+                background-color: $accent !important;
+                opacity: 1 !important;
+            }
 
             &#corner-tl{
-                top: calc(-3.5px / 2) + $pad-size;
-                left: calc(-3.5px / 2) + $pad-size;
+                top: calc(-3.5px / 2) + $corner-offset;
+                left: calc(-3.5px / 2) + $corner-offset;
                 z-index:2;
                 cursor: nwse-resize;
+
+                &::before{ transform: translate3d(-20px,-20px,0px) }
             }
             &#corner-tm{
-                top: calc(-3.5px / 2) + $pad-size;
+                top: calc(-3.5px / 2) + $corner-offset;
                 cursor: ns-resize;
-                z-index:1
+                z-index:1;
+
+                &::before{ width: 10px; transform: translate3d(-4px,-20px,0px) }
             }
             &#corner-tr{
-                top: calc(-3.5px / 2) + $pad-size;
-                right: calc(-3.5px / 2) + $pad-size;
+                top: calc(-3.5px / 2) + $corner-offset;
+                right: calc(-3.5px / 2) + $corner-offset;
                 z-index:2;
                 cursor: nesw-resize;
+
+                &::before{ transform: translate3d(-10px,-20px,0px) }
             }
             &#corner-ml{
-                left: calc(-3.5px / 2) + $pad-size;
+                left: calc(-3.5px / 2) + $corner-offset;
                 cursor: ew-resize;
-                z-index:1
+                z-index:1;
+
+                &::before{ height: 10px; transform: translate3d(-20px,-5px,0px) }
             }
             &#corner-mr{
-                right: calc(-3.5px / 2) + $pad-size;
+                right: calc(-3.5px / 2) + $corner-offset;
                 cursor: ew-resize;
-                z-index:1
+                z-index:1;
+
+                &::before{ height: 10px; transform: translate3d(-10px,-5px,0px) }
             }
             &#corner-bl{
-                bottom: calc(-3.5px / 2) + $pad-size;
-                left: calc(-3.5px / 2) + $pad-size;
+                bottom: calc(-3.5px / 2) + $corner-offset;
+                left: calc(-3.5px / 2) + $corner-offset;
                 z-index:2;
                 cursor: nesw-resize;
+
+                &::before{ transform: translate3d(-20px,-10px,0px) }
             }
             &#corner-bm{
-                bottom: calc(-3.5px / 2) + $pad-size;
+                bottom: calc(-3.5px / 2) + $corner-offset;
                 cursor: ns-resize;
-                z-index:1
+                z-index:1;
+
+                &::before{ width: 10px; transform: translate3d(-4px,-10px,0px) }
             }
             &#corner-br{
-                bottom: calc(-3.5px / 2) + $pad-size;
-                right: calc(-3.5px / 2) + $pad-size;
+                bottom: calc(-3.5px / 2) + $corner-offset;
+                right: calc(-3.5px / 2) + $corner-offset;
                 z-index:2;
                 cursor: nwse-resize;
+
+                &::before{ transform: translate3d(-10px,-10px,0px) }
             }
         }
 
         .vert-margins{
-            width: calc(90% - $pad-size * 2); height:1px;
-            cursor:ns-resize;
+            width: calc(90% - $corner-offset * 2); height:1px;
             position:absolute;
             pointer-events: all;
             background-color: $secondary;
@@ -405,17 +466,18 @@
 
             &::before{
                 content:"";
-                width: 100%; height:10px;
+                width: 100%; height:30px;
                 cursor:ns-resize;
                 position:absolute;
                 pointer-events: all;
                 background: none;
-                transform: translate3d(0,-5px,0);
+
+                // FOR DEBUGGING ONLY
+                // border: 1px solid red;
             }
         }
         .hori-margins{
-            width: 1px; height: calc(90% - $pad-size * 2);
-            cursor:ew-resize;
+            width: 1px; height: calc(90% - $corner-offset * 2);
             position:absolute;
             pointer-events: all;
             background-color: $secondary;
@@ -428,26 +490,36 @@
 
             &::before{
                 content:"";
-                width: 10px; height:100%;
+                width: 30px; height:100%;
                 cursor:ew-resize;
                 position:absolute;
                 pointer-events: all;
                 background: none;
-                transform: translate3d(-5px,0,0);
+
+                // FOR DEBUGGING ONLY
+                // border: 1px solid yellow;
             }
         }
 
         #top{
-            top: $pad-size;
+            top: $corner-offset;
+
+            &::before{ transform: translate3d(0px, -20px, 0px) }
         }
         #bottom{
-            bottom: $pad-size;
+            bottom: $corner-offset;
+
+            &::before{ transform: translate3d(0px, -10px, 0px) }
         }
         #right{
-            right:$pad-size;
+            right:$corner-offset;
+
+            &::before{ transform: translate3d(-10px, 0px, 0px) }
         }
         #left{
-            left:$pad-size;
+            left:$corner-offset;
+
+            &::before{ transform: translate3d(-20px, 0px, 0px) }
         }
     }
 </style>

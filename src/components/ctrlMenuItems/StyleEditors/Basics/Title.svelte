@@ -21,11 +21,11 @@
     @import "../../../../../public/guideline";
 
     main{
-        width: 100%;
+        width: fit-content;
 
         h1{
             font-size: 14px;
-            width:100%;
+            width:fit-content;
             color: $secondarys4;
             font-variation-settings: "wght" 400;
             user-select: none; -webkit-user-select: none; pointer-events: none;

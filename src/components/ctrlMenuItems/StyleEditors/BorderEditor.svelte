@@ -7,6 +7,7 @@
     import Dropdown from "./Basics/Dropdown.svelte";
     import Title from "./Basics/Title.svelte";
     import { clearColorPickerRef, mainColorPickerData } from "../../../stores/colorPickerStat";
+    import { initializeColorFromHSLA } from "../../../helpers/colorMaths";
     
     export let currentParentWidth = 360;
     
@@ -25,7 +26,7 @@
     let cBRL = 0; let cBRLu:units = "px"; // cBR = current border radius
     let cBRAvg = 0;
 
-    let clr:color = {type:"hsl", r:255, g:255, b:255, h:0, s:0, l:100, a:100, hex:"ffffff"}
+    let clr:color = initializeColorFromHSLA(0, 0, 100, 100);
 
     // this has to be a subset of the borderOutlineStyle type set in $collection
     const possibleStyles:borderOutlineStyle[] = ["dotted", "dashed", "solid", "double", "groove", "ridge", "inset", "hidden"];
@@ -102,15 +103,15 @@
     }
     const updateBorderWidthAll = (evt:CustomEvent<any>) => {
         if($selectedOverride !== -1){ // if no override is selected
-            $collection[$selectedComponent].styleOverrides[$selectedOverride].style["borderWidthTop"].v = evt.detail.v;
-            $collection[$selectedComponent].styleOverrides[$selectedOverride].style["borderWidthRight"].v = evt.detail.v;
-            $collection[$selectedComponent].styleOverrides[$selectedOverride].style["borderWidthBottom"].v = evt.detail.v;
-            $collection[$selectedComponent].styleOverrides[$selectedOverride].style["borderWidthLeft"].v = evt.detail.v;
+            $collection[$selectedComponent].styleOverrides[$selectedOverride].style.borderWidthTop.v = evt.detail.v;
+            $collection[$selectedComponent].styleOverrides[$selectedOverride].style.borderWidthRight.v = evt.detail.v;
+            $collection[$selectedComponent].styleOverrides[$selectedOverride].style.borderWidthBottom.v = evt.detail.v;
+            $collection[$selectedComponent].styleOverrides[$selectedOverride].style.borderWidthLeft.v = evt.detail.v;
         } else {
-            $collection[$selectedComponent].style["borderWidthTop"].v = evt.detail.v;
-            $collection[$selectedComponent].style["borderWidthRight"].v = evt.detail.v;
-            $collection[$selectedComponent].style["borderWidthBottom"].v = evt.detail.v;
-            $collection[$selectedComponent].style["borderWidthLeft"].v = evt.detail.v;    
+            $collection[$selectedComponent].style.borderWidthTop.v = evt.detail.v;
+            $collection[$selectedComponent].style.borderWidthRight.v = evt.detail.v;
+            $collection[$selectedComponent].style.borderWidthBottom.v = evt.detail.v;
+            $collection[$selectedComponent].style.borderWidthLeft.v = evt.detail.v;    
         }
     }
 
@@ -124,15 +125,15 @@
 
     const updateBorderRadiusAll = (evt:CustomEvent<any>) => {
         if($selectedOverride !== -1){ // if no override is selected
-            $collection[$selectedComponent].styleOverrides[$selectedOverride].style["borderRadiusTop"].v = evt.detail.v;
-            $collection[$selectedComponent].styleOverrides[$selectedOverride].style["borderRadiusRight"].v = evt.detail.v;
-            $collection[$selectedComponent].styleOverrides[$selectedOverride].style["borderRadiusBottom"].v = evt.detail.v;
-            $collection[$selectedComponent].styleOverrides[$selectedOverride].style["borderRadiusLeft"].v = evt.detail.v;
+            $collection[$selectedComponent].styleOverrides[$selectedOverride].style.borderRadiusTop.v = evt.detail.v;
+            $collection[$selectedComponent].styleOverrides[$selectedOverride].style.borderRadiusRight.v = evt.detail.v;
+            $collection[$selectedComponent].styleOverrides[$selectedOverride].style.borderRadiusBottom.v = evt.detail.v;
+            $collection[$selectedComponent].styleOverrides[$selectedOverride].style.borderRadiusLeft.v = evt.detail.v;
         } else {
-            $collection[$selectedComponent].style["borderRadiusTop"].v = evt.detail.v;
-            $collection[$selectedComponent].style["borderRadiusRight"].v = evt.detail.v;
-            $collection[$selectedComponent].style["borderRadiusBottom"].v = evt.detail.v;
-            $collection[$selectedComponent].style["borderRadiusLeft"].v = evt.detail.v;    
+            $collection[$selectedComponent].style.borderRadiusTop.v = evt.detail.v;
+            $collection[$selectedComponent].style.borderRadiusRight.v = evt.detail.v;
+            $collection[$selectedComponent].style.borderRadiusBottom.v = evt.detail.v;
+            $collection[$selectedComponent].style.borderRadiusLeft.v = evt.detail.v;    
         }
     }
 

@@ -26,6 +26,7 @@
 
     // ======================= UPDATE FUNCTION ======================= //
 
+    
 </script>
 
 <!-- Container transformation to keep the element in the center -->
@@ -40,7 +41,7 @@
         + ${!!currentStyle.marginBottom ? -currentStyle.marginBottom.v/2 : "0"}${!!currentStyle.marginBottom ? currentStyle.marginBottom.u : "px"}
         + ${currentStyle.borderWidthTop && currentStyle.USEBORDER ? -currentStyle.borderWidthTop.v/2 : 0}${currentStyle.borderWidthTop ? currentStyle.borderWidthTop.u : "px"}
         + ${currentStyle.borderWidthBottom && currentStyle.USEBORDER ? -currentStyle.borderWidthBottom.v/2 : 0}${currentStyle.borderWidthBottom ? currentStyle.borderWidthBottom.u : "px"}
-    ), 0);
+    ), 0px);
 `}
 class="no-drag">
     <!-- We have do this terribleness if we want to use anything with a united attribute. It's also fast -->
@@ -114,6 +115,16 @@ class="no-drag">
             ` : ""
         }
 
+        ${ // only use text styles if text is enabled
+            currentStyle["USETEXT"]? `
+                color: hsla(${currentStyle.color.h ?? 0}deg, ${currentStyle.color.s ?? 0}%, ${currentStyle.color.l ?? 0}%, ${currentStyle.color.a ?? 0}%);
+                
+                font-size: ${ currentStyle.typeStyle?.size?.v ?? 14 }${ currentStyle.typeStyle?.size?.u ?? "px" };
+                font-family: "${ currentStyle.typeStyle?.fontObj?.family ?? "Inter" }", Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+                font-weight: ${ currentStyle.typeStyle?.variation ?? "" };
+            ` : ""
+        }
+
         transform: translate3d(
         calc(
             ${ -currentStyle.marginLeft?.v/2 ?? 0 }${ currentStyle.marginLeft?.u ?? "px" }
@@ -126,14 +137,21 @@ class="no-drag">
             + ${ -currentStyle.borderWidthTop?.v/2 ?? 0 }${ currentStyle.borderWidthTop?.u ?? "px"}
             - ${ -currentStyle.borderWidthBottom?.v/2 ?? 0 }${ currentStyle.borderWidthBottom?.u ?? "px"}),
         0);
-    `}></div>
+    `}>
+        <!-- Text content -->
+        {#each currentStyle.content.split("\n") as line}
+            {line}
+            <br>
+        {/each}
+    </div>
 </main>
 
 <style lang="scss">
     @import "../../../../public/guideline";
 
     main{
-        position: absolute; top:0px; left:0px;
-        display: flex; justify-content: center; align-items: center; flex-direction: column;        
+        position: absolute; top:0px; left:0px; 
+        display: flex; justify-content: center; align-items: center; flex-direction: column;
+        overflow: visible;
     }
 </style>
