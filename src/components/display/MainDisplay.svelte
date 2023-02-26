@@ -93,7 +93,6 @@
             background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
             background-size: 8px 1px, 8px 1px, 1px 8px, 1px 8px;
             background-position: 0% 0%, 100% 100%, 0% 100%, 100% 0%;
-            border-radius: 5px;
             padding:0.5px;
             animation: dash 0.5s linear infinite;
             overflow: visible;

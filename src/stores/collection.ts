@@ -12,7 +12,7 @@ export type flexDirection = "row" | "column" | "row-reverse" | "column-reverse";
 export type textTransform = "uppercase" | "lowercase" | "capitalize";
 export type overflow = "visible" | "hidden" | "scroll" | "auto";
 export type colorNumericType = "rgb" | "hsl";
-export type textCasing = "lower" | "mix" | "upper";
+export type textCasing = "lowercase" | "none" | "uppercase";
 export type textDecoration = "italicize" | "underline" | "strike";
 export type typeCategories = "sans-serif" | "serif" | "display" | "handwriting" | "monospace";
 
@@ -80,9 +80,9 @@ export interface typographyStyle{
 
 export interface color{
     type : colorNumericType,
-    r : number,
-    g : number,
-    b : number,
+    r? : number,
+    g? : number,
+    b? : number,
     h : number,
     s : number,
     l : number,

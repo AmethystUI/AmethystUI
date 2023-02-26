@@ -35,15 +35,15 @@
     export const textCasing:multiToggleSelection<textCasingType>[] = [
         {
             iconDir : "./assets/icons/lower-case.svg",
-            val : "lower",
+            val : "lowercase",
             alt : "All Lowercase"
         }, {
             iconDir : "./assets/icons/mix-case.svg",
-            val : "mix",
+            val : "none",
             alt : "Mixed Case"
         }, {
             iconDir : "./assets/icons/upper-case.svg",
-            val : "upper",
+            val : "uppercase",
             alt : "All Uppercase"
         }
     ]

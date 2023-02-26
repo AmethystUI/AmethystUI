@@ -64,9 +64,8 @@
         // assign dV
         v += dV;
         // check v range
-        if(v < min) v = min;
-        if(v > max) v = max;
-
+        v = Math.max(min, Math.min(max, v));
+        
         // dispatch an update value
         disp("updateValue", {
             v:Math.round(v)
@@ -77,8 +76,6 @@
     }
 
     const endDrag = () => {
-        document.body.style.cursor = "normal";
-        
         document.removeEventListener('mousemove', trackDrag);
         document.removeEventListener('mouseup', endDrag);
     }

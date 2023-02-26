@@ -45,14 +45,12 @@
 
     <!-- show editors if there is an override or element selected -->
     {#if $selectedComponent !== -1 || $selectedOverride !== -1}
-
-
         <!-- size editor -->
         <BoundingBoxEditor currentParentWidth={currentWidth}/>
     
         <!-- text editor -->
         <TextEditor currentParentWidth={currentWidth}/>
-
+    
         <!-- appearance editor -->
         <AppearanceEditor currentParentWidth={currentWidth}/>
         

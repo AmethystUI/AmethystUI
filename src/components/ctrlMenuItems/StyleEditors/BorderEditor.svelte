@@ -35,6 +35,7 @@
     let styleRight:borderOutlineStyle = "solid";
     let styleBottom:borderOutlineStyle = "solid";
     let styleLeft:borderOutlineStyle = "solid";
+    let syncStyle = true;
 
     $: if(!!currentStyle){ // these variables just make the code look nicer
         // use border
@@ -139,9 +140,23 @@
 
     const updateStyle = (evt:CustomEvent<any>, dir:string) => {
         if($selectedOverride !== -1){ // if no override is selected
-            $collection[$selectedComponent].styleOverrides[$selectedOverride].style[`borderStyle${dir}`] = evt.detail.v;
+            if(syncStyle){ // synchronize all styles
+                $collection[$selectedComponent].styleOverrides[$selectedOverride].style.borderStyleLeft = evt.detail.v;
+                $collection[$selectedComponent].styleOverrides[$selectedOverride].style.borderStyleTop = evt.detail.v;
+                $collection[$selectedComponent].styleOverrides[$selectedOverride].style.borderStyleRight = evt.detail.v;
+                $collection[$selectedComponent].styleOverrides[$selectedOverride].style.borderStyleBottom = evt.detail.v;
+            } else {
+                $collection[$selectedComponent].styleOverrides[$selectedOverride].style[`borderStyle${dir}`] = evt.detail.v;
+            }
         } else {
-            $collection[$selectedComponent].style[`borderStyle${dir}`] = evt.detail.v;
+            if(syncStyle){ // synchronize all styles
+                $collection[$selectedComponent].style.borderStyleLeft = evt.detail.v;
+                $collection[$selectedComponent].style.borderStyleTop = evt.detail.v;
+                $collection[$selectedComponent].style.borderStyleRight = evt.detail.v;
+                $collection[$selectedComponent].style.borderStyleBottom = evt.detail.v;
+            } else {
+                $collection[$selectedComponent].style[`borderStyle${dir}`] = evt.detail.v;
+            }
         }
     }
     
@@ -149,6 +164,25 @@
     $: if(!currentStyle.USEBORDER && $mainColorPickerData.refName === "borderColor"){
     // if the current style doesn't use this editor, clear ref
         clearColorPickerRef();
+    }
+
+
+    const updateStyleSyncing = () => {
+        syncStyle = !syncStyle; // update link overflow
+
+        if(!syncStyle) return;
+
+        if($selectedOverride !== -1){ // if no override is selected
+            const topStyle = $collection[$selectedComponent].styleOverrides[$selectedOverride].style.borderStyleTop;
+            $collection[$selectedComponent].styleOverrides[$selectedOverride].style.borderStyleLeft = topStyle;
+            $collection[$selectedComponent].styleOverrides[$selectedOverride].style.borderStyleRight = topStyle;
+            $collection[$selectedComponent].styleOverrides[$selectedOverride].style.borderStyleBottom = topStyle;
+        } else{
+            const topStyle = $collection[$selectedComponent].style.borderStyleTop;
+            $collection[$selectedComponent].style.borderStyleLeft = topStyle;
+            $collection[$selectedComponent].style.borderStyleRight = topStyle;
+            $collection[$selectedComponent].style.borderStyleBottom = topStyle;
+        }
     }
 </script>
 
@@ -188,8 +222,17 @@
             <ColorPicker name="Color" propertyName={"Border"} propertyRef={"borderColor"} clr={clr} />
         </section>
 
+        <div style="height:7px"></div>
+
         <section style="flex-direction: column; margin-bottom:7px">
-            <Title name="Style"/>
+            <section style="display:flex; align-items: flex-start; margin:0;">            
+                <Title name="Style" width="fit-content"/>
+                <section id="check-container">
+                    <input type="checkbox" checked={syncStyle} on:click={updateStyleSyncing}>
+                    <img src="./assets/icons/chain.svg" alt="" style="opacity: {syncStyle ? "1" : "0.5"}">
+                </section>
+            </section>
+
             <section>
                 <Dropdown name="Top" sub={true} hasMargin={true} v={styleTop} possibleValues={possibleStyles} on:updateValue={e => updateStyle(e, "Top")}/>
                 <Dropdown name="Right" sub={true} hasMargin={true} v={styleRight} possibleValues={possibleStyles} on:updateValue={e => updateStyle(e, "Right")}/>
@@ -248,6 +291,37 @@
                 }
             }
 
+        }
+
+        #check-container{
+            display:flex; align-items:center; height:100%; transform: translate3d(-5px, -1px, 0px);
+            margin:0;
+            position: relative;
+
+            img{
+                position:absolute;
+                height:80%; width:80%;
+                top:calc(50% + 0.75px); left:calc(50% + 7.25px); transform: translate(-50%, -50%);
+                pointer-events: none;
+            }
+
+            input{
+                /* hide default style */
+                -webkit-appearance: none;
+                appearance: none;
+                background: $primaryl4;
+                cursor: pointer;
+                
+                height:20px; width:30px;
+                border-radius: 3px;
+    
+                margin: 2px 0px 0px 15px;
+    
+                &:checked{
+                    background: $accent;
+                    border:none;
+                }
+            }
         }
 
         section{

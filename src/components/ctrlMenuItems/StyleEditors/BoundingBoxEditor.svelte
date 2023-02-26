@@ -12,7 +12,7 @@
 
     let cW = 100; let cWu:units = "px"; 
     let cH = 100; let cHu:units = "px"; 
-    let cSAvg = 100; let cSAvgu:units = "px"; 
+    let cSAvg = 100;
 
     let cMT = 0; let cMTu:units = "px"; 
     let cMR = 0; let cMRu:units = "px"; 

@@ -33,7 +33,8 @@
     // DEBUG: 
     setTimeout(() => {
         addComponent("DIV", {
-            USETEXT: true
+            USETEXT: true,
+            content: "Hello World!"
         }, true)
         // simulate clicking on it
         $selectedComponent = 0;

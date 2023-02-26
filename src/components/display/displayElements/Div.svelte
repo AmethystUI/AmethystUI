@@ -7,6 +7,11 @@
     $: currentOverride = $selectedOverride !== -1 ? $collection[$selectedComponent].styleOverrides[$selectedOverride] : undefined;
     $: currentStyle = !!currentComponent || !!currentOverride ? ($selectedOverride === -1 ? currentComponent.style : currentOverride.style) : undefined;
 
+    // specific style shortcuts
+    $: textItalisized = !!currentStyle ? currentStyle?.typeStyle?.textDecorations?.includes("italicize") ?? false : false;
+    $: textUnderlined = !!currentStyle ? currentStyle?.typeStyle?.textDecorations?.includes("underline") ?? false : false;
+    $: textStriked = !!currentStyle ? currentStyle?.typeStyle?.textDecorations?.includes("strike") ?? false : false;
+
     const generateShadowString = (shadow: boxShadow):string => {
         return `${shadow.base.x.v}${shadow.base.x.u} ` +
                 `${shadow.base.y.v}${shadow.base.y.u} ` +
@@ -122,6 +127,16 @@ class="no-drag">
                 font-size: ${ currentStyle.typeStyle?.size?.v ?? 14 }${ currentStyle.typeStyle?.size?.u ?? "px" };
                 font-family: "${ currentStyle.typeStyle?.fontObj?.family ?? "Inter" }", Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
                 font-weight: ${ currentStyle.typeStyle?.variation ?? "" };
+
+                text-align: ${ currentStyle.typeStyle?.alignment ?? "left" };
+                letter-spacing: ${ currentStyle.typeStyle?.tracking?.v ?? "100%" }${ currentStyle.typeStyle?.tracking?.u ?? "" };
+                line-height: ${ currentStyle.typeStyle?.lineHeight?.v?? "100%" }${ currentStyle.typeStyle?.lineHeight?.u?? "" };
+                text-transform: ${ currentStyle.typeStyle?.casing ?? "none" };
+                ${textUnderlined || textStriked ? // if the text is either underlined or striked
+                    `text-decoration: ${ textUnderlined ? "underline" : "" } ${ textStriked ? "line-through" : "" };
+                    `: ""
+                }
+                font-style: ${textItalisized ? "italic" : ""};
             ` : ""
         }
 
@@ -137,7 +152,7 @@ class="no-drag">
             + ${ -currentStyle.borderWidthTop?.v/2 ?? 0 }${ currentStyle.borderWidthTop?.u ?? "px"}
             - ${ -currentStyle.borderWidthBottom?.v/2 ?? 0 }${ currentStyle.borderWidthBottom?.u ?? "px"}),
         0);
-    `}>
+    `} class="no-drag">
         <!-- Text content -->
         {#each currentStyle.content.split("\n") as line}
             {line}

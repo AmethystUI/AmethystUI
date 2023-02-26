@@ -13,9 +13,9 @@
     };
     
     const casingIndices: { [K in textCasingType]: number } = {
-        "lower": 0,
-        "mix": 1,
-        "upper": 2,
+        "lowercase": 0,
+        "none": 1,
+        "uppercase": 2,
     };
 
     const decorationIndices: { [K in textDecorationType]: number } = {
@@ -73,7 +73,7 @@
         },
         variation: 400,
         textDecorations: [],
-        casing: "mix",
+        casing: "none",
         alignment: "center",
         size: {
             v: 14, u: "px"
@@ -82,11 +82,11 @@
             v: 100, u: "%"
         },
         tracking: {
-            v: 100, u: "%"
+            v: 0, u: "px"
         }
     }
 
-    let content: string = "Hello World!";
+    let content: string = "";
 
     $: if(!!currentStyle){ // Variable update listener. If the current style changes, then update the variables accordingly
         // text color
@@ -239,19 +239,19 @@
         
         <!-- Sizing control -->
         <section>
-            <UnitInput name={"Size"} sub={true} v={fontRef.size.v} u={fontRef.size.u} hasMargin={true} on:updateValue={e => {
+            <UnitInput name={"Size"} sub={true} v={fontRef.size.v} u={fontRef.size.u} hasMargin={true} useFC={false} usePercent={true} on:updateValue={e => {
                 updateTextSizing("size", e)
             }}/>
             
             <div style="min-height: 2px"></div>
             
-            <UnitInput name={"Tracking"} minVal={-100} sub={true} v={fontRef.tracking.v} u={fontRef.tracking.u} hasMargin={true} on:updateValue={e => {
+            <UnitInput name={"Tracking"} minVal={-100} sub={true} v={fontRef.tracking.v} u={fontRef.tracking.u} hasMargin={true} useFC={false} on:updateValue={e => {
                 updateTextSizing("tracking", e)
             }}/>
             
             <div style="min-height: 2px"></div>
 
-            <UnitInput name={"Line Height"} minVal={-100} sub={true} v={fontRef.lineHeight.v} u={fontRef.lineHeight.u} hasMargin={false} on:updateValue={e => {
+            <UnitInput name={"Line Height"} minVal={0} sub={true} v={fontRef.lineHeight.v} u={fontRef.lineHeight.u} hasMargin={false} useFC={false} usePercent={true} on:updateValue={e => {
                 updateTextSizing("lineHeight", e)
             }}/>
 

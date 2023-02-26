@@ -94,9 +94,9 @@
         "justify": 3,
     };
     const casingIndices: { [K in textCasingType]: number } = {
-        "lower": 0,
-        "mix": 1,
-        "upper": 2,
+        "lowercase": 0,
+        "none": 1,
+        "uppercase": 2,
     };
     const decorationIndices: { [K in textDecorationType]: number } = {
         "italicize": 0,

@@ -106,3 +106,6 @@ dist
 # build files
 public/build/**/*
 public/workers/**/*
+
+# AF Design files
+public/assets/afdesign/**/*

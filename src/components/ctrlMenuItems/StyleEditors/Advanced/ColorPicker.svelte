@@ -124,7 +124,7 @@
     </section>
 
     <!-- the actual selection part -->
-    <ValueStrInput name="Hex" v={clr.hex} on:updateValue={e => updateValue(e, "hex")} hasMargin={true} sub={true} charLim={8} align={"center"} allowedCharRegex={/^[a-fA-F0-9]$/}
+    <ValueStrInput name="Hex" v={clr.hex} on:updateValue={e => updateValue(e, "hex")} hasMargin={true} sub={true} charLim={8} align={"center"} alignTitle={"center"} allowedCharRegex={/^[a-fA-F0-9]$/}
         on:focused={openOverlay}/>
     
     <section id="rgbhslInput">
