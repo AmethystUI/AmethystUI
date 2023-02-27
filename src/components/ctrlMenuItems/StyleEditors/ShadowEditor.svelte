@@ -1,6 +1,8 @@
 <script lang="ts">
-    import { collection, selectedComponent, selectedOverride, boxShadow, color, units } from "../../../stores/collection";
-    
+    import { collection, selectedComponent, selectedOverride } from "../../../stores/collection";
+    import type { boxShadow, color } from "../../../declarations/general";
+    import type { units } from "../../../declarations/general";
+
     import UnitInput from "./Basics/UnitInput.svelte";
     import { setX, setY, mainOverlayData } from "../../../stores/overlayStat";
     import { mainColorPickerData, clearColorPickerRef } from "../../../stores/colorPickerStat";
@@ -39,16 +41,14 @@
 
         // add a new shadow to shadowList
         currentStyle["boxShadows"].push({
-            base : {
-                x: {v:10, u:"px"},
-                y: {v:10, u:"px"},
-                radius: {v:30, u:"px"},
-                color : {
-                    type : "hsl",
-                    r : 0, g : 0, b : 0,
-                    h : 0, s : 0, l : 0,
-                    a : 50, hex : "00000080"
-                },
+            x: {v:10, u:"px"},
+            y: {v:10, u:"px"},
+            radius: {v:30, u:"px"},
+            color : {
+                type : "hsl",
+                r : 0, g : 0, b : 0,
+                h : 0, s : 0, l : 0,
+                a : 50, hex : "00000080"
             },
             grow : {v:0, u:"px"}
         })
@@ -96,7 +96,7 @@
     const updateDemuxID = (demuxIndex:number) => {
         demuxID = demuxIndex;
         // grab the current color from the demuxID
-        currentColor = shadows[demuxID].base.color;        
+        currentColor = shadows[demuxID].color;        
         
         // set mux color to target color. Because this is typescript, we're directly giving the color REFRENCE to the mux. So we don't have to write another funciton for demuxing
         currentStyle["muxBoxShadClr"] = currentColor;
@@ -167,17 +167,17 @@
                         <!-- the color preview & button. Bind all elements that matches the demux ID. We can also use this feature to highlight the blocks or do something special with it -->
                         {#if i === demuxID}
                             <div class="color-preview" bind:this={colorPreviewSquare}>
-                                <div style={`background-color: rgba(${shadow.base.color.r}, ${shadow.base.color.g}, ${shadow.base.color.b}, ${shadow.base.color.a}%)`} on:mousedown={()=>{openOverlay(i)}}></div>
+                                <div style={`background-color: rgba(${shadow.color.r}, ${shadow.color.g}, ${shadow.color.b}, ${shadow.color.a}%)`} on:mousedown={()=>{openOverlay(i)}}></div>
                             </div>
                         {:else}
                             <div class="color-preview">
-                                <div style={`background-color: rgba(${shadow.base.color.r}, ${shadow.base.color.g}, ${shadow.base.color.b}, ${shadow.base.color.a}%)`} on:mousedown={()=>{openOverlay(i)}}></div>
+                                <div style={`background-color: rgba(${shadow.color.r}, ${shadow.color.g}, ${shadow.color.b}, ${shadow.color.a}%)`} on:mousedown={()=>{openOverlay(i)}}></div>
                             </div>
                         {/if}
                         
                         <UnitInput
                             name={"X"}
-                            v={shadow.base.x.v} u={shadow.base.x.u}
+                            v={shadow.x.v} u={shadow.x.u}
                             minWidth={"30px"} maxWidth={"80px"}
                             align={"left"}
                             minVal={-100}
@@ -190,7 +190,7 @@
     
                         <UnitInput
                             name={"Y"}
-                            v={shadow.base.y.v} u={shadow.base.y.u}
+                            v={shadow.y.v} u={shadow.y.u}
                             minWidth={"30px"} maxWidth={"80px"}
                             align={"left"}
                             minVal={-100}
@@ -203,7 +203,7 @@
                     
                         <UnitInput
                             name={"Blur"}
-                            v={shadow.base.radius.v} u={shadow.base.radius.u}
+                            v={shadow.radius.v} u={shadow.radius.u}
                             minWidth={"30px"} maxWidth={"80px"}
                             align={"left"}
                             maxVal={100}
@@ -317,7 +317,6 @@
 
             h1{
                 font-size: 18px;
-                color: $secondarys2;
                 user-select: none; -webkit-user-select: none;
             }
 

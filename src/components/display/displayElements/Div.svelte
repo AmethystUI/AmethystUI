@@ -1,7 +1,8 @@
 <script lang="ts">
     import { onMount } from "svelte";
 
-    import { boxShadow, collection, selectedComponent, selectedOverride } from "../../../stores/collection";
+    import { collection, selectedComponent, selectedOverride } from "../../../stores/collection";
+    import type { boxShadow } from "../../../declarations/general";
 
     $: currentComponent = $collection[$selectedComponent];
     $: currentOverride = $selectedOverride !== -1 ? $collection[$selectedComponent].styleOverrides[$selectedOverride] : undefined;
@@ -13,11 +14,11 @@
     $: textStriked = !!currentStyle ? currentStyle?.typeStyle?.textDecorations?.includes("strike") ?? false : false;
 
     const generateShadowString = (shadow: boxShadow):string => {
-        return `${shadow.base.x.v}${shadow.base.x.u} ` +
-                `${shadow.base.y.v}${shadow.base.y.u} ` +
-                `${shadow.base.radius.v}${shadow.base.radius.u} ` +
+        return `${shadow.x.v}${shadow.x.u} ` +
+                `${shadow.y.v}${shadow.y.u} ` +
+                `${shadow.radius.v}${shadow.radius.u} ` +
                 `${shadow.grow.v}${shadow.grow.u} ` +
-                `hsla(${shadow.base.color.h}deg, ${shadow.base.color.s}%, ${shadow.base.color.l}%, ${shadow.base.color.a}%)`;
+                `hsla(${shadow.color.h}deg, ${shadow.color.s}%, ${shadow.color.l}%, ${shadow.color.a}%)`;
     }
     let shadowString = "";
     $: if(!!currentStyle.boxShadows && currentStyle.boxShadows.length > 0) {
@@ -30,8 +31,6 @@
     }
 
     // ======================= UPDATE FUNCTION ======================= //
-
-    
 </script>
 
 <!-- Container transformation to keep the element in the center -->
@@ -69,6 +68,18 @@ class="no-drag">
         
         overflow-x:${currentStyle.overflowX ?? "auto"};
         overflow-y:${currentStyle.overflowY ?? "auto"};
+
+        ${ // decide whether or not to use the flexbox container by seeing if any flex attribtues are set
+            currentStyle.justifyContent !== "none" || currentStyle.alignItems !== "none" ?`
+                display: flex;
+                ${ // check if justify content is set. If so, use it
+                    currentStyle.justifyContent !== "none" ? `justify-content: ${currentStyle.justifyContent ?? "flex-start"};` : ""
+                }
+                ${ // check if align items is set. If so, use it
+                    currentStyle.alignItems!== "none"? `align-items: ${currentStyle.alignItems?? "flex-start"};` : ""
+                }
+            `: ""
+        }
 
         ${ // only use border styles if border is enabled
             currentStyle["USEBORDER"] ? `
@@ -152,12 +163,15 @@ class="no-drag">
             + ${ -currentStyle.borderWidthTop?.v/2 ?? 0 }${ currentStyle.borderWidthTop?.u ?? "px"}
             - ${ -currentStyle.borderWidthBottom?.v/2 ?? 0 }${ currentStyle.borderWidthBottom?.u ?? "px"}),
         0);
-    `} class="no-drag">
+    `}
+    class="no-drag">
         <!-- Text content -->
-        {#each currentStyle.content.split("\n") as line}
-            {line}
-            <br>
-        {/each}
+        {#if currentStyle.USETEXT}
+            {#each currentStyle.content.split("\n") as line}
+                {line}
+                <br>
+            {/each}
+        {/if}
     </div>
 </main>
 

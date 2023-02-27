@@ -1,6 +1,8 @@
 <script lang="ts">
-    import { collection, selectedComponent, selectedOverride, units, color, borderOutlineStyle } from "../../../stores/collection";
-    
+    import { collection, selectedComponent, selectedOverride } from "../../../stores/collection";
+    import type { color } from "../../../declarations/general";
+    import type { units, borderOutlineStyle } from "../../../declarations/general";
+
     import Slider from "./Basics/Slider.svelte";
     import UnitInput from "./Basics/UnitInput.svelte";
     import ColorPicker from "./Advanced/ColorPicker.svelte";
@@ -228,7 +230,6 @@
 
             h1{
                 font-size: 18px;
-                color: 1px solid $secondarys2;
                 user-select: none; -webkit-user-select: none;
             }
 

@@ -1,6 +1,8 @@
 <script lang="ts">
-    import { addOverride, collection, focusedComponent, HTMltagInfo, selectedComponent, selectedOverride, focusedOverride, layerDeleteLock } from "../../stores/collection";
+    import { addOverride, collection, focusedComponent, selectedComponent, selectedOverride, focusedOverride, layerDeleteLock } from "../../stores/collection";
     import ElementResizer from "./displayControl/ElementResizer.svelte";
+
+    import { HTMltagInfo } from "../../declarations/general";
 
     import Div from "./displayElements/Div.svelte";
 

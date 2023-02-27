@@ -80,7 +80,7 @@
         textCasing as textCasingType,
         textDecoration as textDecorationType,
         typeCategories
-    } from "../../../../stores/collection";
+    } from "../../../../declarations/general";
 
     /**
      * This is an object that maps the alignment values to a certain index.
@@ -164,7 +164,8 @@
 	import { cubicOut } from 'svelte/easing';
     import FontPickerOverlay from "./FontPickerOverlay.svelte"; // this import causes circular dependency warning in the compiler, but it works for now. It might be an issue in the future, so keep an eye out on this line.
     
-    import { typographyStyle, collection, selectedComponent, selectedOverride } from "../../../../stores/collection";
+    import { collection, selectedComponent, selectedOverride } from "../../../../stores/collection";
+    import type { typographyStyle } from "../../../../declarations/general";
     import { mainOverlayData } from "../../../../stores/overlayStat";
     import { get } from "svelte/store";
     import MultiSelect, { textDecoration, typeFilters } from "../Basics/MultiSelect.svelte";

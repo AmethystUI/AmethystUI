@@ -88,7 +88,7 @@
             lastWorkingV = Number(v);
         }
 
-        if(!dispatchLocked) disp("updateValue", {
+        if(!dispatchLocked && String(v).length > 0) disp("updateValue", {
             v: lastWorkingV,
         });
     }

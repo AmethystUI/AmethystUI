@@ -1,0 +1,25 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "dev",
+			"problemMatcher": [
+				"$eslint-compact"
+			],
+			"label": "npm: dev",
+			"detail": "rollup -c rollup.config.js -w"
+		},
+		{
+			"type": "typescript",
+			"tsconfig": "tsconfig.json",
+			"option": "watch",
+			"problemMatcher": [
+				"$tsc-watch"
+			],
+			"group": "build",
+			"label": "tsc: watch - tsconfig.json"
+		}
+		
+	]
+}

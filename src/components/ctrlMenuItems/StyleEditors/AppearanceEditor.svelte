@@ -1,12 +1,72 @@
+<script lang="ts" context="module">
+    import type { multiToggleSelection } from "./Basics/MultiToggle.svelte";
+
+    const horizontalAlignments:multiToggleSelection<flexAlignment>[] = [
+        {
+            iconDir : "./assets/icons/none.svg",
+            val : "none",
+            alt : "No Alignment"
+        },{
+            iconDir : "./assets/icons/flex-align-left.svg",
+            val : "flex-start",
+            alt : "Align Left"
+        }, {
+            iconDir : "./assets/icons/flex-align-center-h.svg",
+            val : "center",
+            alt : "Align Center"
+        }, {
+            iconDir : "./assets/icons/flex-align-right.svg",
+            val : "flex-end",
+            alt : "Align Right"
+        },
+    ]
+
+    const verticalAlignments:multiToggleSelection<flexAlignment>[] = [
+        {
+            iconDir : "./assets/icons/none.svg",
+            val : "none",
+            alt : "No Alignment"
+        },{
+            iconDir : "./assets/icons/flex-align-top.svg",
+            val : "flex-start",
+            alt : "Align Top"
+        }, {
+            iconDir : "./assets/icons/flex-align-center-v.svg",
+            val : "center",
+            alt : "Align Center"
+        }, {
+            iconDir : "./assets/icons/flex-align-bottom.svg",
+            val : "flex-end",
+            alt : "Align Bottom"
+        },
+    ]
+
+    /*
+     * These are objects that maps the alignment values to a certain index.
+     * It helps in easily identifying the position of the element on the component UI.
+     * Every component might have a different indicies object. These are exclusive to this component.
+     */
+    const alignmentIndices: { [K in flexAlignment]: number } = {
+        "none" : 0,
+        "flex-start": 1,
+        "center": 2,
+        "flex-end": 3,
+        "space-around": -1,
+        "space-between": -1,
+        "space-evenly": -1,
+    };
+</script>
+
 <script lang="ts">
-    import { collection, selectedComponent, selectedOverride, units, color, borderOutlineStyle, overflow } from "../../../stores/collection";
-    
+    import { collection, selectedComponent, selectedOverride } from "../../../stores/collection";
+    import type { overflow, flexAlignment } from "../../../declarations/general";
+
     import Slider from "./Basics/Slider.svelte";
-    import UnitInput from "./Basics/UnitInput.svelte";
-    import ColorPicker from "./Advanced/ColorPicker.svelte";
     import Dropdown from "./Basics/Dropdown.svelte";
     import ValueInput from "./Basics/ValueInput.svelte";
     import Title from "./Basics/Title.svelte";
+    import MultiToggle from "./Basics/MultiToggle.svelte";
+    import { textDecoration } from "./Basics/MultiSelect.svelte";
     
     export let currentParentWidth = 360;
     
@@ -18,18 +78,26 @@
     let opacity:number = 100;
     let overflowX:overflow = "auto";
     let overflowY:overflow = "auto";
+    let alignX:flexAlignment = "none";
+    let alignY:flexAlignment = "none";
     let syncOverflow = false;
 
     $: if(!!currentStyle){ // these variables just make the code look nicer
         // opacity
-        if(currentStyle["opacity"] === undefined) currentStyle["opacity"] = opacity;
-        opacity = currentStyle["opacity"];
+        if(currentStyle.opacity === undefined) currentStyle.opacity = opacity;
+        opacity = currentStyle.opacity;
         
         // overflows
-        if(!currentStyle["overflowX"]) currentStyle["overflowX"] = overflowX;
-        overflowX = currentStyle["overflowX"];
-        if(!currentStyle["overflowY"]) currentStyle["overflowY"] = overflowY;
-        overflowY = currentStyle["overflowY"];
+        if(!currentStyle.overflowX) currentStyle.overflowX = overflowX;
+        overflowX = currentStyle.overflowX;
+        if(!currentStyle.overflowY) currentStyle.overflowY = overflowY;
+        overflowY = currentStyle.overflowY;
+
+        // alignments
+        if(!currentStyle.justifyContent) currentStyle.justifyContent = alignX;
+        alignX = currentStyle.justifyContent;
+        if(!currentStyle.alignItems) currentStyle.alignItems = alignY;
+        alignY = currentStyle.alignItems;
     }
 
     const updateOpacity = (evt:CustomEvent<any>, d:string) => {
@@ -71,6 +139,23 @@
         }
     }
 
+    // We're seperating these two functions out because they will have different functionalities when we further develop flexbox alignment
+    const updateHorizontalAlignnment = (e) => {
+        if($selectedOverride !== -1){ // if no override is selected
+            $collection[$selectedComponent].styleOverrides[$selectedOverride].style.justifyContent = e.detail.value;
+        } else{
+            $collection[$selectedComponent].style.justifyContent = e.detail.value;
+        }
+    }
+
+    const updateVerticalAlignnment = (e) => {
+        if($selectedOverride !== -1){ // if no override is selected
+            $collection[$selectedComponent].styleOverrides[$selectedOverride].style.alignItems = e.detail.value;
+        } else{
+            $collection[$selectedComponent].style.alignItems = e.detail.value;
+        }
+    }
+
 </script>
 
 <main class="no-drag">
@@ -88,7 +173,7 @@
     <div class="spacer"></div>
 
     <!-- Overflow -->
-    <section style="display:flex; align-items: flex-start; margin:0;">
+    <section style="display:flex; align-items: flex-start; margin-bottom:0;">
         <Title name="Overflow" width="fit-content"/>
         <section id="check-container">
             <input type="checkbox" checked={syncOverflow} on:click={updateOverflowSyncing}>
@@ -98,7 +183,27 @@
     <section>
         <Dropdown name="Horizontal" sub={true} hasMargin={true} v={overflowX} possibleValues={possibleOverflowStyles} on:updateValue={e => updateOverflow(e, "X")}/>
         <Dropdown name="Vertical" sub={true} hasMargin={true} v={overflowY} possibleValues={possibleOverflowStyles} on:updateValue={e => updateOverflow(e, "Y")}/>
-    </section>  
+    </section>
+
+    <!-- Alignements -->
+    <Title name="Content Alignement"></Title>
+    <MultiToggle
+        name="Horizontal" sub={true}
+        elements={horizontalAlignments}
+        selection={alignmentIndices[alignX]}
+        width={currentParentWidth-27} height={25} radius={4} iconSize={16}
+        on:valueChange={updateHorizontalAlignnment}
+        />
+    <div class="spacer"></div>
+    <MultiToggle
+        name="Vertical" sub={true}
+        elements={verticalAlignments}
+        selection={alignmentIndices[alignY]}
+        width={currentParentWidth-27} height={25} radius={4} iconSize={16}
+        on:valueChange={updateVerticalAlignnment}
+        />
+
+    <div style="height:14px"></div>
 </main>
 
 <style lang="scss">
@@ -114,7 +219,6 @@
 
             h1{
                 font-size: 18px;
-                color: 1px solid $secondarys2;
                 user-select: none; -webkit-user-select: none;
             }
         }

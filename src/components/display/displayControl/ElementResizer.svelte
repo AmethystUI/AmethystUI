@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { addOverride, collection, focusedComponent, HTMltagInfo, selectedComponent, selectedOverride, focusedOverride, layerDeleteLock } from "../../../stores/collection";
+    import { addOverride, collection, focusedComponent, selectedComponent, selectedOverride, focusedOverride, layerDeleteLock } from "../../../stores/collection";
+    import { HTMltagInfo } from "../../../declarations/general";
 
     let icx = 0; // initial cursor x
     let icy = 0; // initial cursor y
@@ -387,7 +388,7 @@
             opacity: 0;
             transition: opacity ease 100ms;
 
-            box-shadow: 1px 1px 4px hsla(0,0,0,70%);
+            box-shadow: 1px 1px 4px hsla(0deg, 0%, 0%, 70%);
 
             &:hover{
                 background-color: $accent !important;

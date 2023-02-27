@@ -29,12 +29,13 @@
     import {
         collection,
         selectedComponent,
-        selectedOverride,
-        units,
-        color,
-        borderOutlineStyle,
-        typographyStyle
+        selectedOverride
     } from "../../../stores/collection";
+    import type {
+        color,
+        typographyStyle
+    } from "../../../declarations/general"
+
     import TypefaceFinder from "./Advanced/TypefaceFinder.svelte";
     import Dropdown from "./Basics/Dropdown.svelte";
     import MultiToggle, { textAlignment, textCasing } from "./Basics/MultiToggle.svelte";
@@ -59,8 +60,6 @@
     let fontPickerTracker:HTMLDivElement;
 
     // these variables just make the code look nicer
-    // let clr:color = {type:"hsl", r:10, g:10, b:10, h:0, s:0, l:4, a:100, hex:"0a0a0a"} // default text color
-    const initialColor = {h:0, s:0, l:4}
     let clr:color = initializeColorFromHSLA(0, 0, 100, 100); // default text color
 
     let fontRef: typographyStyle = {
@@ -74,7 +73,7 @@
         variation: 400,
         textDecorations: [],
         casing: "none",
-        alignment: "center",
+        alignment: "left",
         size: {
             v: 14, u: "px"
         },
@@ -87,19 +86,24 @@
     }
 
     let content: string = "";
+    let placeholder: string = "";
 
     $: if(!!currentStyle){ // Variable update listener. If the current style changes, then update the variables accordingly
         // text color
         if(!currentStyle.color) currentStyle.color = clr;
-        clr = currentStyle["color"];
+        clr = currentStyle.color;
 
         // typeface
         if(!currentStyle.typeStyle) currentStyle.typeStyle = fontRef;
         fontRef = currentStyle.typeStyle;
 
         // initial text
-        if(!currentStyle.content) currentStyle.content = content;
-        fontRef = currentStyle.typeStyle;
+        if(currentStyle.content === undefined) currentStyle.content = content;
+        content = currentStyle.content;
+
+        // initial place holder
+        if(currentStyle.placeholder === undefined) currentStyle.placeholder = placeholder;
+        placeholder = currentStyle.placeholder;
     }
 
     // open the color picker
@@ -124,7 +128,7 @@
         textAlignment as textAlignmentType,
         textCasing as textCasingType,
         textDecoration as textDecorationType
-    } from "../../../stores/collection";
+    } from "../../../declarations/general";
     import { beautifiedFontName, getFontNameValue, standardizedFontName } from "../../../workers/pseudoWorkers/fonts";
     import { keepOpenOverlay } from "./Advanced/Overlay.svelte";
     import { hslToRgb, initializeColorFromHSLA } from "../../../helpers/colorMaths";
@@ -209,7 +213,7 @@
         <TextAreaInput name={"Content"} placeHolder={"Lorem ipsum dolor sit amet."} v={content} hasMargin={false} sub={false} currentParenteWidth={currentParentWidth} on:updateValue={updateTextContent}/>
         <div class="spacer"></div>
         <!-- Placeholder -->
-        <TextAreaInput name={"Placeholder"} placeHolder={"Lorem ipsum dolor sit amet."} v={""} hasMargin={false} sub={false} currentParenteWidth={currentParentWidth} on:updateValue={updatePlaceholder}/>
+        <TextAreaInput name={"Placeholder"} placeHolder={"Lorem ipsum dolor sit amet."} v={placeholder} hasMargin={false} sub={false} currentParenteWidth={currentParentWidth} on:updateValue={updatePlaceholder}/>
 
         <div class="spacer"></div>
 
@@ -304,7 +308,6 @@
 
             h1{
                 font-size: 18px;
-                color: 1px solid $secondarys2;
                 user-select: none; -webkit-user-select: none;
             }
 

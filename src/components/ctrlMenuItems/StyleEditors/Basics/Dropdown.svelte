@@ -146,7 +146,7 @@
             position:absolute;
             width:100%; height:fit-content;
             background-color: hsla(200,5%,21%,50%);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px) !important; -webkit-backdrop-filter: blur(10px) !important;
             overflow:hidden;
             display:flex; flex-direction: column;
             z-index: 1000;

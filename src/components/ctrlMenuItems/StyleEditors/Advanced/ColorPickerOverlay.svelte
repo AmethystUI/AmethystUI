@@ -128,7 +128,8 @@
 <!-- Colorpicker overlay backend -->
 <script lang="ts">
     import { mainColorPickerData } from "../../../../stores/colorPickerStat"
-    import { collection, color, selectedComponent, selectedOverride } from "../../../../stores/collection"
+    import { collection, selectedComponent, selectedOverride } from "../../../../stores/collection"
+    import type { color } from "../../../../declarations/general";
     import { hexToRgba, hslToRgb, rgbaToHex, rgbToHsl } from '../../../../helpers/colorMaths';
     import { tweened } from 'svelte/motion';
 	import { quadOut } from 'svelte/easing';

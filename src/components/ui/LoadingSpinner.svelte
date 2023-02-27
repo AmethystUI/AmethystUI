@@ -1,8 +1,3 @@
-<script lang="ts">
-
-</script>
-
-<!-- HTML -->
 <main>
     <!-- the foreground div -->
     <div></div>

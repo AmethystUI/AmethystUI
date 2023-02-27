@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { color } from '../../../../stores/collection';
+    import type { color } from '../../../../declarations/general';
     import { createEventDispatcher } from 'svelte';
     import Title from './Title.svelte';
     const disp = createEventDispatcher();
@@ -10,11 +10,12 @@
     export let min:number;
     export let max:number;
     export let v: number;
-    export let psuedoV: number = v;
+    export let initialV: number = v;
     export let hasMargin: boolean;
     export let colorRef: color = undefined;
 
     let initialCursorY:number = 0;
+    let initialCursorX:number = 0;
 
     export let currentParentWidth=360;
 
@@ -25,23 +26,24 @@
     const startDrag = (e:MouseEvent) => {
         // record initial cursorY
         initialCursorY = e.clientY;
+        initialCursorX = e.clientX;
 
         // update value first
-        if(!sliderBackground) return; // do not track if it's not initialized fully
+        // if(!sliderBackground) return; // do not track if it's not initialized fully
         
-        const sliderBCR = sliderBackground.getBoundingClientRect();
-        v = ((e.clientX - sliderBCR.x)/(sliderBCR.width))*(max-min)+min;
-        // check v range
-        if(v < min) v = min;
-        if(v > max) v = max;
+        // const sliderBCR = sliderBackground.getBoundingClientRect();
+        // v = ((e.clientX - sliderBCR.x)/(sliderBCR.width))*(max-min)+min;
+        // // check v range
+        // if(v < min) v = min;
+        // if(v > max) v = max;
         
-        // dispatch an update value
-        disp("updateValue", {
-            v:Math.round(v)
-        })
+        // // dispatch an update value
+        // disp("updateValue", {
+        //     v:Math.round(v)
+        // })
 
         // reset psuedoV
-        psuedoV = v;
+        initialV = v;
 
         // start tracking mouse position on move
         document.addEventListener('mousemove', trackDrag);
@@ -53,13 +55,16 @@
         
         const sliderBCR = sliderBackground.getBoundingClientRect();
         // calcuate V
-        let tV = ((e.clientX - sliderBCR.x)/sliderBCR.width)*(max-min)+min;
+        // let tV = ((e.clientX - sliderBCR.x)/sliderBCR.width)*(max-min)+min;
+        let tV = initialV + (e.clientX - initialCursorX);
+        // let tV = v;
 
         // calculate deltaV based off of mouse Y deviation
         let invYFacStrength = 10; // smaller = stronger
         let yFacThreshold = 2;
         let yFac = 1/(Math.abs(e.clientY - initialCursorY)/invYFacStrength < yFacThreshold ? 1 : Math.abs(e.clientY - initialCursorY)/invYFacStrength)
-        let dV = (tV - psuedoV) * yFac;
+        let speedScaler = (max-min) / sliderBCR.width;
+        let dV = (tV - initialV) * yFac * speedScaler;
 
         // assign dV
         v += dV;
@@ -71,8 +76,8 @@
             v:Math.round(v)
         })
 
-        // assign psuedoV
-        psuedoV = tV;
+        // reset initial X position
+        initialCursorX = e.clientX;
     }
 
     const endDrag = () => {

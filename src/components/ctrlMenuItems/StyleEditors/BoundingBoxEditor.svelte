@@ -1,6 +1,7 @@
 <script lang="ts">
-    import { collection, selectedComponent, selectedOverride, units } from "../../../stores/collection";
-    
+    import { collection, selectedComponent, selectedOverride } from "../../../stores/collection";
+    import type { units } from "../../../declarations/general";
+
     import Slider from "./Basics/Slider.svelte";
     import UnitInput from "./Basics/UnitInput.svelte";
     import ValueInput from "./Basics/ValueInput.svelte";
@@ -176,7 +177,6 @@
 
         h1{
             font-size: 18px;
-            color: 1px solid $secondarys2;
             margin: 0px 0px 13px 0px;
             user-select: none; -webkit-user-select: none;
         }

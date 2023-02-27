@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { color } from "../../../../stores/collection";
+    import type { color } from "../../../../declarations/general";
     import ValueInput from "../Basics/ValueInput.svelte";
     import ValueStrInput from "../Basics/ValueStrInput.svelte";
     import { hexToRgba, hslToRgb, rgbaToHex, rgbToHsl } from "../../../../helpers/colorMaths";

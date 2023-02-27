@@ -46,10 +46,16 @@
         }, 0);
     }
 
-    const preventNewline = (e:KeyboardEvent):void =>{
+    const checkKeyPress = (e:KeyboardEvent):void =>{
         if(e.key === "Enter" || e.key === "Escape"){
             e.preventDefault();
             nameField.blur();
+
+            // format the name properly by removing redundant spaces, replacing the spaces with dashes, and lower casing all letters.
+            if(!!$collection[elmntIndex]?.styleOverrides[overrideIndex]){
+                $collection[elmntIndex].styleOverrides[overrideIndex].name = nameField.textContent.replace(/\s+/g, "-").toLowerCase();
+            }
+
             return;
         }
     };
@@ -69,8 +75,8 @@
     <!-- icon + title -->
     <img src="./assets/icons/copy.svg" alt="">
 
-    <p bind:this={nameField} contenteditable={editable} class={`${editable ? "editable" : ""}`} style={`cursor: ${editable ? "text" : "normal"}`} on:blur={() => {editable=false; nameField.scrollLeft = 0}} on:keypress={preventNewline} on:blur={changeName}>
-        {!!$collection[elmntIndex].styleOverrides[overrideIndex] ? $collection[elmntIndex].styleOverrides[overrideIndex].name : ""}
+    <p bind:this={nameField} contenteditable={editable} class={`${editable ? "editable" : ""}`} style={`cursor: ${editable ? "text" : "normal"}`} on:blur={() => {editable=false; nameField.scrollLeft = 0}} on:keypress={checkKeyPress} on:blur={changeName}>
+        {$collection[elmntIndex]?.styleOverrides[overrideIndex]?.name ?? ""}
     </p>
 </main>
 

@@ -1,5 +1,4 @@
 import { writable, get } from "svelte/store";
-import type { color, numberRange } from "./collection";
 
 export type dataMode = "none" | "colorPicker" | "fontEditor";
 

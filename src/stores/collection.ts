@@ -1,94 +1,5 @@
 import { writable, get } from 'svelte/store';
-import type { fontObject } from '../workers/pseudoWorkers/fonts';
-
-export type HTMLtag = "A" | "BODY" | "BUTTON" | "CANVAS" | "DIV" | "H1" | "H2" | "H3" | "H4" | "H5" | "H6" | "HR" | "INPUT" | "LABEL" | "OL" | "UL" | "PROGRESS" | "P" | "SECTION" | "SPAN" | "TEXTAREA";
-export type units = "px" | "pt" | "pc" | "em" | "rem" | "vw" | "vh" | "%" | "fit-content";
-export type borderOutlineStyle = "dotted" | "dashed" | "solid" | "double" | "groove" | "ridge" | "inset" | "outset" | "hidden";
-export type displayTypes = "flex" | "inline" | "none";
-export type typography = "poppins";
-export type textAlignment = "center" | "left" | "right" | "justify";
-export type flexAlignment = "flex-start" | "flex-end" | "center" | "space-between" | "space-around" | "space-evenly";
-export type flexDirection = "row" | "column" | "row-reverse" | "column-reverse";
-export type textTransform = "uppercase" | "lowercase" | "capitalize";
-export type overflow = "visible" | "hidden" | "scroll" | "auto";
-export type colorNumericType = "rgb" | "hsl";
-export type textCasing = "lowercase" | "none" | "uppercase";
-export type textDecoration = "italicize" | "underline" | "strike";
-export type typeCategories = "sans-serif" | "serif" | "display" | "handwriting" | "monospace";
-
-export interface tagInfo{
-    name : string,
-    iconURI : string
-}
-export const HTMltagInfo: Record<HTMLtag, tagInfo> = {
-    "A"         : {"name" : "Anchor", "iconURI" : "./assets/icons/link.svg"},
-    "BODY"      : {"name" : "Document body", "iconURI" : "./assets/icons/browser.svg"},
-    "BUTTON"    : {"name" : "Button", "iconURI" : "./assets/icons/play-circle.svg"},
-    "CANVAS"    : {"name" : "Canvas", "iconURI" : "./assets/icons/canvas.svg"},
-    "DIV"       : {"name" : "Division", "iconURI" : "./assets/icons/grid.svg"},
-    "H1"        : {"name" : "Heading 1", "iconURI" : "./assets/icons/heading.svg"},
-    "H2"        : {"name" : "Heading 2", "iconURI" : "./assets/icons/heading.svg"},
-    "H3"        : {"name" : "Heading 3", "iconURI" : "./assets/icons/heading.svg"},
-    "H4"        : {"name" : "Heading 4", "iconURI" : "./assets/icons/heading.svg"},
-    "H5"        : {"name" : "Heading 5", "iconURI" : "./assets/icons/heading.svg"},
-    "H6"        : {"name" : "Heading 6", "iconURI" : "./assets/icons/heading.svg"},
-    "HR"        : {"name" : "Horizontal line", "iconURI" : "./assets/icons/minus.svg"},
-    "INPUT"     : {"name" : "Input", "iconURI" : "./assets/icons/globe.svg"},
-    "LABEL"     : {"name" : "Label", "iconURI" : "./assets/icons/pricetags.svg"},
-    "OL"        : {"name" : "Organized list", "iconURI" : "./assets/icons/list.svg"},
-    "UL"        : {"name" : "Unorganized list", "iconURI" : "./assets/icons/menu.svg"},
-    "PROGRESS"  : {"name" : "Progress", "iconURI" : "./assets/icons/clock.svg"},
-    "P"         : {"name" : "Paragraph", "iconURI" : "./assets/icons/paragraph.svg"},
-    "SECTION"   : {"name" : "Section", "iconURI" : "./assets/icons/layout.svg"},
-    "SPAN"      : {"name" : "Span", "iconURI" : "./assets/icons/flash.svg"},
-    "TEXTAREA"  : {"name" : "Textarea", "iconURI" : "./assets/icons/edit-2.svg"},
-}
-
-export interface unitedAttr<T>{
-    v : T,
-    u : units
-}
-
-export interface numberRange{
-    low : 0,
-    high : 100
-}
-
-export interface shadow{
-    radius : unitedAttr<number>,
-    x : unitedAttr<number>,
-    y : unitedAttr<number>,
-    color : color
-} export interface boxShadow {
-    base : shadow,
-    grow : unitedAttr<number>,
-}
-
-export interface typographyStyle{
-    fontObj : fontObject, // the font object that contains most of the information we need
-    variation : number, // basically the weight
-    
-    textDecorations: textDecoration[],
-
-    casing: textCasing,
-    alignment: textAlignment,
-
-    size : unitedAttr<number>,
-    tracking :unitedAttr<number>,
-    lineHeight : unitedAttr<number>,
-}
-
-export interface color{
-    type : colorNumericType,
-    r? : number,
-    g? : number,
-    b? : number,
-    h : number,
-    s : number,
-    l : number,
-    a : number,
-    hex : string,
-}
+import type { units, textDecoration, textCasing, textAlignment, colorNumericType, overflow, borderOutlineStyle, displayTypes, flexAlignment, flexDirection, HTMLtag, unitedAttr, boxShadow, color, element, typographyStyle } from '../declarations/general';
 
 // all caps attributes are used as compilation tags
 export interface elementStyle{
@@ -138,43 +49,26 @@ export interface elementStyle{
     outlineStyle? : borderOutlineStyle, // done
     outlineOffset? : unitedAttr<number>, // done
 
-    USETEXT? : boolean,
-    content? : string,
-    placeholder? : string,
+    USETEXT? : boolean, // done
+    content? : string, // done
+    placeholder? : string, // done
     typeStyle? : typographyStyle, // we have to condense all of these stuff into a single attribute because we have an overlay controlling it. And that requires a single, condensed attr.
-    color? : color,
+    color? : color, // done
 
     display?: displayTypes,
 
     // FLEX ONLY (implement in public preview 2.0)
-    // justifyContent?: flexAlignment,
-    // alignItems?: flexAlignment,
-    // flexDirection?: flexDirection,
+    justifyContent?: flexAlignment, // done, kinda
+    alignItems?: flexAlignment, // done, kinda
+    flexDirection?: flexDirection, // 2.0
 
-    translateX? : unitedAttr<number>,
-    translateY? : unitedAttr<number>,
-    scaleX? : number,
-    scaleY? : number,  
+    // translateX? : unitedAttr<number>,
+    // translateY? : unitedAttr<number>,
+    // scaleX? : number,
+    // scaleY? : number,  
 };
 
-// Google font api key: AIzaSyB0YyT0-3AgT2aF45O4HropOlNx1hghmaI
-// Tester key:          AIzaSyDW3JQmec-yJykfP-FcRYpIujOc6jYa4RQ
-
-export interface override{
-    name : string,
-	style : elementStyle
-};
-
-export interface element{
-    type : HTMLtag,
-    showing: boolean,
-    style : elementStyle,
-    showPlaceHolderContent? : boolean,
-    styleOverrides : override[],
-    showOutline : boolean
-};
-
-export let collection = writable<element[]>([]);
+export let collection = writable<element[]>([]); // the project file data
 
 export let selectedComponent = writable<number>(-1);
 export let selectedOverride = writable<number>(-1);
@@ -210,11 +104,11 @@ export const addOverride = (elmntIndex:number):void => {
     let currCollection = get(collection);
 
     // find a non-duplicate name
-    let i = 0;
+    let i = 1;
     while(true){
         let nameDup = false;
         for(let j = 0; j < currCollection[elmntIndex].styleOverrides.length; j++){
-            if(currCollection[elmntIndex].styleOverrides[j].name === `Override ${i}`){
+            if(currCollection[elmntIndex].styleOverrides[j].name === `override-${i}`){
                 // set nameDup to true and break loop
                 nameDup = true;
                 break;
@@ -228,7 +122,7 @@ export const addOverride = (elmntIndex:number):void => {
     // create a new override and add it to styleOverrides
     const cs = currCollection[elmntIndex].style;
     currCollection[elmntIndex].styleOverrides = [...currCollection[elmntIndex].styleOverrides, {
-        name: `Override ${i}`,
+        name: `override-${i}`,
         // style: Object.assign({}, currCollection[elmntIndex].style)
         style: structuredClone(cs)
     }]

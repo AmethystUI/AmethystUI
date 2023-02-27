@@ -2,7 +2,7 @@
     import type {
         textCasing as textCasingType,
         textAlignment as textAlignmentType
-    } from '../../../../stores/collection';
+    } from '../../../../declarations/general';
     
     // define selection data
     export interface multiToggleSelection<T> {

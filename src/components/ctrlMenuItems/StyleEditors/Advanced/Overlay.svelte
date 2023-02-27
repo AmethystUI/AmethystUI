@@ -68,7 +68,7 @@
                 overlayDat.visible=true; // show overlay
                 return overlayDat
             });
-        }, 14); // 14ms update window for the width to change properly and shit
+        }, 30); // 30ms update window for the width to change properly and shit. Again, not the best practice but whatever.
 
         // clear last tracking
         cancelAnimationFrame(get(mainOverlayData).positionTrackingID);

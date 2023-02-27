@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { units } from '../../../../stores/collection';
+    import type { units } from '../../../../declarations/general';
     import { createEventDispatcher } from 'svelte';
     import Title from './Title.svelte';
     const disp = createEventDispatcher();
@@ -76,7 +76,7 @@
     }
 
     // Dispatch value changes when v changes or u is not null
-    $: if ((v !== undefined && String(v).length > 0 && String(v) !== "-") || (u !== null)) {
+    $: if ((v !== undefined && String(v).length > 0 && String(v) !== "-")) {
         // Check if v is a valid value and not just a change in unit
         if (v !== undefined && v.length > 0 && v !== "-") {
             for (let i = v.length - 1; i > -1; i--) { // Clean up every character of v
@@ -97,7 +97,14 @@
             }
         }
 
-        if(!dispatchLocked) disp("updateValue", {
+        if(!dispatchLocked && String(v).length > 0) disp("updateValue", {
+            v: lastWorkingV,
+            u: u
+        });
+    }
+
+    $: if(u !== null){ // update only the unit
+        disp("updateValue", {
             v: lastWorkingV,
             u: u
         });

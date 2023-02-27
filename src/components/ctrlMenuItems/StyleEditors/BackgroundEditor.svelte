@@ -1,6 +1,8 @@
 <script lang="ts">
-    import { collection, selectedComponent, selectedOverride, units, color, borderOutlineStyle } from "../../../stores/collection";
-    
+    import { collection, selectedComponent, selectedOverride } from "../../../stores/collection";
+    import type { color } from "../../../declarations/general";
+    import { units } from "../../../declarations/general";
+
     import ColorPicker from "./Advanced/ColorPicker.svelte";
     import { clearColorPickerRef, mainColorPickerData } from "../../../stores/colorPickerStat";
     import { initializeColorFromHSLA } from "../../../helpers/colorMaths";
@@ -70,7 +72,6 @@
 
             h1{
                 font-size: 18px;
-                color: 1px solid $secondarys2;
                 user-select: none; -webkit-user-select: none;
             }
 

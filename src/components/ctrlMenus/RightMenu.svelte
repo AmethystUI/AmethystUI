@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { addOverride, collection, focusedComponent, HTMltagInfo, selectedComponent, selectedOverride, focusedOverride, layerDeleteLock } from "../../stores/collection";
-    
+    import { collection, selectedComponent, selectedOverride, focusedOverride, layerDeleteLock } from "../../stores/collection";
+
     import BoundingBoxEditor from "../ctrlMenuItems/StyleEditors/BoundingBoxEditor.svelte";
     import BorderEditor from "../ctrlMenuItems/StyleEditors/BorderEditor.svelte";
     import OutlineEditor from "../ctrlMenuItems/StyleEditors/OutlineEditor.svelte";
@@ -47,10 +47,7 @@
     {#if $selectedComponent !== -1 || $selectedOverride !== -1}
         <!-- size editor -->
         <BoundingBoxEditor currentParentWidth={currentWidth}/>
-    
-        <!-- text editor -->
-        <TextEditor currentParentWidth={currentWidth}/>
-    
+
         <!-- appearance editor -->
         <AppearanceEditor currentParentWidth={currentWidth}/>
         
@@ -62,6 +59,9 @@
         
         <!-- outline editor -->
         <OutlineEditor currentParentWidth={currentWidth}/>
+
+        <!-- text editor -->
+        <TextEditor currentParentWidth={currentWidth}/>
 
         <!-- shadow editor -->
         <ShadowEditor/>

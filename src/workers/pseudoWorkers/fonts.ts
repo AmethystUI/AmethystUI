@@ -1,4 +1,4 @@
-import type { typeCategories } from "../../../src/stores/collection";
+import type { typeCategories } from "../../declarations/general";
 import { fontLimit, fontSorting } from "../configs/fontLoading.config";
 
 /**

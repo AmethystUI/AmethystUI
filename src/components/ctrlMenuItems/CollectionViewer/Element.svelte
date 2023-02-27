@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { addOverride, collection, focusedComponent, HTMltagInfo, selectedComponent, selectedOverride, focusedOverride, layerDeleteLock, layerBlurLock } from "../../../stores/collection";
+    import { addOverride, collection, focusedComponent, selectedComponent, selectedOverride, focusedOverride, layerDeleteLock, layerBlurLock } from "../../../stores/collection";
+    import { HTMltagInfo } from "../../../declarations/general";
     import { setSelectedElmnt } from "../../../stores/overlayStat";
     import { createEventDispatcher } from 'svelte';
     import { fly } from "svelte/transition";
