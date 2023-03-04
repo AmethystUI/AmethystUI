@@ -30,7 +30,7 @@ const dragging = writable(undefined);
     import Element from "../CollectionViewer/Element.svelte";
     import Override from "../CollectionViewer/Override.svelte";
     import { collection, focusedComponent, selectedComponent, selectedOverride, focusedOverride } from "../../../stores/collection";
-    import { HTMltagInfo } from '../../../declarations/general';
+    import { HTMltagInfo } from '../../../types/general';
     import { clearColorPickerRef } from "../../../stores/colorPickerStat";
 
     export let id;

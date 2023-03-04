@@ -1,6 +1,7 @@
 <script lang="ts">
+    import { activeStyles } from "../../../stores/activeStyles";
     import { collection, selectedComponent, selectedOverride } from "../../../stores/collection";
-    import type { units } from "../../../declarations/general";
+    import type { units } from "../../../types/general";
 
     import Slider from "./Basics/Slider.svelte";
     import UnitInput from "./Basics/UnitInput.svelte";
@@ -29,14 +30,14 @@
 
     $: if(!!currentStyle){ // these variables just make the code look nicer
         // size
-        if(!currentStyle["width"]) currentStyle["width"] = {v:100,u:"px"};
-        cW = currentStyle["width"].v;
-        cWu = currentStyle["width"].u;
-        if(!currentStyle["height"]) currentStyle["height"] = {v:100,u:"px"};
-        cH = currentStyle["height"].v;
-        cHu = currentStyle["height"].u;
+        if(!currentStyle.width) currentStyle.width = {v:100,u:"px"};
+        cW = currentStyle.width.v;
+        cWu = currentStyle.width.u;
+        if(!currentStyle.height) currentStyle.height = {v:100,u:"px"};
+        cH = currentStyle.height.v;
+        cHu = currentStyle.height.u;
         cSAvg = (cW + cH) / 2;
-
+    
         // margin
         if(!currentStyle["marginTop"]) currentStyle["marginTop"] = {v:0,u:"px"};
         cMT = currentStyle["marginTop"].v;
@@ -135,38 +136,52 @@
             if(!!$collection[$selectedComponent].style["paddingLeft"]) $collection[$selectedComponent].style["paddingLeft"].v = evt.detail.v;
         }
     }
+
+
+    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
+    $: useWidthAndHeight = $activeStyles.width || $activeStyles.height;
+    $: useMargin = $activeStyles.marginTop || $activeStyles.marginBottom || $activeStyles.marginLeft || $activeStyles.marginRight;
+    $: usePadding = $activeStyles.paddingTop || $activeStyles.paddingBottom || $activeStyles.paddingLeft || $activeStyles.paddingRight;
 </script>
 
-<main>
-    <!-- title of the editor -->
-    <h1>Bounding Box</h1>
+<!-- First check if we need to show anything at all. -->
+{#if useWidthAndHeight || useMargin || usePadding}
+    <main>
+        <!-- title of the editor -->
+        <h1>Bounding Box</h1>
 
-    <!-- width & height -->
-    <section>
-        <Slider name="Size" min={0} max={500} v={cSAvg} hasMargin={true} on:updateValue={updateSizeAll} currentParentWidth={currentParentWidth}/>
-        <UnitInput name="Width" usePercent={true} v={cW} u={cWu} on:updateValue={updateWidth} hasMargin={true} sub={true}/>
-        <UnitInput name="Height" usePercent={true} v={cH} u={cHu} on:updateValue={updateHeight} hasMargin={false} sub={true}/>
-    </section>
+        <!-- Size control. Activate whenever either width or height is active and used. -->
+        {#if useWidthAndHeight}
+            <section>
+                <Slider name="Size" min={0} max={500} v={cSAvg} hasMargin={true} on:updateValue={updateSizeAll} currentParentWidth={currentParentWidth}/>
+                <UnitInput name="Width" usePercent={true} v={cW} u={cWu} on:updateValue={updateWidth} hasMargin={true} sub={true}/>
+                <UnitInput name="Height" usePercent={true} v={cH} u={cHu} on:updateValue={updateHeight} hasMargin={false} sub={true}/>
+            </section>
+        {/if}
 
-    <!-- margin -->
-    <section>
-        <Slider name="Margin" min={0} max={200} v={cMAvg} hasMargin={true} on:updateValue={updateMarginAll} currentParentWidth={currentParentWidth}/>
-        <UnitInput name="Top" v={cMT} u={cMTu} on:updateValue={evt => updateMargin(evt, "Top")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
-        <UnitInput name="Right" v={cMR} u={cMRu} on:updateValue={evt => updateMargin(evt, "Right")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
-        <UnitInput name="Bottom" v={cMB} u={cMBu} on:updateValue={evt => updateMargin(evt, "Bottom")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
-        <UnitInput name="Left" v={cML} u={cMLu} on:updateValue={evt => updateMargin(evt, "Left")} hasMargin={false} maxWidth={"70px"} useFC={false} sub={true}/>
-    </section>
+        <!-- margin -->
+        {#if useMargin}
+            <section>
+                <Slider name="Margin" min={0} max={200} v={cMAvg} hasMargin={true} on:updateValue={updateMarginAll} currentParentWidth={currentParentWidth}/>
+                <UnitInput name="Top" v={cMT} u={cMTu} on:updateValue={evt => updateMargin(evt, "Top")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
+                <UnitInput name="Right" v={cMR} u={cMRu} on:updateValue={evt => updateMargin(evt, "Right")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
+                <UnitInput name="Bottom" v={cMB} u={cMBu} on:updateValue={evt => updateMargin(evt, "Bottom")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
+                <UnitInput name="Left" v={cML} u={cMLu} on:updateValue={evt => updateMargin(evt, "Left")} hasMargin={false} maxWidth={"70px"} useFC={false} sub={true}/>
+            </section>
+        {/if}
 
-    <!-- padding -->
-    <section>
-        <Slider name="Padding" min={0} max={100} v={cPAvg} hasMargin={true} on:updateValue={updatePaddingAll} currentParentWidth={currentParentWidth}/>
-        <UnitInput name="Top" v={cPT} u={cPTu} on:updateValue={evt => updatePadding(evt, "Top")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
-        <UnitInput name="Right" v={cPR} u={cPRu} on:updateValue={evt => updatePadding(evt, "Right")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
-        <UnitInput name="Bottom" v={cPB} u={cPBu} on:updateValue={evt => updatePadding(evt, "Bottom")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
-        <UnitInput name="Left" v={cPL} u={cPLu} on:updateValue={evt => updatePadding(evt, "Left")} hasMargin={false} maxWidth={"70px"} useFC={false} sub={true}/>
-    </section>
-
-</main>
+        <!-- padding -->
+        {#if usePadding}
+            <section>
+                <Slider name="Padding" min={0} max={100} v={cPAvg} hasMargin={true} on:updateValue={updatePaddingAll} currentParentWidth={currentParentWidth}/>
+                <UnitInput name="Top" v={cPT} u={cPTu} on:updateValue={evt => updatePadding(evt, "Top")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
+                <UnitInput name="Right" v={cPR} u={cPRu} on:updateValue={evt => updatePadding(evt, "Right")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
+                <UnitInput name="Bottom" v={cPB} u={cPBu} on:updateValue={evt => updatePadding(evt, "Bottom")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
+                <UnitInput name="Left" v={cPL} u={cPLu} on:updateValue={evt => updatePadding(evt, "Left")} hasMargin={false} maxWidth={"70px"} useFC={false} sub={true}/>
+            </section>
+        {/if}
+    </main>
+{/if}
 
 <style lang="scss">
     @import "../../../../public/guideline";

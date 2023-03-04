@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type { color } from "../../../../declarations/general";
+    import type { color } from "../../../../types/general";
     import ValueInput from "../Basics/ValueInput.svelte";
     import ValueStrInput from "../Basics/ValueStrInput.svelte";
-    import { hexToRgba, hslToRgb, rgbaToHex, rgbToHsl } from "../../../../helpers/colorMaths";
+    import { hexToRgba, hslToRgb, rgbaToHex, rgbToHsl } from "../../../../util/colorMaths";
     import { collection } from "../../../../stores/collection";
     import { mainColorPickerData } from "../../../../stores/colorPickerStat";
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { units } from '../../../../declarations/general';
+    import type { units } from '../../../../types/general';
     import { createEventDispatcher } from 'svelte';
     import Title from './Title.svelte';
     const disp = createEventDispatcher();
@@ -268,7 +268,7 @@
                 position:absolute;
                 width:calc(100% - 1px); height:fit-content; // the reason why we do -1 px is to account for the rendering gap
                 background-color: hsla(200,5%,21%,50%);
-                backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+                backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
                 overflow:hidden;
                 display:flex; flex-direction: column;
                 z-index: 1000;

@@ -129,8 +129,8 @@
 <script lang="ts">
     import { mainColorPickerData } from "../../../../stores/colorPickerStat"
     import { collection, selectedComponent, selectedOverride } from "../../../../stores/collection"
-    import type { color } from "../../../../declarations/general";
-    import { hexToRgba, hslToRgb, rgbaToHex, rgbToHsl } from '../../../../helpers/colorMaths';
+    import type { color } from "../../../../types/general";
+    import { hexToRgba, hslToRgb, rgbaToHex, rgbToHsl } from '../../../../util/colorMaths';
     import { tweened } from 'svelte/motion';
 	import { quadOut } from 'svelte/easing';
     

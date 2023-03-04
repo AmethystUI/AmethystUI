@@ -2,7 +2,7 @@
     import { addOverride, collection, focusedComponent, selectedComponent, selectedOverride, focusedOverride, layerDeleteLock } from "../../stores/collection";
     import ElementResizer from "./displayControl/ElementResizer.svelte";
 
-    import { HTMltagInfo } from "../../declarations/general";
+    import { HTMltagInfo } from "../../types/general";
 
     import Div from "./displayElements/Div.svelte";
 
@@ -33,12 +33,12 @@
             || currentStyle.opacity < 10// OR opacity is less than 10, then absolutely show
         ) ? "outlined" : ""}
     `} style={`
-        width: calc(${currentStyle.width ? currentStyle.width.v : 100}${currentStyle.width ? currentStyle.width.u : "px"}
-            + ${currentStyle.paddingLeft ? currentStyle.paddingLeft.v : 100}${currentStyle.paddingLeft ? currentStyle.paddingLeft.u : "px"}
-            + ${currentStyle.paddingRight ? currentStyle.paddingRight.v : 100}${currentStyle.paddingRight ? currentStyle.paddingRight.u : "px"});
-        height: calc(${currentStyle.height ? currentStyle.height.v : 100}${currentStyle.height ? currentStyle.height.u : "px"}
-            + ${currentStyle.paddingTop ? currentStyle.paddingTop.v : 0}${currentStyle.paddingTop ? currentStyle.paddingTop.u : "px"}
-            + ${currentStyle.paddingBottom ? currentStyle.paddingBottom.v : 0}${currentStyle.paddingBottom ? currentStyle.paddingBottom.u : "px"});
+        width: calc(${currentStyle.width?.v ?? "0"}${currentStyle.width?.u ?? "px"}
+            + ${currentStyle.paddingLeft?.v ?? "0"}${currentStyle.paddingLeft?.u ?? "px"}
+            + ${currentStyle.paddingRight?.v ?? "0"}${currentStyle.paddingRight?.u ?? "px"});
+        height: calc(${currentStyle.height?.v ?? "0"}${currentStyle.height?.u ?? "px"}
+            + ${currentStyle.paddingTop?.v ?? "0"}${currentStyle.paddingTop?.u ?? "px"}
+            + ${currentStyle.paddingBottom?.v ?? "0"}${currentStyle.paddingBottom?.u ?? "px"});
     `}>
         <ElementResizer />
 

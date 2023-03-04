@@ -1,7 +1,7 @@
 <script lang="ts">
     import { collection, selectedComponent, selectedOverride } from "../../../stores/collection";
-    import type { color } from "../../../declarations/general";
-    import type { units, borderOutlineStyle } from "../../../declarations/general";
+    import type { color } from "../../../types/general";
+    import type { units, borderOutlineStyle } from "../../../types/general";
 
     import Slider from "./Basics/Slider.svelte";
     import UnitInput from "./Basics/UnitInput.svelte";
@@ -9,7 +9,8 @@
     import Dropdown from "./Basics/Dropdown.svelte";
     import Title from "./Basics/Title.svelte";
     import { clearColorPickerRef, mainColorPickerData } from "../../../stores/colorPickerStat";
-    import { initializeColorFromHSLA } from "../../../helpers/colorMaths";
+    import { initializeColorFromHSLA } from "../../../util/colorMaths";
+    import { activeStyles } from "../../../stores/activeStyles";
     
     export let currentParentWidth = 360;
     
@@ -164,7 +165,7 @@
     
     // update color picker based on if the shadow is enabled or not
     $: if(!currentStyle.USEBORDER && $mainColorPickerData.refName === "borderColor"){
-    // if the current style doesn't use this editor, clear ref
+        // if the current style doesn't use this editor, clear ref
         clearColorPickerRef();
     }
 
@@ -186,64 +187,97 @@
             $collection[$selectedComponent].style.borderStyleBottom = topStyle;
         }
     }
+
+    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
+    $: useBorder = $activeStyles.USEBORDER;
+    $: useWidth = $activeStyles.borderWidthBottom || $activeStyles.borderWidthLeft || $activeStyles.borderWidthRight  || $activeStyles.borderWidthTop;
+    $: useRadius = $activeStyles.borderRadiusBottom || $activeStyles.borderRadiusLeft || $activeStyles.borderRadiusRight  || $activeStyles.borderRadiusTop;
+    $: useColor = $activeStyles.borderColor;
+    
+    $: useStyleBottom = $activeStyles.borderStyleBottom;
+    $: useStyleTop = $activeStyles.borderStyleTop;
+    $: useStyleLeft = $activeStyles.borderStyleLeft;
+    $: useStyleRight = $activeStyles.borderStyleRight;
 </script>
 
-<main class="no-drag">
-    <!-- title of the editor -->
-    <section id="title-container">
-        <h1>Border</h1>
+{#if useBorder}
+    <main class="no-drag">
+        <!-- title of the editor -->
+        <section id="title-container">
+            <h1>Border</h1>
 
-        <section id="check-container">
-            <input type="checkbox" checked={currentStyle.USEBORDER} on:click={toggleUseBorder}>
-            <img src="./assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USEBORDER ? "1" : "0"}">
-        </section>
-    </section>
-
-    <!-- only show editing panel if border is enabled -->
-    {#if currentStyle.USEBORDER}
-        <!-- width & height -->
-        <section>
-            <Slider name="Width" min={0} max={200} v={cBWAvg} hasMargin={true} on:updateValue={updateBorderWidthAll} currentParentWidth={currentParentWidth} colorRef={clr}/>
-            <UnitInput name="Top" v={cBWT} u={cBWTu} on:updateValue={evt => updateBorderWidth(evt, "Top")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
-            <UnitInput name="Right" v={cBWR} u={cBWRu} on:updateValue={evt => updateBorderWidth(evt, "Right")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
-            <UnitInput name="Bottom" v={cBWB} u={cBWBu} on:updateValue={evt => updateBorderWidth(evt, "Bottom")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
-            <UnitInput name="Left" v={cBWL} u={cBWLu} on:updateValue={evt => updateBorderWidth(evt, "Left")} hasMargin={false} maxWidth={"70px"} useFC={false} sub={true}/>
-        </section>
-
-        <!-- border radius -->
-        <section>
-            <Slider name="Radius" min={0} max={200} v={cBRAvg} hasMargin={true} on:updateValue={updateBorderRadiusAll} currentParentWidth={currentParentWidth} colorRef={clr}/>
-            <UnitInput name="Top" v={cBRT} u={cBRTu} on:updateValue={evt => updateBorderRadius(evt, "Top")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
-            <UnitInput name="Right" v={cBRR} u={cBRRu} on:updateValue={evt => updateBorderRadius(evt, "Right")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
-            <UnitInput name="Bottom" v={cBRB} u={cBRBu} on:updateValue={evt => updateBorderRadius(evt, "Bottom")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
-            <UnitInput name="Left" v={cBRL} u={cBRLu} on:updateValue={evt => updateBorderRadius(evt, "Left")} hasMargin={false} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
-        </section>
-
-        <!-- border color -->
-        <section>
-            <ColorPicker name="Color" propertyName={"Border"} propertyRef={"borderColor"} clr={clr} />
-        </section>
-
-        <div style="height:7px"></div>
-
-        <section style="flex-direction: column; margin-bottom:7px">
-            <section style="display:flex; align-items: flex-start; margin:0;">            
-                <Title name="Style" width="fit-content"/>
-                <section id="check-container">
-                    <input type="checkbox" checked={syncStyle} on:click={updateStyleSyncing}>
-                    <img src="./assets/icons/chain.svg" alt="" style="opacity: {syncStyle ? "1" : "0.5"}">
-                </section>
+            <section id="check-container">
+                <input type="checkbox" checked={currentStyle.USEBORDER} on:click={toggleUseBorder}>
+                <img src="./assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USEBORDER ? "1" : "0"}">
             </section>
-
-            <section>
-                <Dropdown name="Top" sub={true} hasMargin={true} v={styleTop} possibleValues={possibleStyles} on:updateValue={e => updateStyle(e, "Top")}/>
-                <Dropdown name="Right" sub={true} hasMargin={true} v={styleRight} possibleValues={possibleStyles} on:updateValue={e => updateStyle(e, "Right")}/>
-                <Dropdown name="Bottom " sub={true} hasMargin={true} v={styleBottom} possibleValues={possibleStyles} on:updateValue={e => updateStyle(e, "Bottom")}/>
-                <Dropdown name="Left" sub={true} hasMargin={false} v={styleLeft} possibleValues={possibleStyles} on:updateValue={e => updateStyle(e, "Left")}/>
-            </section>  
         </section>
-    {/if}
-</main>
+
+        <!-- only show editing panel if border is enabled -->
+        {#if currentStyle.USEBORDER}
+
+            <!-- width & height -->
+            {#if useWidth}
+                <section>
+                    <Slider name="Width" min={0} max={200} v={cBWAvg} hasMargin={true} on:updateValue={updateBorderWidthAll} currentParentWidth={currentParentWidth} colorRef={clr}/>
+                    <UnitInput name="Top" v={cBWT} u={cBWTu} on:updateValue={evt => updateBorderWidth(evt, "Top")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
+                    <UnitInput name="Right" v={cBWR} u={cBWRu} on:updateValue={evt => updateBorderWidth(evt, "Right")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
+                    <UnitInput name="Bottom" v={cBWB} u={cBWBu} on:updateValue={evt => updateBorderWidth(evt, "Bottom")} hasMargin={true} maxWidth={"70px"} useFC={false} sub={true}/>
+                    <UnitInput name="Left" v={cBWL} u={cBWLu} on:updateValue={evt => updateBorderWidth(evt, "Left")} hasMargin={false} maxWidth={"70px"} useFC={false} sub={true}/>
+                </section>
+            {/if}
+
+            <!-- border radius -->
+            {#if useRadius}
+                <section>
+                    <Slider name="Radius" min={0} max={200} v={cBRAvg} hasMargin={true} on:updateValue={updateBorderRadiusAll} currentParentWidth={currentParentWidth} colorRef={clr}/>
+                    <UnitInput name="Top" v={cBRT} u={cBRTu} on:updateValue={evt => updateBorderRadius(evt, "Top")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
+                    <UnitInput name="Right" v={cBRR} u={cBRRu} on:updateValue={evt => updateBorderRadius(evt, "Right")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
+                    <UnitInput name="Bottom" v={cBRB} u={cBRBu} on:updateValue={evt => updateBorderRadius(evt, "Bottom")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
+                    <UnitInput name="Left" v={cBRL} u={cBRLu} on:updateValue={evt => updateBorderRadius(evt, "Left")} hasMargin={false} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
+                </section>
+            {/if}
+
+            <!-- border color -->
+            {#if useColor}
+                <section>
+                    <ColorPicker name="Color" propertyName={"Border"} propertyRef={"borderColor"} clr={clr} />
+                </section>
+
+                <div style="height:7px"></div>
+            {/if}
+
+            {#if useStyleTop || useStyleBottom || useStyleLeft || useStyleRight}
+                <section style="flex-direction: column; margin-bottom:7px">
+                    <section style="display:flex; align-items: flex-start; margin:0;">            
+                        <Title name="Style" width="fit-content"/>
+
+                        {#if useStyleTop && (useStyleBottom || useStyleLeft || useStyleRight) || useStyleBottom && (useStyleLeft || useStyleRight) || useStyleLeft && useStyleRight}
+                            <section id="check-container">
+                                <input type="checkbox" checked={syncStyle} on:click={updateStyleSyncing}>
+                                <img src="./assets/icons/chain.svg" alt="" style="opacity: {syncStyle ? "1" : "0.5"}">
+                            </section>
+                        {/if}
+                    </section>
+
+                    <section>
+                        {#if useStyleTop}
+                            <Dropdown name="Top" sub={true} hasMargin={true} v={styleTop} possibleValues={possibleStyles} on:updateValue={e => updateStyle(e, "Top")}/>
+                        {/if}
+                        {#if useStyleRight}
+                            <Dropdown name="Right" sub={true} hasMargin={true} v={styleRight} possibleValues={possibleStyles} on:updateValue={e => updateStyle(e, "Right")}/>
+                        {/if}
+                        {#if useStyleBottom}
+                            <Dropdown name="Bottom " sub={true} hasMargin={true} v={styleBottom} possibleValues={possibleStyles} on:updateValue={e => updateStyle(e, "Bottom")}/>
+                        {/if}
+                        {#if useStyleLeft}
+                            <Dropdown name="Left" sub={true} hasMargin={false} v={styleLeft} possibleValues={possibleStyles} on:updateValue={e => updateStyle(e, "Left")}/>
+                        {/if}
+                    </section>  
+                </section>
+            {/if}
+        {/if}
+    </main>
+{/if}
 
 <style lang="scss">
     @import "../../../../public/guideline";

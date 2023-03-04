@@ -1,6 +1,7 @@
 <script lang="ts" context="module">
-    import { addComponent, elementStyle } from "../../stores/collection";
-    import { HTMltagInfo } from "../../declarations/general";
+    import { addComponent } from "../../stores/collection";
+    import type { elementStyle } from "../../types/element";
+    import { HTMltagInfo } from "../../types/general";
 
     // define default values
     const defaultDivStyle:elementStyle = {}

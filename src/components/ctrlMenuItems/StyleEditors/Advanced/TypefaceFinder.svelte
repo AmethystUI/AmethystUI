@@ -10,8 +10,8 @@
     export let widthGrowPerc = 0;
 
     import { createEventDispatcher, onMount } from 'svelte';
-    import flipAnimate from '../../../../helpers/flipAnimate';
-    import type { typographyStyle } from '../../../../declarations/general';
+    import flipAnimate from '../../../../util/flipAnimate';
+    import type { typographyStyle } from '../../../../types/general';
     import { mainFontPickerData } from '../../../../stores/fontPickerStat';
     import Title from '../Basics/Title.svelte';
     import { keepOpenOverlay } from './Overlay.svelte';

@@ -59,7 +59,7 @@
 
 <script lang="ts">
     import { collection, selectedComponent, selectedOverride } from "../../../stores/collection";
-    import type { overflow, flexAlignment } from "../../../declarations/general";
+    import type { overflow, flexAlignment } from "../../../types/general";
 
     import Slider from "./Basics/Slider.svelte";
     import Dropdown from "./Basics/Dropdown.svelte";
@@ -67,6 +67,7 @@
     import Title from "./Basics/Title.svelte";
     import MultiToggle from "./Basics/MultiToggle.svelte";
     import { textDecoration } from "./Basics/MultiSelect.svelte";
+    import { activeStyles } from "../../../stores/activeStyles";
     
     export let currentParentWidth = 360;
     
@@ -156,55 +157,87 @@
         }
     }
 
+    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
+    $: useOpacity = $activeStyles.opacity;
+    $: useOverflowX = $activeStyles.overflowX;
+    $: useOverflowY = $activeStyles.overflowY;
+    $: useAlignX = $activeStyles.justifyContent; // might need to change in the future
+    $: useAlignY = $activeStyles.alignItems; // might need to change in the future
+
 </script>
 
-<main class="no-drag">
-    <!-- title of the editor -->
-    <section id="title-container">
-        <h1>Appearance</h1>
-    </section>
-
-    <!-- opacity -->
-    <section style="margin-bottom:0px;">
-        <Slider name="Opacity" min={0} max={100} v={opacity} hasMargin={true} on:updateValue={e => updateOpacity(e, "sli")} currentParentWidth={currentParentWidth}/>
-        <ValueInput name="" v={opacity} on:updateValue={e => updateOpacity(e, "val")} hasMargin={false} maxWidth={"70px"} minWidth={"30px"} maxVal={100} minVal={0} sub={true} align="center"/>
-    </section>
-
-    <div class="spacer"></div>
-
-    <!-- Overflow -->
-    <section style="display:flex; align-items: flex-start; margin-bottom:0;">
-        <Title name="Overflow" width="fit-content"/>
-        <section id="check-container">
-            <input type="checkbox" checked={syncOverflow} on:click={updateOverflowSyncing}>
-        <img src="./assets/icons/chain.svg" alt="" style="opacity: {syncOverflow ? "1" : "0.5"}">
+{#if useOpacity || useOverflowX || useOverflowY || useAlignX || useAlignY}
+    <main class="no-drag">
+        <!-- title of the editor -->
+        <section id="title-container">
+            <h1>Appearance</h1>
         </section>
-    </section>
-    <section>
-        <Dropdown name="Horizontal" sub={true} hasMargin={true} v={overflowX} possibleValues={possibleOverflowStyles} on:updateValue={e => updateOverflow(e, "X")}/>
-        <Dropdown name="Vertical" sub={true} hasMargin={true} v={overflowY} possibleValues={possibleOverflowStyles} on:updateValue={e => updateOverflow(e, "Y")}/>
-    </section>
 
-    <!-- Alignements -->
-    <Title name="Content Alignement"></Title>
-    <MultiToggle
-        name="Horizontal" sub={true}
-        elements={horizontalAlignments}
-        selection={alignmentIndices[alignX]}
-        width={currentParentWidth-27} height={25} radius={4} iconSize={16}
-        on:valueChange={updateHorizontalAlignnment}
-        />
-    <div class="spacer"></div>
-    <MultiToggle
-        name="Vertical" sub={true}
-        elements={verticalAlignments}
-        selection={alignmentIndices[alignY]}
-        width={currentParentWidth-27} height={25} radius={4} iconSize={16}
-        on:valueChange={updateVerticalAlignnment}
-        />
+        <!-- opacity -->
+        {#if useOpacity}
+            <section style="margin-bottom:0px;">
+                <Slider name="Opacity" min={0} max={100} v={opacity} hasMargin={true} on:updateValue={e => updateOpacity(e, "sli")} currentParentWidth={currentParentWidth}/>
+                <ValueInput name="" v={opacity} on:updateValue={e => updateOpacity(e, "val")} hasMargin={false} maxWidth={"70px"} minWidth={"30px"} maxVal={100} minVal={0} sub={true} align="center"/>
+            </section>
 
-    <div style="height:14px"></div>
-</main>
+            <div class="spacer"></div>
+        {/if}
+
+        <!-- Overflow -->
+        {#if useOverflowX || useOverflowY}
+            <section style="display:flex; align-items: flex-start; margin-bottom:0;">
+                <Title name="Overflow" width="fit-content"/>
+                
+                <!-- Only show the sync button if both X and Y are usable -->
+                {#if useOverflowX && useOverflowY}
+                    <section id="check-container">
+                        <input type="checkbox" checked={syncOverflow} on:click={updateOverflowSyncing}>
+                    <img src="./assets/icons/chain.svg" alt="" style="opacity: {syncOverflow ? "1" : "0.5"}">
+                    </section>
+                {/if}
+            </section>
+            <section>
+                <!-- Horizontal overflow (overflowX) -->
+                {#if useOverflowX}
+                    <Dropdown name="Horizontal" sub={true} hasMargin={true} v={overflowX} possibleValues={possibleOverflowStyles} on:updateValue={e => updateOverflow(e, "X")}/>
+                {/if}
+                <!-- Vertical overflow (overflowY) -->
+                {#if useOverflowY}
+                    <Dropdown name="Vertical" sub={true} hasMargin={true} v={overflowY} possibleValues={possibleOverflowStyles} on:updateValue={e => updateOverflow(e, "Y")}/>
+                {/if}
+            </section>
+        {/if}
+
+        <!-- Alignements -->
+        {#if useAlignX || useAlignY}
+            <Title name="Content Alignement"></Title>
+            
+            <!-- Horizontal Alignment -->
+            {#if useAlignX}
+                <MultiToggle
+                    name="Horizontal" sub={true}
+                    elements={horizontalAlignments}
+                    selection={alignmentIndices[alignX]}
+                    width={currentParentWidth-27} height={25} radius={4} iconSize={16}
+                    on:valueChange={updateHorizontalAlignnment}
+                    />
+                <div class="spacer"></div>
+            {/if}
+            <!-- Vertical Alignment -->
+            {#if useAlignY}
+                <MultiToggle
+                    name="Vertical" sub={true}
+                    elements={verticalAlignments}
+                    selection={alignmentIndices[alignY]}
+                    width={currentParentWidth-27} height={25} radius={4} iconSize={16}
+                    on:valueChange={updateVerticalAlignnment}
+                    />
+            {/if}
+        {/if}
+
+        <div style="height:14px"></div>
+    </main>
+{/if}
 
 <style lang="scss">
     @import "../../../../public/guideline";

@@ -1,11 +1,12 @@
 <script lang="ts">
     import { collection, selectedComponent, selectedOverride } from "../../../stores/collection";
-    import type { color } from "../../../declarations/general";
-    import { units } from "../../../declarations/general";
+    import type { color } from "../../../types/general";
+    import { units } from "../../../types/general";
 
     import ColorPicker from "./Advanced/ColorPicker.svelte";
     import { clearColorPickerRef, mainColorPickerData } from "../../../stores/colorPickerStat";
-    import { initializeColorFromHSLA } from "../../../helpers/colorMaths";
+    import { initializeColorFromHSLA } from "../../../util/colorMaths";
+    import { activeStyles } from "../../../stores/activeStyles";
     
     // reactive
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent].style : $collection[$selectedComponent].styleOverrides[$selectedOverride].style;
@@ -35,29 +36,38 @@
         // if the current style doesn't use this editor, clear ref
         clearColorPickerRef();
     }
+
+    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
+    $: useBackground = $activeStyles.USEBACKGROUND;
+    $: useBackgroundColor = $activeStyles.backgroundColor;
 </script>
 
-<main class="no-drag">
-    <!-- title of the editor -->
-    <section id="title-container">
-        <h1>Background</h1>
+{#if useBackground}
+    <main class="no-drag">
+        <!-- title of the editor -->
+        <section id="title-container">
+            <h1>Background</h1>
 
-        <section id="check-container">
-            <input type="checkbox" checked={currentStyle.USEBACKGROUND} on:click={toggleUseBackground}>
-            <img src="./assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USEBACKGROUND ? "1" : "0"}">
-        </section>
-    </section>
-
-    <!-- only show editing panel if border is enabled -->
-    {#if currentStyle.USEBACKGROUND}
-        <!-- background color -->
-        <section>
-            <ColorPicker name="Color" propertyName={"Background"} propertyRef={"backgroundColor"} clr={clr} />
+            <section id="check-container">
+                <input type="checkbox" checked={currentStyle.USEBACKGROUND} on:click={toggleUseBackground}>
+                <img src="./assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USEBACKGROUND ? "1" : "0"}">
+            </section>
         </section>
 
-        <div style="height:7px"></div>
-    {/if}
-</main>
+        <!-- only show editing panel if border is enabled -->
+        {#if currentStyle.USEBACKGROUND}
+        
+            <!-- background color -->
+            {#if useBackgroundColor}
+                <section>
+                    <ColorPicker name="Color" propertyName={"Background"} propertyRef={"backgroundColor"} clr={clr} />
+                </section>
+            {/if}
+
+            <div style="height:7px"></div>
+        {/if}
+    </main>
+{/if}
 
 <style lang="scss">
     @import "../../../../public/guideline";

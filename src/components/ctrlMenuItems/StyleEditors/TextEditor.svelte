@@ -34,7 +34,7 @@
     import type {
         color,
         typographyStyle
-    } from "../../../declarations/general"
+    } from "../../../types/general"
 
     import TypefaceFinder from "./Advanced/TypefaceFinder.svelte";
     import Dropdown from "./Basics/Dropdown.svelte";
@@ -44,11 +44,9 @@
     import TextAreaInput from "./Basics/TextAreaInput.svelte";
     import Title from "./Basics/Title.svelte";
     import UnitInput from "./Basics/UnitInput.svelte";
-    import ValueInput from "./Basics/ValueInput.svelte";
 
     import { openColorPicker } from "./Advanced/ColorPickerOverlay.svelte";
     import { openFontPicker } from "./Advanced/FontPickerOverlay.svelte";
-    import { onMount } from "svelte";
     
     export let currentParentWidth = 360;
     
@@ -57,7 +55,6 @@
 
     // document components
     let colorPreviewSquare:HTMLDivElement;
-    let fontPickerTracker:HTMLDivElement;
 
     // these variables just make the code look nicer
     let clr:color = initializeColorFromHSLA(0, 0, 100, 100); // default text color
@@ -128,10 +125,11 @@
         textAlignment as textAlignmentType,
         textCasing as textCasingType,
         textDecoration as textDecorationType
-    } from "../../../declarations/general";
+    } from "../../../types/general";
     import { beautifiedFontName, getFontNameValue, standardizedFontName } from "../../../workers/pseudoWorkers/fonts";
     import { keepOpenOverlay } from "./Advanced/Overlay.svelte";
-    import { hslToRgb, initializeColorFromHSLA } from "../../../helpers/colorMaths";
+    import { hslToRgb, initializeColorFromHSLA } from "../../../util/colorMaths";
+    import { activeStyles } from "../../../stores/activeStyles";
 
     const toggleUseText = () => {
         if($selectedOverride !== -1){ // if no override is selected
@@ -194,99 +192,114 @@
             $collection[$selectedComponent].style.placeholder = evt.detail.v;
         }
     }
+
+    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
+    $: useText = $activeStyles.USETEXT;
+    $: useContent = $activeStyles.content;
+    $: usePlaceholder = $activeStyles.placeholder;
+    $: useTypefaceSettings = $activeStyles.typeStyle && $activeStyles.color;
+
 </script>
 
-<main class="no-drag">
-    <!-- title of the editor -->
-    <section id="title-container">
-        <h1>Text</h1>
+{#if useText}
+    <main class="no-drag">
+        <!-- title of the editor -->
+        <section id="title-container">
+            <h1>Text</h1>
 
-        <section id="check-container">
-            <input type="checkbox" checked={currentStyle.USETEXT} on:click={toggleUseText}>
-            <img src="./assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USETEXT ? "1" : "0"}">
-        </section>
-    </section>
-
-    <!-- only show editing panel if text is enabled -->
-    {#if currentStyle.USETEXT}
-        <!-- Content -->
-        <TextAreaInput name={"Content"} placeHolder={"Lorem ipsum dolor sit amet."} v={content} hasMargin={false} sub={false} currentParenteWidth={currentParentWidth} on:updateValue={updateTextContent}/>
-        <div class="spacer"></div>
-        <!-- Placeholder -->
-        <TextAreaInput name={"Placeholder"} placeHolder={"Lorem ipsum dolor sit amet."} v={placeholder} hasMargin={false} sub={false} currentParenteWidth={currentParentWidth} on:updateValue={updatePlaceholder}/>
-
-        <div class="spacer"></div>
-
-        <!-- Appearance -->
-        <Title name="Typography & Appearance"></Title>
-        <!-- Text style and font chooser -->
-        <section on:mousedown={keepOpenOverlay}>
-            <!-- Color picker -->
-            <div bind:this={colorPreviewSquare}
-                class="preview-square" style="background-color: hsla({clr.h}deg, {clr.s}%, {clr.l}%, {clr.a}%);"
-                on:mousedown={openColorOverlay}></div>
-            <!-- Font finder -->
-            <div bind:this={fontPickerTracker}></div>
-            <TypefaceFinder name="Typeface" typeface={fontRef} hasMargin={true} sub={true} minWidth={""} widthGrowPerc={176} on:focused={openFontOverlay}/>
-            <!-- Weight -->
-            <Dropdown
-                name="Weight"
-                v={ beautifiedFontName[getFontNameValue(fontRef.variation, "name")] }
-                possibleValues={ fontRef.fontObj.variations.map(v => beautifiedFontName[getFontNameValue(v, "name")]) }
-                sub={true}
-                hasMargin={false}
-                on:updateValue={ updateTextWeighting }
-                />
-        </section>
-        
-        <div class="spacer"></div>
-        
-        <!-- Sizing control -->
-        <section>
-            <UnitInput name={"Size"} sub={true} v={fontRef.size.v} u={fontRef.size.u} hasMargin={true} useFC={false} usePercent={true} on:updateValue={e => {
-                updateTextSizing("size", e)
-            }}/>
-            
-            <div style="min-height: 2px"></div>
-            
-            <UnitInput name={"Tracking"} minVal={-100} sub={true} v={fontRef.tracking.v} u={fontRef.tracking.u} hasMargin={true} useFC={false} on:updateValue={e => {
-                updateTextSizing("tracking", e)
-            }}/>
-            
-            <div style="min-height: 2px"></div>
-
-            <UnitInput name={"Line Height"} minVal={0} sub={true} v={fontRef.lineHeight.v} u={fontRef.lineHeight.u} hasMargin={false} useFC={false} usePercent={true} on:updateValue={e => {
-                updateTextSizing("lineHeight", e)
-            }}/>
-
-            <!-- Add later for variable fonts -->
-            <!-- <ValueInput name={"Weight"} v={0} sub={true} hasMargin={false} align={"center"} alignTitle={"left"}/> -->
+            <section id="check-container">
+                <input type="checkbox" checked={currentStyle.USETEXT} on:click={toggleUseText}>
+                <img src="./assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USETEXT ? "1" : "0"}">
+            </section>
         </section>
 
-        <div class="spacer"></div>
+        <!-- only show editing panel if text is enabled -->
+        {#if currentStyle.USETEXT}
 
-        <!-- Alignment control -->
-        <MultiToggle elements={textAlignment} selection={alignmentIndices[fontRef.alignment]}
-            name={"Alignment"} sub={true} width={currentParentWidth-27} height={25} radius={4} iconSize={18}
-            on:valueChange={updateAlignment}/>
+            <!-- Content -->
+            {#if useContent}
+                <TextAreaInput name={"Content"} placeHolder={"Lorem ipsum dolor sit amet."} v={content} hasMargin={false} sub={false} currentParenteWidth={currentParentWidth} on:updateValue={updateTextContent}/>
+            {/if}
+            {#if usePlaceholder}
+                <div class="spacer"></div>
+                <!-- Placeholder -->
+                <TextAreaInput name={"Placeholder"} placeHolder={"Lorem ipsum dolor sit amet."} v={placeholder} hasMargin={false} sub={false} currentParenteWidth={currentParentWidth} on:updateValue={updatePlaceholder}/>
+            {/if}
 
-        <div class="spacer"></div>
+            <!-- Typeface settings. All the text appearnace stuff goes here -->
+            {#if useTypefaceSettings}
+                <div class="spacer"></div>
 
-        <!-- Casing control -->
-        <MultiToggle elements={textCasing} selection={casingIndices[fontRef.casing]}
-            name={"Text Casing"} sub={true} width={currentParentWidth-27} height={25} radius={4} iconSize={18}
-            on:valueChange={updateCasing}/>
+                <!-- Appearance -->
+                <Title name="Typography & Appearance"></Title>
+                <!-- Text style and font chooser -->
+                <section on:mousedown={keepOpenOverlay}>
+                    <!-- Color picker -->
+                    <div bind:this={colorPreviewSquare}
+                        class="preview-square" style="background-color: hsla({clr.h}deg, {clr.s}%, {clr.l}%, {clr.a}%);"
+                        on:mousedown={openColorOverlay}></div>
+                    <TypefaceFinder name="Typeface" typeface={fontRef} hasMargin={true} sub={true} minWidth={""} widthGrowPerc={176} on:focused={openFontOverlay}/>
+                    <!-- Weight -->
+                    <Dropdown
+                        name="Weight"
+                        v={ beautifiedFontName[getFontNameValue(fontRef.variation, "name")] }
+                        possibleValues={ fontRef.fontObj.variations.map(v => beautifiedFontName[getFontNameValue(v, "name")]) }
+                        sub={true}
+                        hasMargin={false}
+                        on:updateValue={ updateTextWeighting }
+                        />
+                </section>
+                
+                <div class="spacer"></div>
+                
+                <!-- Sizing control -->
+                <section>
+                    <UnitInput name={"Size"} sub={true} v={fontRef.size.v} u={fontRef.size.u} hasMargin={true} useFC={false} usePercent={true} on:updateValue={e => {
+                        updateTextSizing("size", e)
+                    }}/>
+                    
+                    <div style="min-height: 2px"></div>
+                    
+                    <UnitInput name={"Tracking"} minVal={-100} sub={true} v={fontRef.tracking.v} u={fontRef.tracking.u} hasMargin={true} useFC={false} on:updateValue={e => {
+                        updateTextSizing("tracking", e)
+                    }}/>
+                    
+                    <div style="min-height: 2px"></div>
 
-        <div class="spacer"></div>
+                    <UnitInput name={"Line Height"} minVal={0} sub={true} v={fontRef.lineHeight.v} u={fontRef.lineHeight.u} hasMargin={false} useFC={false} usePercent={true} on:updateValue={e => {
+                        updateTextSizing("lineHeight", e)
+                    }}/>
 
-        <!-- Decor control -->
-        <MultiSelect elements={textDecoration} selections={fontRef.textDecorations.map(i => decorationIndices[i])}
-            name={"Decoration"} sub={true} width={currentParentWidth-27} height={25} radius={4} iconSize={18}
-            on:valueChange={updateDecoration}/>
+                    <!-- Add later for variable fonts -->
+                    <!-- <ValueInput name={"Weight"} v={0} sub={true} hasMargin={false} align={"center"} alignTitle={"left"}/> -->
+                </section>
 
-        <div style="height:17px"></div>
-    {/if}
-</main>
+                <div class="spacer"></div>
+
+                <!-- Alignment control -->
+                <MultiToggle elements={textAlignment} selection={alignmentIndices[fontRef.alignment]}
+                    name={"Alignment"} sub={true} width={currentParentWidth-27} height={25} radius={4} iconSize={18}
+                    on:valueChange={updateAlignment}/>
+
+                <div class="spacer"></div>
+
+                <!-- Casing control -->
+                <MultiToggle elements={textCasing} selection={casingIndices[fontRef.casing]}
+                    name={"Text Casing"} sub={true} width={currentParentWidth-27} height={25} radius={4} iconSize={18}
+                    on:valueChange={updateCasing}/>
+
+                <div class="spacer"></div>
+
+                <!-- Decor control -->
+                <MultiSelect elements={textDecoration} selections={fontRef.textDecorations.map(i => decorationIndices[i])}
+                    name={"Decoration"} sub={true} width={currentParentWidth-27} height={25} radius={4} iconSize={18}
+                    on:valueChange={updateDecoration}/>
+            {/if}
+
+            <div style="height:17px"></div>
+        {/if}
+    </main>
+{/if}
 
 <style lang="scss">
     @import "./public/guideline";

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { collection, selectedComponent, selectedOverride } from "../../../stores/collection";
-    import type { boxShadow, color } from "../../../declarations/general";
-    import type { units } from "../../../declarations/general";
+    import type { boxShadow, color } from "../../../types/general";
+    import type { units } from "../../../types/general";
 
     import UnitInput from "./Basics/UnitInput.svelte";
     import { setX, setY, mainOverlayData } from "../../../stores/overlayStat";
@@ -9,10 +9,9 @@
     
     import { openColorPicker } from "./Advanced/ColorPickerOverlay.svelte";
     import { keepOpenOverlay } from "./Advanced/Overlay.svelte";
+    import { activeStyles } from "../../../stores/activeStyles";
 
     let indicatorOffset = 8.5;
-
-    let colorPreviewSquare:HTMLDivElement;
 
     // reactive
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent].style : $collection[$selectedComponent].styleOverrides[$selectedOverride].style;
@@ -133,110 +132,115 @@
     } else {
         if(showEditorIndicator) showEditorIndicator = false;
     }
+
+    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
+    $: useShadow = $activeStyles.boxShadows && $activeStyles.USESHADOW; // only active when both are true. We want to make sure that box shadow is used if we want it to be used. A simple check for fish brained developers
 </script>
 
-<main class="no-drag">
-    <div id="editing-shadow-indicator" class={`${showEditorIndicator ? "visible" : "hidden"}`}
-        style={`transform: translate3d(0px, ${60*demuxID - indicatorOffset}px, 0px)`}></div>
+{#if useShadow}
+    <main class="no-drag">
+        <div id="editing-shadow-indicator" class={`${showEditorIndicator ? "visible" : "hidden"}`}
+            style={`transform: translate3d(0px, ${60*demuxID - indicatorOffset}px, 0px)`}></div>
 
-    <!-- title of the editor -->
-    <section id="title-container">
-        <h1>Shadows</h1>
+        <!-- title of the editor -->
+        <section id="title-container">
+            <h1>Shadows</h1>
 
-        <section id="check-container">
-            <input type="checkbox" checked={currentStyle.USESHADOW} on:click={toggleUseShadow}>
-            <img src="./assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USESHADOW ? "1" : "0"}">
-        </section>
-
-        <section id="add-container" on:click={addNewShadow} on:mousedown={keepOpenOverlay}>
-            <img src="./assets/icons/plus.svg" alt="">
-        </section>
-    </section>
-
-    <!-- only show editing panel if border is enabled -->
-    {#if currentStyle.USESHADOW}
-        <!-- show default text if shadow list length is 0 -->
-        {#if shadows.length === 0}
-            <p id="empty-holder">No shadows currently configured</p>
-        {:else}
-            <section bind:this={shadowContainer} id="shadow-container">
-                <!-- the list of shadows -->
-                {#each shadows as shadow, i (shadow)}
-                    <!-- a single container -->
-                    <section class="shadow-editor-container">
-                        <!-- the color preview & button. Bind all elements that matches the demux ID. We can also use this feature to highlight the blocks or do something special with it -->
-                        {#if i === demuxID}
-                            <div class="color-preview" bind:this={colorPreviewSquare}>
-                                <div style={`background-color: rgba(${shadow.color.r}, ${shadow.color.g}, ${shadow.color.b}, ${shadow.color.a}%)`} on:mousedown={()=>{openOverlay(i)}}></div>
-                            </div>
-                        {:else}
-                            <div class="color-preview">
-                                <div style={`background-color: rgba(${shadow.color.r}, ${shadow.color.g}, ${shadow.color.b}, ${shadow.color.a}%)`} on:mousedown={()=>{openOverlay(i)}}></div>
-                            </div>
-                        {/if}
-                        
-                        <UnitInput
-                            name={"X"}
-                            v={shadow.x.v} u={shadow.x.u}
-                            minWidth={"30px"} maxWidth={"80px"}
-                            align={"left"}
-                            minVal={-100}
-                            maxVal={100}
-                            useFC={false}
-                            textClrOverride={i === demuxID && showEditorIndicator ? "#fff" : ""}
-                            on:updateValue={e=>{updateShadowProp("x", e.detail.v, e.detail.u)}}
-                            on:focused={() => {updateDemuxID(i)}}
-                            hasMargin={true} sub={true}/>
-    
-                        <UnitInput
-                            name={"Y"}
-                            v={shadow.y.v} u={shadow.y.u}
-                            minWidth={"30px"} maxWidth={"80px"}
-                            align={"left"}
-                            minVal={-100}
-                            maxVal={100}
-                            useFC={false}
-                            textClrOverride={i === demuxID && showEditorIndicator ? "#fff" : ""}
-                            on:updateValue={e=>{updateShadowProp("y", e.detail.v, e.detail.u)}}
-                            on:focused={() => {updateDemuxID(i)}}
-                            hasMargin={true} sub={true}/>
-                    
-                        <UnitInput
-                            name={"Blur"}
-                            v={shadow.radius.v} u={shadow.radius.u}
-                            minWidth={"30px"} maxWidth={"80px"}
-                            align={"left"}
-                            maxVal={100}
-                            useFC={false}
-                            textClrOverride={i === demuxID && showEditorIndicator ? "#fff" : ""}
-                            on:updateValue={e=>{updateShadowProp("radius", e.detail.v, e.detail.u)}}
-                            on:focused={() => {updateDemuxID(i)}}
-    
-                            hasMargin={true} sub={true}/>
-    
-                        <UnitInput
-                            name={"Grow"}
-                            v={shadow.grow.v} u={shadow.grow.u}
-                            minWidth={"30px"} maxWidth={"80px"}
-                            align={"left"}
-                            minVal={-100}
-                            maxVal={100}
-                            useFC={false}
-                            textClrOverride={i === demuxID && showEditorIndicator ? "#fff" : ""}
-                            on:updateValue={e=>{updateShadowProp("grow", e.detail.v, e.detail.u, false)}}
-                            on:focused={() => {updateDemuxID(i)}}
-                            hasMargin={true} sub={true}/>
-    
-                        <button on:click={() => removeShadow(i)}>
-                            <img src="./assets/icons/trash.svg" alt="">
-                        </button>
-                    </section>
-                {/each}
+            <section id="check-container">
+                <input type="checkbox" checked={currentStyle.USESHADOW} on:click={toggleUseShadow}>
+                <img src="./assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USESHADOW ? "1" : "0"}">
             </section>
-        <div style="height:5px"></div>
-    {/if}
+
+            <section id="add-container" on:click={addNewShadow} on:mousedown={keepOpenOverlay}>
+                <img src="./assets/icons/plus.svg" alt="">
+            </section>
+        </section>
+
+        <!-- only show editing panel if border is enabled -->
+        {#if currentStyle.USESHADOW}
+            <!-- show default text if shadow list length is 0 -->
+            {#if shadows.length === 0}
+                <p id="empty-holder">No shadows currently configured</p>
+            {:else}
+                <section bind:this={shadowContainer} id="shadow-container">
+                    <!-- the list of shadows -->
+                    {#each shadows as shadow, i (shadow)}
+                        <!-- a single container -->
+                        <section class="shadow-editor-container">
+                            <!-- the color preview & button. Bind all elements that matches the demux ID. We can also use this feature to highlight the blocks or do something special with it -->
+                            {#if i === demuxID}
+                                <div class="color-preview">
+                                    <div style={`background-color: rgba(${shadow.color.r}, ${shadow.color.g}, ${shadow.color.b}, ${shadow.color.a}%)`} on:mousedown={()=>{openOverlay(i)}}></div>
+                                </div>
+                            {:else}
+                                <div class="color-preview">
+                                    <div style={`background-color: rgba(${shadow.color.r}, ${shadow.color.g}, ${shadow.color.b}, ${shadow.color.a}%)`} on:mousedown={()=>{openOverlay(i)}}></div>
+                                </div>
+                            {/if}
+                            
+                            <UnitInput
+                                name={"X"}
+                                v={shadow.x.v} u={shadow.x.u}
+                                minWidth={"30px"} maxWidth={"80px"}
+                                align={"left"}
+                                minVal={-100}
+                                maxVal={100}
+                                useFC={false}
+                                textClrOverride={i === demuxID && showEditorIndicator ? "#fff" : ""}
+                                on:updateValue={e=>{updateShadowProp("x", e.detail.v, e.detail.u)}}
+                                on:focused={() => {updateDemuxID(i)}}
+                                hasMargin={true} sub={true}/>
+        
+                            <UnitInput
+                                name={"Y"}
+                                v={shadow.y.v} u={shadow.y.u}
+                                minWidth={"30px"} maxWidth={"80px"}
+                                align={"left"}
+                                minVal={-100}
+                                maxVal={100}
+                                useFC={false}
+                                textClrOverride={i === demuxID && showEditorIndicator ? "#fff" : ""}
+                                on:updateValue={e=>{updateShadowProp("y", e.detail.v, e.detail.u)}}
+                                on:focused={() => {updateDemuxID(i)}}
+                                hasMargin={true} sub={true}/>
+                        
+                            <UnitInput
+                                name={"Blur"}
+                                v={shadow.radius.v} u={shadow.radius.u}
+                                minWidth={"30px"} maxWidth={"80px"}
+                                align={"left"}
+                                maxVal={100}
+                                useFC={false}
+                                textClrOverride={i === demuxID && showEditorIndicator ? "#fff" : ""}
+                                on:updateValue={e=>{updateShadowProp("radius", e.detail.v, e.detail.u)}}
+                                on:focused={() => {updateDemuxID(i)}}
+        
+                                hasMargin={true} sub={true}/>
+    
+                            <UnitInput
+                                name={"Grow"}
+                                v={shadow.grow.v} u={shadow.grow.u}
+                                minWidth={"30px"} maxWidth={"80px"}
+                                align={"left"}
+                                minVal={-100}
+                                maxVal={100}
+                                useFC={false}
+                                textClrOverride={i === demuxID && showEditorIndicator ? "#fff" : ""}
+                                on:updateValue={e=>{updateShadowProp("grow", e.detail.v, e.detail.u, false)}}
+                                on:focused={() => {updateDemuxID(i)}}
+                                hasMargin={true} sub={true}/>
+    
+                            <button on:click={() => removeShadow(i)}>
+                                <img src="./assets/icons/trash.svg" alt="">
+                            </button>
+                        </section>
+                    {/each}
+                </section>
+                <div style="height:5px"></div>
+            {/if}
+        {/if}
+    </main>
 {/if}
-</main>
 
 <style lang="scss">
     @import "../../../../public/guideline";

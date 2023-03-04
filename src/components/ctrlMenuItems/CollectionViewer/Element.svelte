@@ -1,6 +1,6 @@
 <script lang="ts">
     import { addOverride, collection, focusedComponent, selectedComponent, selectedOverride, focusedOverride, layerDeleteLock, layerBlurLock } from "../../../stores/collection";
-    import { HTMltagInfo } from "../../../declarations/general";
+    import { HTMltagInfo } from "../../../types/general";
     import { setSelectedElmnt } from "../../../stores/overlayStat";
     import { createEventDispatcher } from 'svelte';
     import { fly } from "svelte/transition";
@@ -113,7 +113,7 @@
 
     main{
         background-color: hsla(0,0%,100%,15%);
-        backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
         border-radius: 6px;
         display: flex; align-items: center;
         margin: 0px;

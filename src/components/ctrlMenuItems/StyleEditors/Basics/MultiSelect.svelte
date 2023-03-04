@@ -2,7 +2,7 @@
     import type {
         textDecoration as textDecorationType,
         typeCategories as typeCategoriesType
-    } from '../../../../declarations/general';
+    } from '../../../../types/general';
     
     // define selection data
     export interface multiSelectSelection<T> {

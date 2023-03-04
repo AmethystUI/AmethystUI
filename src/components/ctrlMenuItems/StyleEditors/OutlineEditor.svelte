@@ -1,14 +1,15 @@
 <script lang="ts">
     import { collection, selectedComponent, selectedOverride } from "../../../stores/collection";
-    import type { color } from "../../../declarations/general";
-    import type { units, borderOutlineStyle } from "../../../declarations/general";
+    import type { color } from "../../../types/general";
+    import type { units, borderOutlineStyle } from "../../../types/general";
 
     import Slider from "./Basics/Slider.svelte";
     import UnitInput from "./Basics/UnitInput.svelte";
     import ColorPicker from "./Advanced/ColorPicker.svelte";
     import Dropdown from "./Basics/Dropdown.svelte";
     import { clearColorPickerRef, mainColorPickerData } from "../../../stores/colorPickerStat";
-    import { initializeColorFromHSLA } from "../../../helpers/colorMaths";
+    import { initializeColorFromHSLA } from "../../../util/colorMaths";
+    import { activeStyles } from "../../../stores/activeStyles";
     
     export let currentParentWidth = 360;
     
@@ -159,63 +160,87 @@
 
     // update color picker based on if the shadow is enabled or not
     $: if(!currentStyle.USEOUTLINE && $mainColorPickerData.refName === "outlineColor"){
-    // if the current style doesn't use this editor, clear ref
+        // if the current style doesn't use this editor, clear ref
         clearColorPickerRef();
     }
+
+    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
+    $: useOutline = $activeStyles.USEOUTLINE;
+    $: useWidth = $activeStyles.outlineWidth;
+    $: useOffset = $activeStyles.outlineOffset;
+    $: useRadius = $activeStyles.borderRadiusBottom || $activeStyles.borderRadiusLeft || $activeStyles.borderRadiusRight  || $activeStyles.borderRadiusTop;
+    $: useColor = $activeStyles.outlineColor;
+    
+    $: useStyle = $activeStyles.outlineStyle;
 </script>
 
-<main class="no-drag">
-    <!-- title of the editor -->
-    <section id="title-container">
-        <h1>Outline</h1>
+{#if useOutline}
+    <main class="no-drag">
+        <!-- title of the editor -->
+        <section id="title-container">
+            <h1>Outline</h1>
 
-        <section id="check-container">
-            <input type="checkbox" checked={currentStyle.USEOUTLINE} on:click={toggleUseOutline}>
-            <img src="./assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USEOUTLINE ? "1" : "0"}">
-        </section>
-    </section>
-
-    <!-- only show editing panel if border is enabled -->
-    {#if currentStyle.USEOUTLINE}
-        <section>
-            <Slider name="Width" min={0} max={200} v={cOW} hasMargin={true} on:updateValue={updateOutlineWidth} currentParentWidth={currentParentWidth} colorRef={clr}/>
-            <UnitInput name="" v={cOW} u={cOWu} on:updateValue={evt => updateOutlineWidth(evt)} hasMargin={false} maxWidth={"120px"} minWidth={"70px"} useFC={false} sub={true}/>
-        </section>
-
-        <div class="spcaer"></div>
-
-        <section>
-            <Slider name="Offset" min={0} max={100} v={cOFF} hasMargin={true} on:updateValue={updateOutlineOffset} currentParentWidth={currentParentWidth} colorRef={clr}/>
-            <UnitInput name="" v={cOFF} u={cOFFu} on:updateValue={evt => updateOutlineOffset(evt)} hasMargin={false} maxWidth={"120px"} minWidth={"70px"} useFC={false} sub={true}/>
-        </section>
-
-        <div class="spcaer"></div>
-        
-        <!-- border radius (only show when border section isn't open) -->
-        {#if !currentStyle.USEBORDER}
-            <section>
-                <Slider name="Radius" min={0} max={200} v={cBRAvg} hasMargin={true} on:updateValue={updateBorderRadiusAll} currentParentWidth={currentParentWidth} colorRef={clr}/>
-                <UnitInput name="Top" v={cBRT} u={cBRTu} on:updateValue={evt => updateBorderRadius(evt, "Top")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
-                <UnitInput name="Right" v={cBRR} u={cBRRu} on:updateValue={evt => updateBorderRadius(evt, "Right")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
-                <UnitInput name="Bottom" v={cBRB} u={cBRBu} on:updateValue={evt => updateBorderRadius(evt, "Bottom")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
-                <UnitInput name="Left" v={cBRL} u={cBRLu} on:updateValue={evt => updateBorderRadius(evt, "Left")} hasMargin={false} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
+            <section id="check-container">
+                <input type="checkbox" checked={currentStyle.USEOUTLINE} on:click={toggleUseOutline}>
+                <img src="./assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USEOUTLINE ? "1" : "0"}">
             </section>
+        </section>
+
+        <!-- only show editing panel if border is enabled -->
+        {#if currentStyle.USEOUTLINE}
+
+            <!-- outline width -->
+            {#if useWidth}
+                <section>
+                    <Slider name="Width" min={0} max={200} v={cOW} hasMargin={true} on:updateValue={updateOutlineWidth} currentParentWidth={currentParentWidth} colorRef={clr}/>
+                    <UnitInput name="" v={cOW} u={cOWu} on:updateValue={evt => updateOutlineWidth(evt)} hasMargin={false} maxWidth={"120px"} minWidth={"70px"} useFC={false} sub={true}/>
+                </section>
+
+            {/if}
+            
+            <!-- offset -->
+            {#if useOffset}
+                <div class="spcaer"></div>
+                
+                <section>
+                    <Slider name="Offset" min={0} max={100} v={cOFF} hasMargin={true} on:updateValue={updateOutlineOffset} currentParentWidth={currentParentWidth} colorRef={clr}/>
+                    <UnitInput name="" v={cOFF} u={cOFFu} on:updateValue={evt => updateOutlineOffset(evt)} hasMargin={false} maxWidth={"120px"} minWidth={"70px"} useFC={false} sub={true}/>
+                </section>
+            {/if}
+
+            <!-- border radius (only show when border section isn't open) -->
+            {#if !currentStyle.USEBORDER && useRadius}
+                <div class="spcaer"></div>
+                
+                <section>
+                    <Slider name="Radius" min={0} max={200} v={cBRAvg} hasMargin={true} on:updateValue={updateBorderRadiusAll} currentParentWidth={currentParentWidth} colorRef={clr}/>
+                    <UnitInput name="Top" v={cBRT} u={cBRTu} on:updateValue={evt => updateBorderRadius(evt, "Top")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
+                    <UnitInput name="Right" v={cBRR} u={cBRRu} on:updateValue={evt => updateBorderRadius(evt, "Right")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
+                    <UnitInput name="Bottom" v={cBRB} u={cBRBu} on:updateValue={evt => updateBorderRadius(evt, "Bottom")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
+                    <UnitInput name="Left" v={cBRL} u={cBRLu} on:updateValue={evt => updateBorderRadius(evt, "Left")} hasMargin={false} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
+                </section>
+            {/if}
+
+            <!-- border color -->
+            {#if useColor}
+                <div class="spcaer"></div>
+
+                <section>
+                    <ColorPicker name="Color" propertyName={"Outline"} propertyRef={"outlineColor"} clr={clr} />
+                </section>
+            {/if}
+
+            <!-- outline style -->
+            {#if useStyle}
+                <section>
+                    <Dropdown name="Style" sub={false} hasMargin={true} v={style} possibleValues={possibleStyles} on:updateValue={e => updateStyle(e)}/>
+                </section>
+            {/if}
+            
+            <div style="height:7px"></div>
         {/if}
-
-        <div class="spcaer"></div>
-
-        <!-- border color -->
-        <section>
-            <ColorPicker name="Color" propertyName={"Outline"} propertyRef={"outlineColor"} clr={clr} />
-        </section>
-
-        <section>
-            <Dropdown name="Style" sub={false} hasMargin={true} v={style} possibleValues={possibleStyles} on:updateValue={e => updateStyle(e)}/>
-        </section>
-        
-        <div style="height:7px"></div>
-    {/if}
-</main>
+    </main>
+{/if}
 
 <style lang="scss">
     @import "../../../../public/guideline";

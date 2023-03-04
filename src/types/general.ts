@@ -1,7 +1,7 @@
-import type { elementStyle } from "../stores/collection";
+import type { elementStyle } from "./element";
 import type { fontObject } from "../workers/pseudoWorkers/fonts";
 
-export type HTMLtag = "A" | "BODY" | "BUTTON" | "CANVAS" | "DIV" | "H1" | "H2" | "H3" | "H4" | "H5" | "H6" | "HR" | "INPUT" | "LABEL" | "OL" | "UL" | "PROGRESS" | "P" | "SECTION" | "SPAN" | "TEXTAREA";
+export type HTMLtags = "A" | "BODY" | "BUTTON" | "CANVAS" | "DIV" | "H1" | "H2" | "H3" | "H4" | "H5" | "H6" | "HR" | "INPUT" | "LABEL" | "OL" | "UL" | "PROGRESS" | "P" | "SECTION" | "SPAN" | "TEXTAREA";
 export type units = "px" | "pt" | "pc" | "em" | "rem" | "vw" | "vh" | "%" | "fit-content";
 export type borderOutlineStyle = "dotted" | "dashed" | "solid" | "double" | "groove" | "ridge" | "inset" | "outset" | "hidden";
 export type displayTypes = "flex" | "inline" | "none";
@@ -15,10 +15,23 @@ export type textCasing = "lowercase" | "none" | "uppercase";
 export type textDecoration = "italicize" | "underline" | "strike";
 export type typeCategories = "sans-serif" | "serif" | "display" | "handwriting" | "monospace";
 
+export interface override{ // overrides for the element
+    name : string,
+	style : elementStyle
+};
+
+export interface element{ // a single HTML element
+    type : HTMLtags, // html element types
+    showing: boolean, // show overrides
+    style : elementStyle, // main style
+    styleOverrides : override[], // self explanatory
+    showOutline : boolean // show the dashed outline on the editor
+};
+
 /**
  * A mapping of HTML tag names to a friendly name and an icon URI.
  */
-export const HTMltagInfo: {[K in HTMLtag] : {name: string, iconURI: string}} = {
+export const HTMltagInfo: {[K in HTMLtags] : {name: string, iconURI: string}} = {
     "A"         : {"name" : "Anchor", "iconURI" : "./assets/icons/link.svg"},
     "BODY"      : {"name" : "Document body", "iconURI" : "./assets/icons/browser.svg"},
     "BUTTON"    : {"name" : "Button", "iconURI" : "./assets/icons/play-circle.svg"},
@@ -87,17 +100,3 @@ export interface color{
 
 // Google font api key: AIzaSyB0YyT0-3AgT2aF45O4HropOlNx1hghmaI
 // Tester key:          AIzaSyDW3JQmec-yJykfP-FcRYpIujOc6jYa4RQ
-
-export interface override{
-    name : string,
-	style : elementStyle
-};
-
-export interface element{
-    type : HTMLtag,
-    showing: boolean,
-    style : elementStyle,
-    showPlaceHolderContent? : boolean,
-    styleOverrides : override[],
-    showOutline : boolean
-};

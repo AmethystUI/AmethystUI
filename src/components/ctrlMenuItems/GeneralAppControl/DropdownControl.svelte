@@ -130,7 +130,7 @@
 
         .optionContainer{
             min-width: 220px; max-width: 500px; width: fit-content; min-height: 14px; max-height: calc(100vh - 120px);
-            background-color: hsl(200,5%,13%,50%); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            background-color: hsl(200,5%,13%,50%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             position: absolute; top:0; left:0; transform: translateY($btnHeight); margin-top:7px; margin-left:7px;
             border: 1px solid $primaryl4; border-radius: 7px;
             box-shadow: 0px 6px 30px -5px hsla(0,0%,0%,60%);

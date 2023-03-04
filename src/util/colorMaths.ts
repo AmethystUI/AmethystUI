@@ -1,4 +1,4 @@
-import type { color } from "../declarations/general";
+import type { color } from "../types/general";
 
 export type colorType = "HEX" | "RGB" | "HSL";
 

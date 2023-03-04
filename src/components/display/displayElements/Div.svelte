@@ -1,8 +1,10 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import { activeStyles, activeStylesType } from "../../../stores/activeStyles";
 
     import { collection, selectedComponent, selectedOverride } from "../../../stores/collection";
-    import type { boxShadow } from "../../../declarations/general";
+    import type { boxShadow } from "../../../types/general";
+    import getStyleSetting from "./elementStyleSettings";
 
     $: currentComponent = $collection[$selectedComponent];
     $: currentOverride = $selectedOverride !== -1 ? $collection[$selectedComponent].styleOverrides[$selectedOverride] : undefined;
@@ -30,7 +32,13 @@
         shadowString = "none";
     }
 
-    // ======================= UPDATE FUNCTION ======================= //
+    // ======================= INITIALIZE EDITOR SETTINGS ======================= //
+    onMount(() => {
+        activeStyles.set(getStyleSetting("DIV")); // don't pass in undefined pls
+
+        $collection = $collection; // update collection so the value initializers in the editors can kick in and access the updated value.
+    })
+
 </script>
 
 <!-- Container transformation to keep the element in the center -->
@@ -51,8 +59,8 @@ class="no-drag">
     <!-- We have do this terribleness if we want to use anything with a united attribute. It's also fast -->
     <!-- If you want a quick guide, "currentStyle.width?" checks if width exist on the current style. If it's undefined, it will default to whatever is after the "??" -->
     <div style={`
-        width: ${ currentStyle.width?.v ?? "auto" }${ currentStyle.width?.u ?? "" };
-        height: ${ currentStyle.height?.v ?? "auto" }${ currentStyle.height?.u ?? "" };
+        width: ${ currentStyle.width?.v ?? "0" }${ currentStyle.width?.u ?? "px" };
+        height: ${ currentStyle.height?.v ?? "0" }${ currentStyle.height?.u ?? "px" };
 
         margin-top: ${ currentStyle.marginTop?.v ?? "auto" }${ currentStyle.marginTop?.u ?? "" };
         margin-right: ${ currentStyle.marginRight?.v ?? "auto" }${ currentStyle.marginRight?.u ?? "" };
