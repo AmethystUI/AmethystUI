@@ -27,7 +27,10 @@
 <!-- HTML -->
 <main>
     <a href="https://google.com"><img src="./assets/svgs/emblem_flat.svg" alt=""></a>
-    <MultiToggle elements={viewToggleElements} selection={0} on:valueChange={updateView}/>
+    <section>
+        <MultiToggle elements={viewToggleElements} selection={0} on:valueChange={updateView}/>
+        <div style="width: 10px"></div>
+    </section>
 </main>
 
 <!-- STYLE -->
@@ -37,6 +40,10 @@
     main{
         width:100%; height: 65px;
         display:flex; justify-content: space-between; align-items: center;
+
+        section{
+            display: flex; justify-content: center;align-items: center;
+        }
 
         a{
             opacity:0.2;

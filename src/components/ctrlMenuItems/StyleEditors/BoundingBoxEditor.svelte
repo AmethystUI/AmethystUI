@@ -1,16 +1,16 @@
 <script lang="ts">
+    import { get } from "svelte/store";
     import { activeStyles } from "../../../stores/activeStyles";
     import { collection, selectedComponent, selectedOverride } from "../../../stores/collection";
     import type { units } from "../../../types/general";
 
     import Slider from "./Basics/Slider.svelte";
     import UnitInput from "./Basics/UnitInput.svelte";
-    import ValueInput from "./Basics/ValueInput.svelte";
 
     export let currentParentWidth = 360;
     
     // reactive
-    $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent].style : $collection[$selectedComponent].styleOverrides[$selectedOverride].style;
+    $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
     let cW = 100; let cWu:units = "px"; 
     let cH = 100; let cHu:units = "px"; 
@@ -28,45 +28,57 @@
     let cPL = 0; let cPLu:units = "px"; 
     let cPAvg = 0;
 
+    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
+    $: useWidthAndHeight = $activeStyles.width || $activeStyles.height;
+    $: useMargin = $activeStyles.marginTop || $activeStyles.marginBottom || $activeStyles.marginLeft || $activeStyles.marginRight;
+    $: usePadding = $activeStyles.paddingTop || $activeStyles.paddingBottom || $activeStyles.paddingLeft || $activeStyles.paddingRight;
+
     $: if(!!currentStyle){ // these variables just make the code look nicer
         // size
-        if(!currentStyle.width) currentStyle.width = {v:100,u:"px"};
-        cW = currentStyle.width.v;
-        cWu = currentStyle.width.u;
-        if(!currentStyle.height) currentStyle.height = {v:100,u:"px"};
-        cH = currentStyle.height.v;
-        cHu = currentStyle.height.u;
-        cSAvg = (cW + cH) / 2;
+        if(useWidthAndHeight){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
+
+            if(!currentStyle.width) currentStyle.width = {v:100,u:"px"};            
+            cW = currentStyle.width.v;
+            cWu = currentStyle.width.u;
+            if(!currentStyle.height) currentStyle.height = {v:100,u:"px"};
+            cH = currentStyle.height.v;
+            cHu = currentStyle.height.u;
+            cSAvg = (cW + cH) / 2;
+        }
     
         // margin
-        if(!currentStyle["marginTop"]) currentStyle["marginTop"] = {v:0,u:"px"};
-        cMT = currentStyle["marginTop"].v;
-        cMTu = currentStyle["marginTop"].u;
-        if(!currentStyle["marginRight"]) currentStyle["marginRight"] = {v:0,u:"px"};
-        cMR = currentStyle["marginRight"].v;
-        cMRu = currentStyle["marginRight"].u;
-        if(!currentStyle["marginBottom"]) currentStyle["marginBottom"] = {v:0,u:"px"};
-        cMB = currentStyle["marginBottom"].v;
-        cMBu = currentStyle["marginBottom"].u;
-        if(!currentStyle["marginLeft"]) currentStyle["marginLeft"] = {v:0,u:"px"};
-        cML = currentStyle["marginLeft"].v;
-        cMLu = currentStyle["marginLeft"].u;
-        cMAvg = (cMT + cMR + cMB + cML) / 4;
+        if(useMargin){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
+            if(!currentStyle["marginTop"]) currentStyle["marginTop"] = {v:0,u:"px"};
+            cMT = currentStyle["marginTop"].v;
+            cMTu = currentStyle["marginTop"].u;
+            if(!currentStyle["marginRight"]) currentStyle["marginRight"] = {v:0,u:"px"};
+            cMR = currentStyle["marginRight"].v;
+            cMRu = currentStyle["marginRight"].u;
+            if(!currentStyle["marginBottom"]) currentStyle["marginBottom"] = {v:0,u:"px"};
+            cMB = currentStyle["marginBottom"].v;
+            cMBu = currentStyle["marginBottom"].u;
+            if(!currentStyle["marginLeft"]) currentStyle["marginLeft"] = {v:0,u:"px"};
+            cML = currentStyle["marginLeft"].v;
+            cMLu = currentStyle["marginLeft"].u;
+            cMAvg = (cMT + cMR + cMB + cML) / 4;
+        }
 
         // padding
-        if(!currentStyle["paddingTop"]) currentStyle["paddingTop"] = {v:0,u:"px"};
-        cPT = currentStyle["paddingTop"].v
-        cPTu = currentStyle["paddingTop"].u;
-        if(!currentStyle["paddingRight"]) currentStyle["paddingRight"] = {v:0,u:"px"};
-        cPR = currentStyle["paddingRight"].v
-        cPRu = currentStyle["paddingRight"].u;
-        if(!currentStyle["paddingBottom"]) currentStyle["paddingBottom"] = {v:0,u:"px"};
-        cPB = currentStyle["paddingBottom"].v
-        cPBu = currentStyle["paddingBottom"].u;
-        if(!currentStyle["paddingLeft"]) currentStyle["paddingLeft"] = {v:0,u:"px"};
-        cPL = currentStyle["paddingLeft"].v
-        cPLu = currentStyle["paddingLeft"].u;
-        cPAvg = (cPT + cPR + cPB + cPL) / 4;
+        if(usePadding){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
+            if(!currentStyle["paddingTop"]) currentStyle["paddingTop"] = {v:0,u:"px"};
+            cPT = currentStyle["paddingTop"].v
+            cPTu = currentStyle["paddingTop"].u;
+            if(!currentStyle["paddingRight"]) currentStyle["paddingRight"] = {v:0,u:"px"};
+            cPR = currentStyle["paddingRight"].v
+            cPRu = currentStyle["paddingRight"].u;
+            if(!currentStyle["paddingBottom"]) currentStyle["paddingBottom"] = {v:0,u:"px"};
+            cPB = currentStyle["paddingBottom"].v
+            cPBu = currentStyle["paddingBottom"].u;
+            if(!currentStyle["paddingLeft"]) currentStyle["paddingLeft"] = {v:0,u:"px"};
+            cPL = currentStyle["paddingLeft"].v
+            cPLu = currentStyle["paddingLeft"].u;
+            cPAvg = (cPT + cPR + cPB + cPL) / 4;
+        }
     }
 
     const updateWidth = (evt:CustomEvent<any>) => {
@@ -136,12 +148,6 @@
             if(!!$collection[$selectedComponent].style["paddingLeft"]) $collection[$selectedComponent].style["paddingLeft"].v = evt.detail.v;
         }
     }
-
-
-    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
-    $: useWidthAndHeight = $activeStyles.width || $activeStyles.height;
-    $: useMargin = $activeStyles.marginTop || $activeStyles.marginBottom || $activeStyles.marginLeft || $activeStyles.marginRight;
-    $: usePadding = $activeStyles.paddingTop || $activeStyles.paddingBottom || $activeStyles.paddingLeft || $activeStyles.paddingRight;
 </script>
 
 <!-- First check if we need to show anything at all. -->

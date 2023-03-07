@@ -1,12 +1,16 @@
 <script lang="ts">
+    import { onDestroy, onMount } from "svelte";
+    import { get } from "svelte/store";
     import Overlay from "./components/ctrlMenuItems/StyleEditors/Advanced/Overlay.svelte";
     import LeftMenu from "./components/ctrlMenus/LeftMenu.svelte";
     import RightMenu from "./components/ctrlMenus/RightMenu.svelte";
     import TopMenu from "./components/ctrlMenus/TopMenu.svelte";
+    import getStyleSetting from "./components/display/displayElements/elementStyleSettings";
     import MainDisplay from "./components/display/MainDisplay.svelte";
+    import { activeStyles } from "./stores/activeStyles";
     import { addComponent, collection, focusedComponent, focusedOverride, layerBlurLock, selectedComponent, selectedOverride } from "./stores/collection"
-    import { mainFontPickerData } from "./stores/fontPickerStat";
-    import { storedFontData } from "./stores/fontStorageStat";
+
+    $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
     let leftMenuWidth = 260;
     const leftMenuWidthChange = (evt:CustomEvent<any>):void => {
@@ -32,14 +36,20 @@
 
     // DEBUG: 
     setTimeout(() => {
-        addComponent("DIV", {
+        addComponent("SECTION", {
         }, true)
         // simulate clicking on it
         $selectedComponent = 0;
         $focusedComponent = 0;
         $selectedOverride = -1;
         $focusedOverride = -1;
+        $collection = $collection;
     }, 50);
+
+    $: if(!!currentStyle){
+        const currentElement = $collection[get(selectedComponent)];
+        $activeStyles = getStyleSetting(currentElement?.type);
+    }
 </script>
 
 <main>

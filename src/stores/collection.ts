@@ -11,7 +11,13 @@ export let focusedOverride = writable<number>(-1); // this is for detecting dele
 export let layerDeleteLock = writable<boolean>(false); // this is for locking the delete function. If this is true, you can't delete
 export let layerBlurLock = writable<boolean>(false); // this is for locking the blur function. If this is true, you can't blur
 
-// functions for controlling the collection list
+/**
+ * Adds a new component to the collection with the specified HTML tag type, default style, and show outline option.
+ *
+ * @param {HTMLtags} type - The HTML tag type of the new component to add.
+ * @param {elementStyle} [defaultStyle={}] - The default style of the new component to add.
+ * @param {boolean} [showOutline=false] - Whether or not to show an outline around the new component.
+ */
 export const addComponent = (type:HTMLtags, defaultStyle:elementStyle={}, showOutline=false) => {
     let currCollection = get(collection);
     // check if type aready exist in currCollection
@@ -31,9 +37,15 @@ export const addComponent = (type:HTMLtags, defaultStyle:elementStyle={}, showOu
         styleOverrides : [],
         showOutline : showOutline
     }];
+    
     collection.set(currCollection);
 }
 
+/**
+ * Adds a new blank override to the specified element in the collection, and sets its name and style.
+ *
+ * @param {number} elmntIndex - The index of the element in the collection to add the override to.
+ */
 export const addOverride = (elmntIndex:number):void => {
     let currCollection = get(collection);
 

@@ -9,18 +9,24 @@
     import { activeStyles } from "../../../stores/activeStyles";
     
     // reactive
-    $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent].style : $collection[$selectedComponent].styleOverrides[$selectedOverride].style;
+        $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
-    let clr:color = initializeColorFromHSLA(0, 0, 100, 100);
+    const initialClr:color = initializeColorFromHSLA(0, 0, 100, 100);
+    let clr:color = {...initialClr};
 
-    $: if(!!currentStyle){ // these variables just make the code look nicer
+    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
+    $: useBackground = $activeStyles.USEBACKGROUND;
+    $: useBackgroundColor = $activeStyles.backgroundColor;
+
+    $: if(!!currentStyle && useBackground){ // these variables just make the code look nicer        
         // use background
         currentStyle["USEBACKGROUND"] = !!currentStyle["USEBACKGROUND"]; // boolean initialization weirdness
-        // currentStyle["USEBACKGROUND"] = true; // debugging force open
 
         // background color
-        if(!currentStyle["backgroundColor"]) currentStyle["backgroundColor"] = clr
-        clr = currentStyle["backgroundColor"];
+        if(useBackgroundColor){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
+            if(!currentStyle["backgroundColor"]) currentStyle["backgroundColor"] = {...initialClr};
+            clr = currentStyle["backgroundColor"];
+        }
     }
 
     const toggleUseBackground = () => {
@@ -36,10 +42,6 @@
         // if the current style doesn't use this editor, clear ref
         clearColorPickerRef();
     }
-
-    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
-    $: useBackground = $activeStyles.USEBACKGROUND;
-    $: useBackgroundColor = $activeStyles.backgroundColor;
 </script>
 
 {#if useBackground}

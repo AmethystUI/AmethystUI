@@ -4,14 +4,13 @@
     import { createEventDispatcher } from 'svelte';
     import { setSelectedElmnt } from "../../../stores/overlayStat";
 
-    const disp = createEventDispatcher();
-
     export let height:number;
     export let elmntIndex:number;
     export let overrideIndex:number;
     
     let editable = false;
     let nameField:HTMLParagraphElement;
+    let nameFieldContainer:HTMLElement;
 
     const focusOverride = () => {
         // turn on blur lock
@@ -49,27 +48,69 @@
     const checkKeyPress = (e:KeyboardEvent):void =>{
         if(e.key === "Enter" || e.key === "Escape"){
             e.preventDefault();
-            nameField.blur();
 
-            // format the name properly by removing redundant spaces, replacing the spaces with dashes, and lower casing all letters.
-            if(!!$collection[elmntIndex]?.styleOverrides[overrideIndex]){
-                $collection[elmntIndex].styleOverrides[overrideIndex].name = nameField.textContent.replace(/\s+/g, "-").toLowerCase();
+            // format the name properly by removing redundant spaces, replacing the spaces with dashes, lower casing all letters, and removing any characters that's not a number or a letter (any symbols or punctuations).
+            if (!!$collection[elmntIndex]?.styleOverrides[overrideIndex]) {
+                let name = nameField.textContent
+                    .replace(/[^a-zA-Z0-9\s+\-]/g, "")
+                    .trim()
+                    .replace(/\s+/g, "-")
+                    .toLowerCase();
+                
+                // check to see if name is empty
+                if(name.length === 0){
+                    name = $collection[elmntIndex]?.styleOverrides[overrideIndex].name; // reset to last working one.
+                }
+                // Check if it's a duplicate name, make sure to ignore self.
+                if($collection[elmntIndex]?.styleOverrides.map(ov => ov.name).indexOf(name) !== -1 && name !== $collection[elmntIndex]?.styleOverrides[overrideIndex].name){
+                    if(e.key === "Escape"){ // reset name in input field if it's the escape key
+                        nameField.textContent = $collection[elmntIndex]?.styleOverrides[overrideIndex].name;
+                    }
+
+                    const animation = nameFieldContainer.animate([
+                        { transform: 'translateX(0px)' },
+                        { transform: 'translateX(-5px)' },
+                        { transform: 'translateX(5px)' },
+                        { transform: 'translateX(0px)' }
+                    ], {
+                        duration: 300,
+                        easing: 'ease-out',
+                        iterations: 1
+                    });
+
+                    animation.play();
+                    
+                    return;
+                }
+        
+                // set final name
+                $collection[elmntIndex].styleOverrides[overrideIndex].name = name;
+
+                nameField.blur();
             }
 
             return;
         }
     };
 
-    const changeName = ():void => {
-        const name = nameField.innerHTML;
+    const changeName = (e:Event):void => {
+        let name = nameField.textContent;
+
+        if($collection[elmntIndex]?.styleOverrides.map(ov => ov.name).indexOf(name) !== -1 && name !== $collection[elmntIndex]?.styleOverrides[overrideIndex].name){
+            name = $collection[elmntIndex]?.styleOverrides[overrideIndex].name; // reset name
+        }
+
         $collection[elmntIndex].styleOverrides[overrideIndex].name = name; // change value in the store
-        $collection = [...$collection]
+        nameField.textContent = name; // update the text in the input field
+        $collection = $collection;
     }
+
+    $: if(!!nameField) nameField.textContent = $collection[elmntIndex]?.styleOverrides[overrideIndex]?.name ?? "";
 
     $: $layerDeleteLock = editable // lock delete
 </script>
 
-<main class={`
+<main bind:this={nameFieldContainer} class={`
     layer ${$selectedOverride === overrideIndex && $selectedComponent === elmntIndex ? "selected" : ""} ${$focusedOverride !== overrideIndex && $selectedOverride === overrideIndex && $selectedComponent === elmntIndex ? "blurred" : ""}`} on:mousedown={focusOverride} style="min-height: {height}px;" in:fly={{y:-10, duration:300}}
     on:dblclick={setEditableTrue}>
     <!-- icon + title -->

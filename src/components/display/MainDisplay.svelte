@@ -1,17 +1,16 @@
 <script lang="ts">
-    import { addOverride, collection, focusedComponent, selectedComponent, selectedOverride, focusedOverride, layerDeleteLock } from "../../stores/collection";
+    import { collection, selectedComponent, selectedOverride } from "../../stores/collection";
     import ElementResizer from "./displayControl/ElementResizer.svelte";
 
-    import { HTMltagInfo } from "../../types/general";
-
     import Div from "./displayElements/Div.svelte";
+    import Section from "./displayElements/Section.svelte";
 
     export let leftMenuWidth:number;
     export let rightMenuWidth:number;
 
     $: currentComponent = $collection[$selectedComponent];
     $: currentOverride = $selectedOverride !== -1 ? $collection[$selectedComponent].styleOverrides[$selectedOverride] : undefined;
-    $: currentStyle = !!currentComponent || !!currentOverride ? ($selectedOverride === -1 ? currentComponent.style : currentOverride.style) : undefined;
+    $: currentStyle = (currentOverride?.style ?? currentComponent?.style) ?? undefined;
 </script>
 
 <!-- HTML -->
@@ -20,7 +19,7 @@
     {#if $selectedComponent === -1 && $selectedOverride === -1}
     
     <section id="app-hint-add-elmnt">
-        <p>Click <span>+</span> to add components for customization</p>        
+        <p>Click <span>+</span> to add components for customization</p>
     </section>
     
     {:else} <!-- this is where we display our shit -->
@@ -42,8 +41,10 @@
     `}>
         <ElementResizer />
 
-        {#if currentComponent.type === "DIV"}
+        {#if currentComponent?.type === "DIV"}
             <Div/>
+        {:else if currentComponent?.type === "SECTION"}
+            <Section/>
         {/if}
     </section>
     

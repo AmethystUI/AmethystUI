@@ -32,7 +32,7 @@ export interface element{ // a single HTML element
  * A mapping of HTML tag names to a friendly name and an icon URI.
  */
 export const HTMltagInfo: {[K in HTMLtags] : {name: string, iconURI: string}} = {
-    "A"         : {"name" : "Anchor", "iconURI" : "./assets/icons/link.svg"},
+    "A"         : {"name" : "Anchors", "iconURI" : "./assets/icons/link.svg"},
     "BODY"      : {"name" : "Document body", "iconURI" : "./assets/icons/browser.svg"},
     "BUTTON"    : {"name" : "Button", "iconURI" : "./assets/icons/play-circle.svg"},
     "CANVAS"    : {"name" : "Canvas", "iconURI" : "./assets/icons/canvas.svg"},
@@ -49,7 +49,7 @@ export const HTMltagInfo: {[K in HTMLtags] : {name: string, iconURI: string}} = 
     "OL"        : {"name" : "Organized list", "iconURI" : "./assets/icons/list.svg"},
     "UL"        : {"name" : "Unorganized list", "iconURI" : "./assets/icons/menu.svg"},
     "PROGRESS"  : {"name" : "Progress", "iconURI" : "./assets/icons/clock.svg"},
-    "P"         : {"name" : "Paragraph", "iconURI" : "./assets/icons/paragraph.svg"},
+    "P"         : {"name" : "Body", "iconURI" : "./assets/icons/paragraph.svg"},
     "SECTION"   : {"name" : "Section", "iconURI" : "./assets/icons/layout.svg"},
     "SPAN"      : {"name" : "Span", "iconURI" : "./assets/icons/flash.svg"},
     "TEXTAREA"  : {"name" : "Textarea", "iconURI" : "./assets/icons/edit-2.svg"},

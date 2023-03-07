@@ -14,7 +14,7 @@
     let cX = true; let cY = true;
 
     // reactive
-    $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent].style : $collection[$selectedComponent].styleOverrides[$selectedOverride].style;
+        $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
     $: currentComponent = $collection[$selectedComponent];
     $: currentOverride = $selectedOverride !== -1 ? $collection[$selectedComponent].styleOverrides[$selectedOverride] : undefined;
 
@@ -25,16 +25,11 @@
 
         // set iw and ih to current component width / height
         if($selectedOverride !== -1){
-            if(!currentOverride.style.width) currentOverride.style.width = {v:0,u:"px"};
-            iw = currentOverride.style["width"].v;
-            
-            if(!currentOverride.style.height) currentOverride.style.height = {v:0,u:"px"};
-            ih = currentOverride.style["height"].v;
+            iw = currentOverride?.style?.width?.v ?? 0;
+            ih = currentOverride?.style?.height?.v ?? 0;
         } else {
-            if(!currentComponent.style.width) currentComponent.style.width = {v:0,u:"px"};
-            iw = currentComponent.style["width"].v;
-            if(!currentComponent.style.height) currentComponent.style.height = {v:0,u:"px"};
-            ih = currentComponent.style["height"].v;
+            iw = currentComponent?.style?.width?.v ?? 0;
+            ih = currentComponent?.style?.height?.v ?? 0;
         }
 
         // set reverse
@@ -135,11 +130,9 @@
         icy = e.clientY;
         // set imt
         if($selectedOverride !== -1){
-            if(!currentOverride.style["marginTop"]) currentOverride.style["marginTop"] = {v:0,u:"px"};
-            imt = currentOverride.style["marginTop"].v;
-        }else{
-            if(!currentComponent.style["marginTop"]) currentComponent.style["marginTop"] = {v:0,u:"px"};
-            imt = currentComponent.style["marginTop"].v;
+            imt = currentOverride?.style?.marginTop?.v ?? 0;
+        } else {
+            imt = currentComponent?.style?.marginTop?.v ?? 0;
         }
 
         // start tracking mouse position on move
@@ -167,14 +160,13 @@
     const startMBDrag = (e:MouseEvent) => {
         // set icx/icy to current mouse position
         icy = e.clientY;
-        // set imt
+        // set imb
         if($selectedOverride !== -1){
-            if(!currentOverride.style["marginBottom"]) currentOverride.style["marginBottom"] = {v:0,u:"px"};
-            imb = currentOverride.style["marginBottom"].v;
-        }else{
-            if(!currentComponent.style["marginBottom"]) currentComponent.style["marginBottom"] = {v:0,u:"px"};
-            imb = currentComponent.style["marginBottom"].v;
+            imb = currentOverride?.style?.marginBottom?.v ?? 0;
+        } else {
+            imb = currentComponent?.style?.marginBottom?.v ?? 0;
         }
+
         // start tracking mouse position on move
         document.addEventListener('mousemove', trackMBDrag);
         document.addEventListener('mouseup', endDrag);
@@ -199,13 +191,13 @@
     }
     const startMRDrag = (e:MouseEvent) => {
         icx = e.clientX;
+        // set imr
         if($selectedOverride !== -1){
-            if(!currentOverride.style["marginRight"]) currentOverride.style["marginRight"] = {v:0,u:"px"};
-            imr = currentOverride.style["marginRight"].v;
-        }else{
-            if(!currentComponent.style["marginRight"]) currentComponent.style["marginRight"] = {v:0,u:"px"};
-            imr = currentComponent.style["marginRight"].v;
+            imr = currentOverride?.style?.marginRight?.v ?? 0;
+        } else {
+            imr = currentComponent?.style?.marginRight?.v ?? 0;
         }
+        
         // start tracking mouse position on move
         document.addEventListener('mousemove', trackMRDrag);
         document.addEventListener('mouseup', endDrag);
@@ -230,13 +222,13 @@
     }
     const startMLDrag = (e:MouseEvent) => {
         icx = e.clientX;
+        // set iml
         if($selectedOverride !== -1){
-            if(!currentOverride.style["marginLeft"]) currentOverride.style["marginLeft"] = {v:0,u:"px"};
-            iml = currentOverride.style["marginLeft"].v;
-        }else{
-            if(!currentComponent.style["marginLeft"]) currentComponent.style["marginLeft"] = {v:0,u:"px"};
-            iml = currentComponent.style["marginLeft"].v;
+            iml = currentOverride?.style?.marginLeft?.v ?? 0;
+        } else {
+            iml = currentComponent?.style?.marginLeft?.v ?? 0;
         }
+        
         // start tracking mouse position on move
         document.addEventListener('mousemove', trackMLDrag);
         document.addEventListener('mouseup', endDrag);
@@ -276,7 +268,6 @@
         document.removeEventListener('mousemove', trackCornerDrag);
         document.removeEventListener('mouseup', endDrag);
     }
-
 </script>
 
 <main>

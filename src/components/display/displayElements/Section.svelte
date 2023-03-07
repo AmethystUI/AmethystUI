@@ -6,7 +6,7 @@
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
     onMount(() => { $collection = $collection }); // required to refresh the current style so all the initialized values can load.
-    
+
     // specific style shortcuts
     $: textItalisized = !!currentStyle ? currentStyle?.typeStyle?.textDecorations?.includes("italicize") ?? false : false;
     $: textUnderlined = !!currentStyle ? currentStyle?.typeStyle?.textDecorations?.includes("underline") ?? false : false;
@@ -33,21 +33,21 @@
 <!-- Container transformation to keep the element in the center -->
 <main style={`
     transform: translate3d(calc(
-        ${-currentStyle.marginLeft?.v/2 ?? "0"}${currentStyle.marginLeft?.u ?? "px"}
-        + ${-currentStyle.marginRight?.v/2 ?? "0"}${currentStyle.marginRight?.u ?? "px"}
-        + ${currentStyle.borderWidthLeft && currentStyle.USEBORDER ? -currentStyle.borderWidthLeft.v/2 : 0}${currentStyle.borderWidthLeft ? currentStyle.borderWidthLeft.u : "px"}
-        + ${currentStyle.borderWidthRight && currentStyle.USEBORDER ? -currentStyle.borderWidthRight.v/2 : 0}${currentStyle.borderWidthRight ? currentStyle.borderWidthRight.u : "px"}
+        ${!!currentStyle.marginLeft ? -currentStyle.marginLeft.v/2 : "0"}${!!currentStyle.marginLeft ? currentStyle.marginLeft.u : "px"}
+        + ${!!currentStyle.marginRight ? -currentStyle.marginRight.v/2 : "0"}${!!currentStyle.marginRight ? currentStyle.marginRight.u : "px"}
+        + ${currentStyle.borderWidthLeft && currentStyle.borderStyleLeft !== "hidden" && currentStyle.USEBORDER ? -currentStyle.borderWidthLeft.v/2 : 0}${currentStyle.borderWidthLeft ? currentStyle.borderWidthLeft.u : "px"}
+        + ${currentStyle.borderWidthRight && currentStyle.borderStyleRight !== "hidden" && currentStyle.USEBORDER ? -currentStyle.borderWidthRight.v/2 : 0}${currentStyle.borderWidthRight ? currentStyle.borderWidthRight.u : "px"}
     ), calc(
-        ${-currentStyle.marginTop?.v/2 ?? "0"}${currentStyle.marginTop?.u ?? "px"}
-        + ${-currentStyle.marginBottom?.v/2 ?? "0"}${currentStyle.marginBottom?.u ?? "px"}
-        + ${currentStyle.borderWidthTop && currentStyle.USEBORDER ? -currentStyle.borderWidthTop.v/2 : 0}${currentStyle.borderWidthTop ? currentStyle.borderWidthTop.u : "px"}
-        + ${currentStyle.borderWidthBottom && currentStyle.USEBORDER ? -currentStyle.borderWidthBottom.v/2 : 0}${currentStyle.borderWidthBottom ? currentStyle.borderWidthBottom.u : "px"}
+        ${!!currentStyle.marginTop ? -currentStyle.marginTop.v/2 : "0"}${!!currentStyle.marginTop ? currentStyle.marginTop.u : "px"}
+        + ${!!currentStyle.marginBottom ? -currentStyle.marginBottom.v/2 : "0"}${!!currentStyle.marginBottom ? currentStyle.marginBottom.u : "px"}
+        + ${currentStyle.borderWidthTop && currentStyle.borderStyleTop !== "hidden" && currentStyle.USEBORDER ? -currentStyle.borderWidthTop.v/2 : 0}${currentStyle.borderWidthTop ? currentStyle.borderWidthTop.u : "px"}
+        + ${currentStyle.borderWidthBottom && currentStyle.borderStyleBottom !== "hidden" && currentStyle.USEBORDER ? -currentStyle.borderWidthBottom.v/2 : 0}${currentStyle.borderWidthBottom ? currentStyle.borderWidthBottom.u : "px"}
     ), 0px);
 `}
 class="no-drag">
     <!-- We have do this terribleness if we want to use anything with a united attribute. It's also fast -->
     <!-- If you want a quick guide, "currentStyle.width?" checks if width exist on the current style. If it's undefined, it will default to whatever is after the "??" -->
-    <div style={`
+    <section style={`
         width: ${ currentStyle.width?.v ?? "0" }${ currentStyle.width?.u ?? "px" };
         height: ${ currentStyle.height?.v ?? "0" }${ currentStyle.height?.u ?? "px" };
 
@@ -128,26 +128,6 @@ class="no-drag">
             ` : ""
         }
 
-        ${ // only use text styles if text is enabled
-            currentStyle["USETEXT"]? `
-                color: hsla(${currentStyle.color.h ?? 0}deg, ${currentStyle.color.s ?? 0}%, ${currentStyle.color.l ?? 0}%, ${currentStyle.color.a ?? 0}%);
-                
-                font-size: ${ currentStyle.typeStyle?.size?.v ?? 14 }${ currentStyle.typeStyle?.size?.u ?? "px" };
-                font-family: "${ currentStyle.typeStyle?.fontObj?.family ?? "Inter" }", Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-                font-weight: ${ currentStyle.typeStyle?.variation ?? "" };
-
-                text-align: ${ currentStyle.typeStyle?.alignment ?? "left" };
-                letter-spacing: ${ currentStyle.typeStyle?.tracking?.v ?? "100%" }${ currentStyle.typeStyle?.tracking?.u ?? "" };
-                line-height: ${ currentStyle.typeStyle?.lineHeight?.v?? "100%" }${ currentStyle.typeStyle?.lineHeight?.u?? "" };
-                text-transform: ${ currentStyle.typeStyle?.casing ?? "none" };
-                ${textUnderlined || textStriked ? // if the text is either underlined or striked
-                    `text-decoration: ${ textUnderlined ? "underline" : "" } ${ textStriked ? "line-through" : "" };
-                    `: ""
-                }
-                font-style: ${textItalisized ? "italic" : ""};
-            ` : ""
-        }
-
         transform: translate3d(
         calc(
             ${ -currentStyle.marginLeft?.v/2 ?? 0 }${ currentStyle.marginLeft?.u ?? "px" }
@@ -162,14 +142,7 @@ class="no-drag">
         0);
     `}
     class="no-drag">
-        <!-- Text content -->
-        {#if currentStyle.USETEXT}
-            {#each currentStyle.content.split("\n") as line}
-                {line}
-                <br>
-            {/each}
-        {/if}
-    </div>
+    </section>
 </main>
 
 <style lang="scss">

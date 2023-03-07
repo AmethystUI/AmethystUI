@@ -14,7 +14,7 @@
     export let currentParentWidth = 360;
     
     // reactive
-    $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent].style : $collection[$selectedComponent].styleOverrides[$selectedOverride].style;
+        $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
     let cOW = 0; let cOWu:units = "px"; // cBW = current outline width
     let cOFF = 0; let cOFFu:units = "px"; // cBW = current outline width
@@ -32,43 +32,62 @@
 
     let style:borderOutlineStyle = "solid";
 
-    $: if(!!currentStyle){ // these variables just make the code look nicer
+    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
+    $: useOutline = $activeStyles.USEOUTLINE;
+    $: useWidth = $activeStyles.outlineWidth;
+    $: useOffset = $activeStyles.outlineOffset;
+    $: useRadius = $activeStyles.borderRadiusBottom || $activeStyles.borderRadiusLeft || $activeStyles.borderRadiusRight  || $activeStyles.borderRadiusTop;
+    $: useColor = $activeStyles.outlineColor;
+    
+    $: useStyle = $activeStyles.outlineStyle;
+
+    $: if(!!currentStyle && useOutline){ // these variables just make the code look nicer
         // use outline
         currentStyle["USEOUTLINE"] = !!currentStyle["USEOUTLINE"]; // boolean initialization weirdness
         // currentStyle["USEOUTLINE"] = true; // debugging force open
 
         // outline width
-        if(!currentStyle["outlineWidth"]) currentStyle["outlineWidth"] = {v:2.5,u:"px"};
-        cOW = currentStyle["outlineWidth"].v;
-        cOWu = currentStyle["outlineWidth"].u;
+        if(useWidth){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
+            if(!currentStyle["outlineWidth"]) currentStyle["outlineWidth"] = {v:2.5,u:"px"};
+            cOW = currentStyle["outlineWidth"].v;
+            cOWu = currentStyle["outlineWidth"].u;
+        }
 
         // border radius (yes border radius also control the outline radius for some reason)
-        if(!currentStyle["borderRadiusTop"]) currentStyle["borderRadiusTop"] = {v:18,u:"pt"};
-        cBRT = currentStyle["borderRadiusTop"].v;
-        cBRTu = currentStyle["borderRadiusTop"].u;
-        if(!currentStyle["borderRadiusRight"]) currentStyle["borderRadiusRight"] = {v:18,u:"pt"};
-        cBRR = currentStyle["borderRadiusRight"].v;
-        cBRRu = currentStyle["borderRadiusRight"].u;
-        if(!currentStyle["borderRadiusBottom"]) currentStyle["borderRadiusBottom"] = {v:18,u:"pt"};
-        cBRB = currentStyle["borderRadiusBottom"].v;
-        cBRBu = currentStyle["borderRadiusBottom"].u;
-        if(!currentStyle["borderRadiusLeft"]) currentStyle["borderRadiusLeft"] = {v:18,u:"pt"};
-        cBRL = currentStyle["borderRadiusLeft"].v;
-        cBRLu = currentStyle["borderRadiusLeft"].u;
-        cBRAvg = (cBRT + cBRR + cBRB + cBRL) / 4;
+        if(useRadius){
+            if(!currentStyle["borderRadiusTop"]) currentStyle["borderRadiusTop"] = {v:18,u:"pt"};
+            cBRT = currentStyle["borderRadiusTop"].v;
+            cBRTu = currentStyle["borderRadiusTop"].u;
+            if(!currentStyle["borderRadiusRight"]) currentStyle["borderRadiusRight"] = {v:18,u:"pt"};
+            cBRR = currentStyle["borderRadiusRight"].v;
+            cBRRu = currentStyle["borderRadiusRight"].u;
+            if(!currentStyle["borderRadiusBottom"]) currentStyle["borderRadiusBottom"] = {v:18,u:"pt"};
+            cBRB = currentStyle["borderRadiusBottom"].v;
+            cBRBu = currentStyle["borderRadiusBottom"].u;
+            if(!currentStyle["borderRadiusLeft"]) currentStyle["borderRadiusLeft"] = {v:18,u:"pt"};
+            cBRL = currentStyle["borderRadiusLeft"].v;
+            cBRLu = currentStyle["borderRadiusLeft"].u;
+            cBRAvg = (cBRT + cBRR + cBRB + cBRL) / 4;
+        }
 
         // outline offset
-        if(!currentStyle["outlineOffset"]) currentStyle["outlineOffset"] = {v:2,u:"px"};
-        cOFF = currentStyle["outlineOffset"].v;
-        cOFFu = currentStyle["outlineOffset"].u;
+        if(useOffset){
+            if(!currentStyle["outlineOffset"]) currentStyle["outlineOffset"] = {v:2,u:"px"};
+            cOFF = currentStyle["outlineOffset"].v;
+            cOFFu = currentStyle["outlineOffset"].u;
+        }
 
         // outline color
-        if(!currentStyle["outlineColor"]) currentStyle["outlineColor"] = clr
-        clr = currentStyle["outlineColor"];
+        if(useColor){
+            if(!currentStyle["outlineColor"]) currentStyle["outlineColor"] = clr
+            clr = currentStyle["outlineColor"];
+        }
 
         // outline style
-        if(!currentStyle["outlineStyle"]) currentStyle["outlineStyle"] = style
-        style = currentStyle["outlineStyle"];
+        if(useStyle){
+            if(!currentStyle["outlineStyle"]) currentStyle["outlineStyle"] = style
+            style = currentStyle["outlineStyle"];
+        }
     }
 
     const toggleUseOutline = () => {
@@ -163,15 +182,6 @@
         // if the current style doesn't use this editor, clear ref
         clearColorPickerRef();
     }
-
-    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
-    $: useOutline = $activeStyles.USEOUTLINE;
-    $: useWidth = $activeStyles.outlineWidth;
-    $: useOffset = $activeStyles.outlineOffset;
-    $: useRadius = $activeStyles.borderRadiusBottom || $activeStyles.borderRadiusLeft || $activeStyles.borderRadiusRight  || $activeStyles.borderRadiusTop;
-    $: useColor = $activeStyles.outlineColor;
-    
-    $: useStyle = $activeStyles.outlineStyle;
 </script>
 
 {#if useOutline}

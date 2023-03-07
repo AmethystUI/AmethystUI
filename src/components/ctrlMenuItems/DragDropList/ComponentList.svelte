@@ -8,7 +8,7 @@
     
     This code is based on tarb's svelte-dnd-list at https://github.com/tarb/svelte-dnd-list
     If you are the author and have issues with copyrights, please contact me at lemon@thelemonorange.com
- -->
+-->
 
 <svelte:options immutable={true} accessors={true} />
 

@@ -66,13 +66,12 @@
     import ValueInput from "./Basics/ValueInput.svelte";
     import Title from "./Basics/Title.svelte";
     import MultiToggle from "./Basics/MultiToggle.svelte";
-    import { textDecoration } from "./Basics/MultiSelect.svelte";
     import { activeStyles } from "../../../stores/activeStyles";
     
     export let currentParentWidth = 360;
     
     // reactive
-    $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent].style : $collection[$selectedComponent].styleOverrides[$selectedOverride].style;
+        $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
     const possibleOverflowStyles:overflow[] = ["auto", "hidden", "scroll", "visible"];
 
@@ -83,22 +82,38 @@
     let alignY:flexAlignment = "none";
     let syncOverflow = false;
 
+    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
+    $: useOpacity = $activeStyles.opacity;
+    $: useOverflowX = $activeStyles.overflowX;
+    $: useOverflowY = $activeStyles.overflowY;
+    $: useAlignX = $activeStyles.justifyContent; // might need to change in the future
+    $: useAlignY = $activeStyles.alignItems; // might need to change in the future
+
     $: if(!!currentStyle){ // these variables just make the code look nicer
+        
         // opacity
-        if(currentStyle.opacity === undefined) currentStyle.opacity = opacity;
-        opacity = currentStyle.opacity;
+        if(useOpacity){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
+            if(currentStyle.opacity === undefined) currentStyle.opacity = opacity;
+            opacity = currentStyle.opacity;
+        }
         
         // overflows
-        if(!currentStyle.overflowX) currentStyle.overflowX = overflowX;
-        overflowX = currentStyle.overflowX;
-        if(!currentStyle.overflowY) currentStyle.overflowY = overflowY;
-        overflowY = currentStyle.overflowY;
+        if(useOverflowX){
+            if(!currentStyle.overflowX) currentStyle.overflowX = overflowX;
+            overflowX = currentStyle.overflowX;
+        } if(useOverflowY){
+            if(!currentStyle.overflowY) currentStyle.overflowY = overflowY;
+            overflowY = currentStyle.overflowY;
+        }
 
         // alignments
-        if(!currentStyle.justifyContent) currentStyle.justifyContent = alignX;
-        alignX = currentStyle.justifyContent;
-        if(!currentStyle.alignItems) currentStyle.alignItems = alignY;
-        alignY = currentStyle.alignItems;
+        if(useAlignX){
+            if(!currentStyle.justifyContent) currentStyle.justifyContent = alignX;
+            alignX = currentStyle.justifyContent;
+        } if (useAlignY) {
+            if(!currentStyle.alignItems) currentStyle.alignItems = alignY;
+            alignY = currentStyle.alignItems;
+        }
     }
 
     const updateOpacity = (evt:CustomEvent<any>, d:string) => {
@@ -156,14 +171,6 @@
             $collection[$selectedComponent].style.alignItems = e.detail.value;
         }
     }
-
-    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
-    $: useOpacity = $activeStyles.opacity;
-    $: useOverflowX = $activeStyles.overflowX;
-    $: useOverflowY = $activeStyles.overflowY;
-    $: useAlignX = $activeStyles.justifyContent; // might need to change in the future
-    $: useAlignY = $activeStyles.alignItems; // might need to change in the future
-
 </script>
 
 {#if useOpacity || useOverflowX || useOverflowY || useAlignX || useAlignY}

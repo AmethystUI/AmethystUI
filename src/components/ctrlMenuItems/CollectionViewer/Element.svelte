@@ -4,6 +4,7 @@
     import { setSelectedElmnt } from "../../../stores/overlayStat";
     import { createEventDispatcher } from 'svelte';
     import { fly } from "svelte/transition";
+    import { activeStyles } from "../../../stores/activeStyles";
     const disp = createEventDispatcher();
 
     export let tagType:string;
@@ -32,10 +33,9 @@
 
     // event handler for key delete to delete element
     $: if(($focusedComponent !== -1 || $focusedOverride !== -1) && !$layerDeleteLock){
-        setTimeout(() => {
             document.onkeydown = (e:KeyboardEvent) => {
                 // if delete is pressed, delete this element or override
-                if (e.key == "Backspace") {
+                if (e.key === "Backspace") {
                     // first detect if any override is selected. If it is, delete the override instead of the element
                     if($selectedOverride === -1){ // the case of if override is not selected
                         // check what the number of elements after removal is. If it's 0, reset all selected and focused comp index
@@ -81,10 +81,46 @@
                         $collection = [...$collection];
                     }
                 }
-            }        
-        }, 0);
+
+                if(e.key === "ArrowUp"){
+                    // move the focus on the override or the elment down
+                    if($selectedOverride !== -1){
+                        // move the override up, given that it can still move up
+                        $selectedOverride -= 1;
+                        $focusedOverride = $selectedOverride;
+
+                        // check if the selected override is -1. If it is, select the elmnt instead
+                        if($selectedOverride === -1){
+                            $focusedComponent = $selectedComponent;
+                        }
+                    } else if ($selectedComponent !== 0) { // select the last override of the previous elmnt if there is an elmnt above the current one
+                        $selectedComponent -= 1;
+                        $focusedComponent = $selectedComponent;
+
+                        // set override to be the last one
+                        $selectedOverride = $collection[$selectedComponent].styleOverrides.length-1;
+                        $focusedOverride = $selectedOverride;
+                    } // else do nothing
+                } else if (e.key === "ArrowDown"){
+                    // move the focus on the override or the elment down
+                    if($selectedOverride !== $collection[$selectedComponent].styleOverrides.length-1 || $selectedComponent !== $collection.length-1){
+                        // move the override down, given that it can still move up
+                        $selectedOverride += 1;
+                        $focusedOverride = $selectedOverride;
+
+                        // check if the selected override is the last one. If it is, select the elmnt instead and set the overrides to -1
+                        if($selectedOverride === $collection[$selectedComponent].styleOverrides.length){
+                            $focusedOverride = $selectedOverride = -1;
+
+                            // advance to the next elmnt if there is one
+                            $selectedComponent += 1
+                            $focusedComponent = $selectedComponent;
+                        }
+                    }
+                }
+            }
     } else {
-        document.onkeydown = undefined
+        document.onkeydown = undefined;
     }
 </script>
 
@@ -103,7 +139,7 @@
     <img src={iconURI} alt="" style="transition:none">
     <p>{HTMltagInfo[tagType].name}</p>
 
-    <div style="margin-right:4px;" on:click={() => {addOverride(elmntIndex)}} title="Add Override">
+    <div style="margin-right:4px; pointer-events: all;" on:click={() => {addOverride(elmntIndex)}} on:mousedown={e => e.stopPropagation()} title="Add Override">
         <img src={"./assets/icons/plus.svg"} alt="">
     </div>
 </main>

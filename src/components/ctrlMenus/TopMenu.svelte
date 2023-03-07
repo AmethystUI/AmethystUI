@@ -13,36 +13,43 @@
             title : HTMltagInfo["DIV"].name,
             iconSrc : HTMltagInfo["DIV"].iconURI,
             desc: "<div>",
-            cta : () => {addComponent("DIV", defaultDivStyle, true)}
+            cta : () => {addComponent("DIV", {}, true)}
         },{ // section
             type : "reg",
             title : HTMltagInfo["SECTION"].name,
             iconSrc : HTMltagInfo["SECTION"].iconURI,
             desc: "<section>",
             cta : () => {addComponent("SECTION", {}, true)}
-        },{ // span
+        }, { // span
             type : "reg",
             title : HTMltagInfo["SPAN"].name,
             iconSrc : HTMltagInfo["SPAN"].iconURI,
             desc: "<span>",
-            cta : () => {addComponent("SPAN", {})}
-        },{ // body
-            type : "reg",
-            title : HTMltagInfo["BODY"].name,
-            iconSrc : HTMltagInfo["BODY"].iconURI,
-            desc: "<body>",
-            cta : () => {addComponent("BODY", {})}
-        },{ // canvas
-            type : "reg",
-            title : HTMltagInfo["CANVAS"].name,
-            iconSrc : HTMltagInfo["CANVAS"].iconURI,
-            desc: "<canvas>",
-            cta : () => {addComponent("CANVAS", {})}
-        },{ // ==========
+            cta : () => {addComponent("SPAN", {
+                content: "Hello World!"
+            }, true)}
+        },
+        // { // body
+        //     type : "reg",
+        //     title : HTMltagInfo["BODY"].name,
+        //     iconSrc : HTMltagInfo["BODY"].iconURI,
+        //     desc: "<body>",
+        //     cta : () => {addComponent("BODY", {})}
+        // },{ // canvas
+        //     type : "reg",
+        //     title : HTMltagInfo["CANVAS"].name,
+        //     iconSrc : HTMltagInfo["CANVAS"].iconURI,
+        //     desc: "<canvas>",
+        //     cta : () => {addComponent("CANVAS", {})}
+        // },
+        
+        { // ==========
             type : "sep",
             title : "",
             cta : () => {}
-        },{ // h1
+        },
+        
+        { // h1
             type : "reg",
             title : HTMltagInfo["H1"].name,
             iconSrc : HTMltagInfo["H1"].iconURI,
@@ -90,11 +97,15 @@
             iconSrc : HTMltagInfo["A"].iconURI,
             desc: "<a>",
             cta : () => {addComponent("A", {})}
-        },{ // ==========
+        },
+        
+        { // ==========
             type : "sep",
             title : "",
             cta : () => {}
-        },{ // button
+        },
+        
+        { // button
             type : "reg",
             title : HTMltagInfo["BUTTON"].name,
             iconSrc : HTMltagInfo["BUTTON"].iconURI,
@@ -112,33 +123,41 @@
             iconSrc : HTMltagInfo["TEXTAREA"].iconURI,
             desc: "<textarea>",
             cta : () => {addComponent("TEXTAREA", {})}
-        },{ // label
-            type : "reg",
-            title : HTMltagInfo["LABEL"].name,
-            iconSrc : HTMltagInfo["LABEL"].iconURI,
-            desc: "<label>",
-            cta : () => {addComponent("LABEL", {})}
-        },{ // ==========
+        },
+        
+        // { // label
+        //     type : "reg",
+        //     title : HTMltagInfo["LABEL"].name,
+        //     iconSrc : HTMltagInfo["LABEL"].iconURI,
+        //     desc: "<label>",
+        //     cta : () => {addComponent("LABEL", {})}
+        // },
+        
+        { // ==========
             type : "sep",
             title : "",
             cta : () => {}
-        },{ // ol
-            type : "reg",
-            title : HTMltagInfo["OL"].name,
-            iconSrc : HTMltagInfo["OL"].iconURI,
-            desc: "<ol>",
-            cta : () => {addComponent("OL", {})}
-        },{ // ul
-            type : "reg",
-            title : HTMltagInfo["UL"].name,
-            iconSrc : HTMltagInfo["UL"].iconURI,
-            desc: "<ul>",
-            cta : () => {addComponent("UL", {})}
-        },{ // ==========
-            type : "sep",
-            title : "",
-            cta : () => {}
-        },{ // hr
+        },
+        
+        // { // ol
+        //     type : "reg",
+        //     title : HTMltagInfo["OL"].name,
+        //     iconSrc : HTMltagInfo["OL"].iconURI,
+        //     desc: "<ol>",
+        //     cta : () => {addComponent("OL", {})}
+        // },{ // ul
+        //     type : "reg",
+        //     title : HTMltagInfo["UL"].name,
+        //     iconSrc : HTMltagInfo["UL"].iconURI,
+        //     desc: "<ul>",
+        //     cta : () => {addComponent("UL", {})}
+        // },{ // ==========
+        //     type : "sep",
+        //     title : "",
+        //     cta : () => {}
+        // },
+
+        { // hr
             type : "reg",
             title : HTMltagInfo["HR"].name,
             iconSrc : HTMltagInfo["HR"].iconURI,

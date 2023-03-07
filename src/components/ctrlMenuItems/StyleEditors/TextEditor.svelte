@@ -51,7 +51,7 @@
     export let currentParentWidth = 360;
     
     // reactive
-    $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent].style : $collection[$selectedComponent].styleOverrides[$selectedOverride].style;
+        $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
     // document components
     let colorPreviewSquare:HTMLDivElement;
@@ -85,22 +85,36 @@
     let content: string = "";
     let placeholder: string = "";
 
-    $: if(!!currentStyle){ // Variable update listener. If the current style changes, then update the variables accordingly
-        // text color
-        if(!currentStyle.color) currentStyle.color = clr;
-        clr = currentStyle.color;
+    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
+    $: useText = $activeStyles.USETEXT;
+    $: useContent = $activeStyles.content;
+    $: usePlaceholder = $activeStyles.placeholder;
+    $: useTypefaceSettings = $activeStyles.typeStyle && $activeStyles.color;
 
-        // typeface
-        if(!currentStyle.typeStyle) currentStyle.typeStyle = fontRef;
-        fontRef = currentStyle.typeStyle;
+    $: if(!!currentStyle && useText){ // Variable update listener. If the current style changes, then update the variables accordingly
+        currentStyle["USETEXT"] = !!currentStyle["USETEXT"];
+
+        // text color
+        if(useContent){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
+            if(!currentStyle.color) currentStyle.color = clr;
+            clr = currentStyle.color;
+
+            // typeface
+            if(!currentStyle.typeStyle) currentStyle.typeStyle = fontRef;
+            fontRef = currentStyle.typeStyle;
+        }
 
         // initial text
-        if(currentStyle.content === undefined) currentStyle.content = content;
-        content = currentStyle.content;
+        if(useContent){
+            if(currentStyle.content === undefined) currentStyle.content = content;
+            content = currentStyle.content;
+        }
 
         // initial place holder
-        if(currentStyle.placeholder === undefined) currentStyle.placeholder = placeholder;
-        placeholder = currentStyle.placeholder;
+        if(usePlaceholder){
+            if(currentStyle.placeholder === undefined) currentStyle.placeholder = placeholder;
+            placeholder = currentStyle.placeholder;
+        }
     }
 
     // open the color picker
@@ -128,7 +142,7 @@
     } from "../../../types/general";
     import { beautifiedFontName, getFontNameValue, standardizedFontName } from "../../../workers/pseudoWorkers/fonts";
     import { keepOpenOverlay } from "./Advanced/Overlay.svelte";
-    import { hslToRgb, initializeColorFromHSLA } from "../../../util/colorMaths";
+    import { initializeColorFromHSLA } from "../../../util/colorMaths";
     import { activeStyles } from "../../../stores/activeStyles";
 
     const toggleUseText = () => {
@@ -192,13 +206,6 @@
             $collection[$selectedComponent].style.placeholder = evt.detail.v;
         }
     }
-
-    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
-    $: useText = $activeStyles.USETEXT;
-    $: useContent = $activeStyles.content;
-    $: usePlaceholder = $activeStyles.placeholder;
-    $: useTypefaceSettings = $activeStyles.typeStyle && $activeStyles.color;
-
 </script>
 
 {#if useText}

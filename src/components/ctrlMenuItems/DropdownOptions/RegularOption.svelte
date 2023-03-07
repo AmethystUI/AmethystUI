@@ -33,11 +33,17 @@
         cursor:pointer;
         user-select: none; -webkit-user-select: none;
 
+        #desc{
+            color: $secondary !important;
+            opacity: 0.3 !important;
+        }
+
         &:hover{
             background-color: $accent;
 
             #desc{
-                color: $secondarys2
+                color: $secondary !important;
+                opacity: 1 !important;
             }
 
             section{

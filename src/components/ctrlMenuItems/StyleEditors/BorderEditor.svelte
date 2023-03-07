@@ -15,7 +15,7 @@
     export let currentParentWidth = 360;
     
     // reactive
-    $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent].style : $collection[$selectedComponent].styleOverrides[$selectedOverride].style;
+        $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
     let cBWT = 0; let cBWTu:units = "px"; // cBW = current border width
     let cBWR = 0; let cBWRu:units = "px"; // cBW = current border width
@@ -40,54 +40,76 @@
     let styleLeft:borderOutlineStyle = "solid";
     let syncStyle = true;
 
-    $: if(!!currentStyle){ // these variables just make the code look nicer
+    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
+    $: useBorder = $activeStyles.USEBORDER;
+    $: useWidth = $activeStyles.borderWidthBottom || $activeStyles.borderWidthLeft || $activeStyles.borderWidthRight  || $activeStyles.borderWidthTop;
+    $: useRadius = $activeStyles.borderRadiusBottom || $activeStyles.borderRadiusLeft || $activeStyles.borderRadiusRight  || $activeStyles.borderRadiusTop;
+    $: useColor = $activeStyles.borderColor;
+    
+    $: useStyleBottom = $activeStyles.borderStyleBottom;
+    $: useStyleTop = $activeStyles.borderStyleTop;
+    $: useStyleLeft = $activeStyles.borderStyleLeft;
+    $: useStyleRight = $activeStyles.borderStyleRight;
+
+    $: if(!!currentStyle && useBorder){ // these variables just make the code look nicer
         // use border
         currentStyle["USEBORDER"] = !!currentStyle["USEBORDER"]; // boolean initialization weirdness
         // currentStyle["USEBORDER"] = true; // debugging force open
 
         // border width
-        if(!currentStyle["borderWidthTop"]) currentStyle["borderWidthTop"] = {v:2,u:"px"};
-        cBWT = currentStyle["borderWidthTop"].v;
-        cBWTu = currentStyle["borderWidthTop"].u;
-        if(!currentStyle["borderWidthRight"]) currentStyle["borderWidthRight"] = {v:2,u:"px"};
-        cBWR = currentStyle["borderWidthRight"].v;
-        cBWRu = currentStyle["borderWidthRight"].u;
-        if(!currentStyle["borderWidthBottom"]) currentStyle["borderWidthBottom"] = {v:2,u:"px"};
-        cBWB = currentStyle["borderWidthBottom"].v;
-        cBWBu = currentStyle["borderWidthBottom"].u;
-        if(!currentStyle["borderWidthLeft"]) currentStyle["borderWidthLeft"] = {v:2,u:"px"};
-        cBWL = currentStyle["borderWidthLeft"].v;
-        cBWLu = currentStyle["borderWidthLeft"].u;
-        cBWAvg = (cBWT + cBWR + cBWB + cBWL) / 4;
+        if(useWidth){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
+            if(!currentStyle["borderWidthTop"]) currentStyle["borderWidthTop"] = {v:2,u:"px"};
+            cBWT = currentStyle["borderWidthTop"].v;
+            cBWTu = currentStyle["borderWidthTop"].u;
+            if(!currentStyle["borderWidthRight"]) currentStyle["borderWidthRight"] = {v:2,u:"px"};
+            cBWR = currentStyle["borderWidthRight"].v;
+            cBWRu = currentStyle["borderWidthRight"].u;
+            if(!currentStyle["borderWidthBottom"]) currentStyle["borderWidthBottom"] = {v:2,u:"px"};
+            cBWB = currentStyle["borderWidthBottom"].v;
+            cBWBu = currentStyle["borderWidthBottom"].u;
+            if(!currentStyle["borderWidthLeft"]) currentStyle["borderWidthLeft"] = {v:2,u:"px"};
+            cBWL = currentStyle["borderWidthLeft"].v;
+            cBWLu = currentStyle["borderWidthLeft"].u;
+            cBWAvg = (cBWT + cBWR + cBWB + cBWL) / 4;
+        }
 
         // border radius
-        if(!currentStyle["borderRadiusTop"]) currentStyle["borderRadiusTop"] = {v:18,u:"pt"};
-        cBRT = currentStyle["borderRadiusTop"].v;
-        cBRTu = currentStyle["borderRadiusTop"].u;
-        if(!currentStyle["borderRadiusRight"]) currentStyle["borderRadiusRight"] = {v:18,u:"pt"};
-        cBRR = currentStyle["borderRadiusRight"].v;
-        cBRRu = currentStyle["borderRadiusRight"].u;
-        if(!currentStyle["borderRadiusBottom"]) currentStyle["borderRadiusBottom"] = {v:18,u:"pt"};
-        cBRB = currentStyle["borderRadiusBottom"].v;
-        cBRBu = currentStyle["borderRadiusBottom"].u;
-        if(!currentStyle["borderRadiusLeft"]) currentStyle["borderRadiusLeft"] = {v:18,u:"pt"};
-        cBRL = currentStyle["borderRadiusLeft"].v;
-        cBRLu = currentStyle["borderRadiusLeft"].u;
-        cBRAvg = (cBRT + cBRR + cBRB + cBRL) / 4;
+        if(useRadius){
+            if(!currentStyle["borderRadiusTop"]) currentStyle["borderRadiusTop"] = {v:18,u:"pt"};
+            cBRT = currentStyle["borderRadiusTop"].v;
+            cBRTu = currentStyle["borderRadiusTop"].u;
+            if(!currentStyle["borderRadiusRight"]) currentStyle["borderRadiusRight"] = {v:18,u:"pt"};
+            cBRR = currentStyle["borderRadiusRight"].v;
+            cBRRu = currentStyle["borderRadiusRight"].u;
+            if(!currentStyle["borderRadiusBottom"]) currentStyle["borderRadiusBottom"] = {v:18,u:"pt"};
+            cBRB = currentStyle["borderRadiusBottom"].v;
+            cBRBu = currentStyle["borderRadiusBottom"].u;
+            if(!currentStyle["borderRadiusLeft"]) currentStyle["borderRadiusLeft"] = {v:18,u:"pt"};
+            cBRL = currentStyle["borderRadiusLeft"].v;
+            cBRLu = currentStyle["borderRadiusLeft"].u;
+            cBRAvg = (cBRT + cBRR + cBRB + cBRL) / 4;
+        }
 
         // border color
-        if(!currentStyle["borderColor"]) currentStyle["borderColor"] = clr
-        clr = currentStyle["borderColor"];
+        if(useColor){
+            if(!currentStyle["borderColor"]) currentStyle["borderColor"] = clr
+            clr = currentStyle["borderColor"];
+        }
 
         // border style
-        if(!currentStyle["borderStyleTop"]) currentStyle["borderStyleTop"] = styleTop;
-        styleTop = currentStyle["borderStyleTop"];
-        if(!currentStyle["borderStyleRight"]) currentStyle["borderStyleRight"] = styleRight;
-        styleRight = currentStyle["borderStyleRight"];
-        if(!currentStyle["borderStyleBottom"]) currentStyle["borderStyleBottom"] = styleBottom;
-        styleBottom = currentStyle["borderStyleBottom"];
-        if(!currentStyle["borderStyleLeft"]) currentStyle["borderStyleLeft"] = styleLeft;
-        styleLeft = currentStyle["borderStyleLeft"];
+        if(useStyleTop){
+            if(!currentStyle["borderStyleTop"]) currentStyle["borderStyleTop"] = styleTop;
+            styleTop = currentStyle["borderStyleTop"];
+        } if(useStyleRight){
+            if(!currentStyle["borderStyleRight"]) currentStyle["borderStyleRight"] = styleRight;
+            styleRight = currentStyle["borderStyleRight"];
+        } if(useStyleBottom){
+            if(!currentStyle["borderStyleBottom"]) currentStyle["borderStyleBottom"] = styleBottom;
+            styleBottom = currentStyle["borderStyleBottom"];
+        } if(useStyleLeft){
+            if(!currentStyle["borderStyleLeft"]) currentStyle["borderStyleLeft"] = styleLeft;
+            styleLeft = currentStyle["borderStyleLeft"];
+        }
     }
 
     const toggleUseBorder = () => {
@@ -187,17 +209,6 @@
             $collection[$selectedComponent].style.borderStyleBottom = topStyle;
         }
     }
-
-    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
-    $: useBorder = $activeStyles.USEBORDER;
-    $: useWidth = $activeStyles.borderWidthBottom || $activeStyles.borderWidthLeft || $activeStyles.borderWidthRight  || $activeStyles.borderWidthTop;
-    $: useRadius = $activeStyles.borderRadiusBottom || $activeStyles.borderRadiusLeft || $activeStyles.borderRadiusRight  || $activeStyles.borderRadiusTop;
-    $: useColor = $activeStyles.borderColor;
-    
-    $: useStyleBottom = $activeStyles.borderStyleBottom;
-    $: useStyleTop = $activeStyles.borderStyleTop;
-    $: useStyleLeft = $activeStyles.borderStyleLeft;
-    $: useStyleRight = $activeStyles.borderStyleRight;
 </script>
 
 {#if useBorder}

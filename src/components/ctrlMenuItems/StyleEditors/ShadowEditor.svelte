@@ -14,12 +14,15 @@
     let indicatorOffset = 8.5;
 
     // reactive
-    $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent].style : $collection[$selectedComponent].styleOverrides[$selectedOverride].style;
+        $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
     let shadows:boxShadow[] = [];
     // we don't have a color defined here because we're using muxBoxShadClr as a multiplexer
 
-    $: if(!!currentStyle){ // these variables just make the code look nicer
+    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
+    $: useShadow = $activeStyles.boxShadows && $activeStyles.USESHADOW; // only active when both are true. We want to make sure that box shadow is used if we want it to be used. A simple check for fish brained developers
+
+    $: if(!!currentStyle && useShadow){ // these variables just make the code look nicer
         // use outline
         currentStyle["USESHADOW"] = !!currentStyle["USESHADOW"]; // boolean initialization weirdness
         // currentStyle["USESHADOW"] = true; // debugging force open
@@ -132,9 +135,6 @@
     } else {
         if(showEditorIndicator) showEditorIndicator = false;
     }
-
-    // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
-    $: useShadow = $activeStyles.boxShadows && $activeStyles.USESHADOW; // only active when both are true. We want to make sure that box shadow is used if we want it to be used. A simple check for fish brained developers
 </script>
 
 {#if useShadow}
