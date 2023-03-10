@@ -55,18 +55,14 @@
                     .replace(/[^a-zA-Z0-9\s+\-]/g, "")
                     .trim()
                     .replace(/\s+/g, "-")
-                    .toLowerCase();
                 
-                // check to see if name is empty
-                if(name.length === 0){
+                // check to see if name is empty or if the escape key is pressed instead of the enter key.
+                if(name.length === 0 || e.key === "Escape"){
                     name = $collection[elmntIndex]?.styleOverrides[overrideIndex].name; // reset to last working one.
                 }
+
                 // Check if it's a duplicate name, make sure to ignore self.
                 if($collection[elmntIndex]?.styleOverrides.map(ov => ov.name).indexOf(name) !== -1 && name !== $collection[elmntIndex]?.styleOverrides[overrideIndex].name){
-                    if(e.key === "Escape"){ // reset name in input field if it's the escape key
-                        nameField.textContent = $collection[elmntIndex]?.styleOverrides[overrideIndex].name;
-                    }
-
                     const animation = nameFieldContainer.animate([
                         { transform: 'translateX(0px)' },
                         { transform: 'translateX(-5px)' },
@@ -85,6 +81,7 @@
         
                 // set final name
                 $collection[elmntIndex].styleOverrides[overrideIndex].name = name;
+                nameField.textContent = name;
 
                 nameField.blur();
             }
@@ -94,7 +91,10 @@
     };
 
     const changeName = (e:Event):void => {
-        let name = nameField.textContent;
+        let name = nameField.textContent
+            .replace(/[^a-zA-Z0-9\s+\-]/g, "")
+            .trim()
+            .replace(/\s+/g, "-")
 
         if($collection[elmntIndex]?.styleOverrides.map(ov => ov.name).indexOf(name) !== -1 && name !== $collection[elmntIndex]?.styleOverrides[overrideIndex].name){
             name = $collection[elmntIndex]?.styleOverrides[overrideIndex].name; // reset name

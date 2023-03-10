@@ -29,7 +29,8 @@
     let cBRL = 0; let cBRLu:units = "px"; // cBR = current border radius
     let cBRAvg = 0;
 
-    let clr:color = initializeColorFromHSLA(0, 0, 100, 100);
+    const initialColor:color = initializeColorFromHSLA(0, 0, 100, 100);
+    let clr:color = {...initialColor};
 
     // this has to be a subset of the borderOutlineStyle type set in $collection
     const possibleStyles:borderOutlineStyle[] = ["dotted", "dashed", "solid", "double", "groove", "ridge", "inset", "hidden"];
@@ -92,7 +93,7 @@
 
         // border color
         if(useColor){
-            if(!currentStyle["borderColor"]) currentStyle["borderColor"] = clr
+            if(!currentStyle["borderColor"]) currentStyle["borderColor"] = {...initialColor};
             clr = currentStyle["borderColor"];
         }
 

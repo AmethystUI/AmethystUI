@@ -33,15 +33,15 @@
 <!-- Container transformation to keep the element in the center -->
 <main style={`
     transform: translate3d(calc(
-        ${-currentStyle.marginLeft?.v/2 ?? "0"}${currentStyle.marginLeft?.u ?? "px"}
-        + ${-currentStyle.marginRight?.v/2 ?? "0"}${currentStyle.marginRight?.u ?? "px"}
-        + ${currentStyle.borderWidthLeft && currentStyle.USEBORDER ? -currentStyle.borderWidthLeft.v/2 : 0}${currentStyle.borderWidthLeft ? currentStyle.borderWidthLeft.u : "px"}
-        + ${currentStyle.borderWidthRight && currentStyle.USEBORDER ? -currentStyle.borderWidthRight.v/2 : 0}${currentStyle.borderWidthRight ? currentStyle.borderWidthRight.u : "px"}
+        ${!!currentStyle.marginLeft ? -currentStyle.marginLeft.v/2 : "0"}${!!currentStyle.marginLeft ? currentStyle.marginLeft.u : "px"}
+        + ${!!currentStyle.marginRight ? -currentStyle.marginRight.v/2 : "0"}${!!currentStyle.marginRight ? currentStyle.marginRight.u : "px"}
+        + ${currentStyle.borderWidthLeft && currentStyle.borderStyleLeft !== "hidden" && currentStyle.USEBORDER ? -currentStyle.borderWidthLeft.v/2 : 0}${currentStyle.borderWidthLeft ? currentStyle.borderWidthLeft.u : "px"}
+        + ${currentStyle.borderWidthRight && currentStyle.borderStyleRight !== "hidden" && currentStyle.USEBORDER ? -currentStyle.borderWidthRight.v/2 : 0}${currentStyle.borderWidthRight ? currentStyle.borderWidthRight.u : "px"}
     ), calc(
-        ${-currentStyle.marginTop?.v/2 ?? "0"}${currentStyle.marginTop?.u ?? "px"}
-        + ${-currentStyle.marginBottom?.v/2 ?? "0"}${currentStyle.marginBottom?.u ?? "px"}
-        + ${currentStyle.borderWidthTop && currentStyle.USEBORDER ? -currentStyle.borderWidthTop.v/2 : 0}${currentStyle.borderWidthTop ? currentStyle.borderWidthTop.u : "px"}
-        + ${currentStyle.borderWidthBottom && currentStyle.USEBORDER ? -currentStyle.borderWidthBottom.v/2 : 0}${currentStyle.borderWidthBottom ? currentStyle.borderWidthBottom.u : "px"}
+        ${!!currentStyle.marginTop ? -currentStyle.marginTop.v/2 : "0"}${!!currentStyle.marginTop ? currentStyle.marginTop.u : "px"}
+        + ${!!currentStyle.marginBottom ? -currentStyle.marginBottom.v/2 : "0"}${!!currentStyle.marginBottom ? currentStyle.marginBottom.u : "px"}
+        + ${currentStyle.borderWidthTop && currentStyle.borderStyleTop !== "hidden" && currentStyle.USEBORDER ? -currentStyle.borderWidthTop.v/2 : 0}${currentStyle.borderWidthTop ? currentStyle.borderWidthTop.u : "px"}
+        + ${currentStyle.borderWidthBottom && currentStyle.borderStyleBottom !== "hidden" && currentStyle.USEBORDER ? -currentStyle.borderWidthBottom.v/2 : 0}${currentStyle.borderWidthBottom ? currentStyle.borderWidthBottom.u : "px"}
     ), 0px);
 `}
 class="no-drag">
