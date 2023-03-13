@@ -14,7 +14,7 @@
     let cX = true; let cY = true;
 
     // reactive
-        $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
+    $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
     $: currentComponent = $collection[$selectedComponent];
     $: currentOverride = $selectedOverride !== -1 ? $collection[$selectedComponent].styleOverrides[$selectedOverride] : undefined;
 
@@ -270,41 +270,79 @@
     }
 </script>
 
-<main>
+<main style={`
+    ${(currentStyle.width?.u ?? "px") === "fit-content"
+    ? // if the current width is "fit-content"
+    `
+        width: 100%;
+    ` : // other wise, just use normal width
+    `
+        width: calc(
+            ${currentStyle.width?.v ?? 0}${currentStyle.width?.u ?? "px"} + 
+            ${currentStyle.paddingLeft?.v ?? 0}${currentStyle.paddingLeft?.u ?? "px"} +
+            ${currentStyle.paddingRight?.v ?? 0}${currentStyle.paddingRight?.u ?? "px"}
+        );
+    `}
+
+    ${(currentStyle.height?.u ?? "px") === "fit-content"
+    ? // if the current width is "fit-content"
+    `
+        height: 100%;
+    ` : // other wise, just use normal width
+    `
+        height: calc(
+            ${currentStyle.height?.v ?? 0}${currentStyle.height?.u ?? "px"} + 
+            ${currentStyle.paddingTop?.v ?? 0}${currentStyle.paddingTop?.u ?? "px"} +
+            ${currentStyle.paddingBottom?.v ?? 0}${currentStyle.paddingBottom?.u ?? "px"}
+        );
+    `}
+`}>
     {#if $activeStyles.width || $activeStyles.height}
         <!-- size handlers -->
-        <div class="corner-drag {hovered ? "visible" : ""}"
-            id="corner-tl"
-            style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
-            on:mousedown={e => startCornerDrag(e, false, false, true, true)}></div>
-        <div class="corner-drag {hovered ? "visible" : ""}"
-            id="corner-tm"
-            style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
-            on:mousedown={e => startCornerDrag(e, false, false, false, true)}></div>
-        <div class="corner-drag {hovered ? "visible" : ""}"
-            id="corner-tr"
-            style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
-            on:mousedown={e => startCornerDrag(e, true, false, true, true)}></div>
-        <div class="corner-drag {hovered ? "visible" : ""}"
-            id="corner-ml"
-            style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
-            on:mousedown={e => startCornerDrag(e, false, false, true, false)}></div>
-        <div class="corner-drag {hovered ? "visible" : ""}"
-            id="corner-mr"
-            style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
-            on:mousedown={e => startCornerDrag(e, true, false, true, false)}></div>
-        <div class="corner-drag {hovered ? "visible" : ""}"
-            id="corner-bl"
-            style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
-            on:mousedown={e => startCornerDrag(e, false, true, true, true)}></div>
-        <div class="corner-drag {hovered ? "visible" : ""}"
-            id="corner-bm"
-            style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
-            on:mousedown={e => startCornerDrag(e, false, true, false, true)}></div>
-        <div class="corner-drag {hovered ? "visible" : ""}"
-            id="corner-br"
-            style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
-            on:mousedown={e => startCornerDrag(e, true, true, true, true)}></div>
+
+        <!-- Top and bottoms -->
+        {#if (currentStyle?.height?.u !== "fit-content")}
+            <div class="corner-drag {hovered ? "visible" : ""}"
+                id="corner-tm"
+                style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
+                on:mousedown={e => startCornerDrag(e, false, false, false, true)}></div>
+            <div class="corner-drag {hovered ? "visible" : ""}"
+                id="corner-bm"
+                style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
+                on:mousedown={e => startCornerDrag(e, false, true, false, true)}></div>
+        {/if}
+
+        <!-- Left and Right -->
+        {#if (currentStyle?.width?.u !== "fit-content")}
+            <div class="corner-drag {hovered ? "visible" : ""}"
+                id="corner-ml"
+                style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
+                on:mousedown={e => startCornerDrag(e, false, false, true, false)}></div>
+            <div class="corner-drag {hovered ? "visible" : ""}"
+                id="corner-mr"
+                style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
+                on:mousedown={e => startCornerDrag(e, true, false, true, false)}></div>
+        {/if}
+
+        <!-- The corner ones -->
+        {#if (currentStyle?.width?.u !== "fit-content") || (currentStyle?.height?.u !== "fit-content")}
+            <div class="corner-drag {hovered ? "visible" : ""}"
+                id="corner-tl"
+                style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
+                on:mousedown={e => startCornerDrag(e, false, false, true, true)}></div>
+            <div class="corner-drag {hovered ? "visible" : ""}"
+                id="corner-tr"
+                style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
+                on:mousedown={e => startCornerDrag(e, true, false, true, true)}></div>
+            <div class="corner-drag {hovered ? "visible" : ""}"
+                id="corner-bl"
+                style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
+                on:mousedown={e => startCornerDrag(e, false, true, true, true)}></div>
+            <div class="corner-drag {hovered ? "visible" : ""}"
+                id="corner-br"
+                style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
+                on:mousedown={e => startCornerDrag(e, true, true, true, true)}></div>
+        {/if}
     {/if}
 
     <!-- margin resizers -->
@@ -337,7 +375,6 @@
     main{
         $corner-offset: -2px;
 
-        width:100%; height:100%;
         position: absolute;
         background: none;
         display:flex; flex-direction: column; justify-content: center; align-items: center;

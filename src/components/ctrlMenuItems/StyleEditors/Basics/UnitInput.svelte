@@ -110,6 +110,11 @@
         });
     }
 
+    // update last working v on the change of v
+    $: if(v !== lastWorkingV && !isNaN(Number(v))){
+        lastWorkingV = v;
+    }
+
     const openUnitSel = () => {
         updateSelectionDirection();
         unitSelOpen = true;
@@ -128,7 +133,7 @@
         
         const bbRect = dropDownElement.getBoundingClientRect()
         const margin = 10;
-        if(openDirection == "open-bottom") openDirection = (bbRect.y+bbRect.height+margin > window.innerHeight) ? "open-top" : "open-bottom";
+        if(openDirection == "open-bottom") openDirection = (bbRect.y + bbRect.height + margin > window.innerHeight) ? "open-top" : "open-bottom";
         else openDirection = (bbRect.y+25+bbRect.height*2+margin > window.innerHeight) ? "open-top" : "open-bottom";
 
         if(trackingDir) requestAnimationFrame(updateSelectionDirection);
@@ -191,11 +196,12 @@
                     pc
                 </p></div>
             {/if}
-            {#if u !== "em"}
+            <!-- Broken but I dont wanna fix it. Not like anyone use this unit anyways -->
+            <!-- {#if u !== "em"}
                 <div on:click={() => u="em"}><p>
                     em
                 </p></div>
-            {/if}
+            {/if} -->
             {#if u !== "rem"}
                 <div on:click={() => u="rem"}><p>
                     rem

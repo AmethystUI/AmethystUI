@@ -5,12 +5,12 @@
 
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
-    onMount(() => { $collection = $collection }); // required to refresh the current style so all the initialized values can load.
-
-    // specific style shortcuts
-    $: textItalisized = !!currentStyle ? currentStyle?.typeStyle?.textDecorations?.includes("italicize") ?? false : false;
-    $: textUnderlined = !!currentStyle ? currentStyle?.typeStyle?.textDecorations?.includes("underline") ?? false : false;
-    $: textStriked = !!currentStyle ? currentStyle?.typeStyle?.textDecorations?.includes("strike") ?? false : false;
+    onMount(() => {
+        $collection = $collection
+        setTimeout(() => {
+            console.log(currentStyle);
+        }, 0);
+    }); // required to refresh the current style so all the initialized values can load.
 
     const generateShadowString = (shadow: boxShadow):string => {
         return `${shadow.x.v}${shadow.x.u} ` +
@@ -31,30 +31,12 @@
 </script>
 
 <!-- Container transformation to keep the element in the center -->
-<main style={`
-    transform: translate3d(calc(
-        ${!!currentStyle.marginLeft ? -currentStyle.marginLeft.v/2 : "0"}${!!currentStyle.marginLeft ? currentStyle.marginLeft.u : "px"}
-        + ${!!currentStyle.marginRight ? -currentStyle.marginRight.v/2 : "0"}${!!currentStyle.marginRight ? currentStyle.marginRight.u : "px"}
-        + ${currentStyle.borderWidthLeft && currentStyle.borderStyleLeft !== "hidden" && currentStyle.USEBORDER ? -currentStyle.borderWidthLeft.v/2 : 0}${currentStyle.borderWidthLeft ? currentStyle.borderWidthLeft.u : "px"}
-        + ${currentStyle.borderWidthRight && currentStyle.borderStyleRight !== "hidden" && currentStyle.USEBORDER ? -currentStyle.borderWidthRight.v/2 : 0}${currentStyle.borderWidthRight ? currentStyle.borderWidthRight.u : "px"}
-    ), calc(
-        ${!!currentStyle.marginTop ? -currentStyle.marginTop.v/2 : "0"}${!!currentStyle.marginTop ? currentStyle.marginTop.u : "px"}
-        + ${!!currentStyle.marginBottom ? -currentStyle.marginBottom.v/2 : "0"}${!!currentStyle.marginBottom ? currentStyle.marginBottom.u : "px"}
-        + ${currentStyle.borderWidthTop && currentStyle.borderStyleTop !== "hidden" && currentStyle.USEBORDER ? -currentStyle.borderWidthTop.v/2 : 0}${currentStyle.borderWidthTop ? currentStyle.borderWidthTop.u : "px"}
-        + ${currentStyle.borderWidthBottom && currentStyle.borderStyleBottom !== "hidden" && currentStyle.USEBORDER ? -currentStyle.borderWidthBottom.v/2 : 0}${currentStyle.borderWidthBottom ? currentStyle.borderWidthBottom.u : "px"}
-    ), 0px);
-`}
-class="no-drag">
+<main class="no-drag">
     <!-- We have do this terribleness if we want to use anything with a united attribute. It's also fast -->
     <!-- If you want a quick guide, "currentStyle.width?" checks if width exist on the current style. If it's undefined, it will default to whatever is after the "??" -->
     <section style={`
         width: ${ currentStyle.width?.v ?? "0" }${ currentStyle.width?.u ?? "px" };
         height: ${ currentStyle.height?.v ?? "0" }${ currentStyle.height?.u ?? "px" };
-
-        margin-top: ${ currentStyle.marginTop?.v ?? "auto" }${ currentStyle.marginTop?.u ?? "" };
-        margin-right: ${ currentStyle.marginRight?.v ?? "auto" }${ currentStyle.marginRight?.u ?? "" };
-        margin-bottom: ${ currentStyle.marginBottom?.v ?? "auto" }${ currentStyle.marginBottom?.u ?? "" };
-        margin-left: ${ currentStyle.marginLeft?.v ?? "auto" }${ currentStyle.marginLeft?.u ?? "" };
 
         padding-top: ${ currentStyle.paddingTop?.v ?? "auto" }${ currentStyle.paddingTop?.u ?? "" };
         padding-right: ${ currentStyle.paddingRight?.v ?? "auto" }${ currentStyle.paddingRight?.u ?? "" };
@@ -127,19 +109,6 @@ class="no-drag">
                 box-shadow: ${shadowString};
             ` : ""
         }
-
-        transform: translate3d(
-        calc(
-            ${ -currentStyle.marginLeft?.v/2 ?? 0 }${ currentStyle.marginLeft?.u ?? "px" }
-            - ${ -currentStyle.marginRight?.v/2 ?? 0 }${ currentStyle.marginRight?.u ?? "px" }
-            + ${ -currentStyle.borderWidthLeft?.v/2 ?? 0}${ currentStyle.borderWidthLeft?.u ?? "px"}
-            - ${ -currentStyle.borderWidthRight?.v/2 ?? 0}${ currentStyle.borderWidthRight?.u ?? "px"}),
-        calc(
-            ${ -currentStyle.marginTop?.v/2 ?? 0 }${ currentStyle.marginTop?.u ?? "px"}
-            - ${ -currentStyle.marginBottom?.v/2 ?? 0 }${ currentStyle.marginBottom?.u ?? "px"}
-            + ${ -currentStyle.borderWidthTop?.v/2 ?? 0 }${ currentStyle.borderWidthTop?.u ?? "px"}
-            - ${ -currentStyle.borderWidthBottom?.v/2 ?? 0 }${ currentStyle.borderWidthBottom?.u ?? "px"}),
-        0);
     `}
     class="no-drag">
     </section>
@@ -149,7 +118,6 @@ class="no-drag">
     @import "../../../../public/guideline";
 
     main{
-        position: absolute; top:0px; left:0px; 
         display: flex; justify-content: center; align-items: center; flex-direction: column;
         overflow: visible;
     }

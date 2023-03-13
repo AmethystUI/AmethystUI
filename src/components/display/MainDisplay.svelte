@@ -4,6 +4,7 @@
 
     import Div from "./displayElements/Div.svelte";
     import Section from "./displayElements/Section.svelte";
+    import Span from "./displayElements/Span.svelte";
 
     export let leftMenuWidth:number;
     export let rightMenuWidth:number;
@@ -11,10 +12,19 @@
     $: currentComponent = $collection[$selectedComponent];
     $: currentOverride = $selectedOverride !== -1 ? $collection[$selectedComponent].styleOverrides[$selectedOverride] : undefined;
     $: currentStyle = (currentOverride?.style ?? currentComponent?.style) ?? undefined;
+
+    // style={`
+    //     width: calc(${currentStyle.width?.v ?? "0"}${currentStyle.width?.u ?? "px"}
+    //         + ${currentStyle.paddingLeft?.v ?? "0"}${currentStyle.paddingLeft?.u ?? "px"}
+    //         + ${currentStyle.paddingRight?.v ?? "0"}${currentStyle.paddingRight?.u ?? "px"});
+    //     height: calc(${currentStyle.height?.v ?? "0"}${currentStyle.height?.u ?? "px"}
+    //         + ${currentStyle.paddingTop?.v ?? "0"}${currentStyle.paddingTop?.u ?? "px"}
+    //         + ${currentStyle.paddingBottom?.v ?? "0"}${currentStyle.paddingBottom?.u ?? "px"});
+    // `}
 </script>
 
 <!-- HTML -->
-<main style="position:absolute; width:calc(100vw - {leftMenuWidth+1}px - {rightMenuWidth-1}px); left: {leftMenuWidth+1}px; overflow:visible">
+<main class="no-drag" style="position:absolute; width:calc(100vw - {leftMenuWidth+1}px - {rightMenuWidth-1}px); left: {leftMenuWidth+1}px; overflow:visible">
     <!-- if no component or override is selected, show the app hint -->
     {#if $selectedComponent === -1 && $selectedOverride === -1}
     
@@ -31,13 +41,6 @@
             && (!currentStyle.USEBACKGROUND || !!currentStyle.USEBACKGROUND && currentStyle.backgroundColor.a < 10) // background needs to be disabled OR background enabled with opacity at 0
             || currentStyle.opacity < 10// OR opacity is less than 10, then absolutely show
         ) ? "outlined" : ""}
-    `} style={`
-        width: calc(${currentStyle.width?.v ?? "0"}${currentStyle.width?.u ?? "px"}
-            + ${currentStyle.paddingLeft?.v ?? "0"}${currentStyle.paddingLeft?.u ?? "px"}
-            + ${currentStyle.paddingRight?.v ?? "0"}${currentStyle.paddingRight?.u ?? "px"});
-        height: calc(${currentStyle.height?.v ?? "0"}${currentStyle.height?.u ?? "px"}
-            + ${currentStyle.paddingTop?.v ?? "0"}${currentStyle.paddingTop?.u ?? "px"}
-            + ${currentStyle.paddingBottom?.v ?? "0"}${currentStyle.paddingBottom?.u ?? "px"});
     `}>
         <ElementResizer />
 
@@ -45,6 +48,8 @@
             <Div/>
         {:else if currentComponent?.type === "SECTION"}
             <Section/>
+        {:else if currentComponent?.type === "SPAN"}
+            <Span/>
         {/if}
     </section>
     

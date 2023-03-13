@@ -36,8 +36,14 @@
 
     // DEBUG: 
     setTimeout(() => {
-        addComponent("SECTION", {
-        }, true)
+        addComponent("SPAN", {
+                width: {v: 100, u:"fit-content"},
+                height: {v: 40, u:"fit-content"},
+                paddingTop: {v: 10, u:"px"}, paddingRight: {v: 10, u:"px"}, paddingBottom: {v: 10, u:"px"}, paddingLeft: {v: 10, u:"px"},
+                justifyContent: "center", alignItems: "center",
+                content: "Special Style Text",
+                USETEXT: true
+        }, true);
         // simulate clicking on it
         $selectedComponent = 0;
         $focusedComponent = 0;

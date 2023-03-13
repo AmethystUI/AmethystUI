@@ -31,17 +31,15 @@
 </script>
 
 <!-- Container transformation to keep the element in the center -->
-<main class="no-drag">
+<main style={`
+    
+`}
+class="no-drag">
     <!-- We have do this terribleness if we want to use anything with a united attribute. It's also fast -->
     <!-- If you want a quick guide, "currentStyle.width?" checks if width exist on the current style. If it's undefined, it will default to whatever is after the "??" -->
-    <div style={`
+    <span style={`
         width: ${ currentStyle.width?.v ?? "0" }${ currentStyle.width?.u ?? "px" };
         height: ${ currentStyle.height?.v ?? "0" }${ currentStyle.height?.u ?? "px" };
-
-        margin-top: ${ currentStyle.marginTop?.v ?? "auto" }${ currentStyle.marginTop?.u ?? "" };
-        margin-right: ${ currentStyle.marginRight?.v ?? "auto" }${ currentStyle.marginRight?.u ?? "" };
-        margin-bottom: ${ currentStyle.marginBottom?.v ?? "auto" }${ currentStyle.marginBottom?.u ?? "" };
-        margin-left: ${ currentStyle.marginLeft?.v ?? "auto" }${ currentStyle.marginLeft?.u ?? "" };
 
         padding-top: ${ currentStyle.paddingTop?.v ?? "auto" }${ currentStyle.paddingTop?.u ?? "" };
         padding-right: ${ currentStyle.paddingRight?.v ?? "auto" }${ currentStyle.paddingRight?.u ?? "" };
@@ -50,8 +48,7 @@
 
         opacity:${currentStyle.opacity/100 ?? 1};
         
-        overflow-x:${currentStyle.overflowX ?? "auto"};
-        overflow-y:${currentStyle.overflowY ?? "auto"};
+        overflow-x: visible; overflow-y: visible;
 
         ${ // decide whether or not to use the flexbox container by seeing if any flex attribtues are set
             currentStyle.justifyContent !== "none" || currentStyle.alignItems !== "none" ?`
@@ -134,6 +131,8 @@
                 font-style: ${textItalisized ? "italic" : ""};
             ` : ""
         }
+
+        
     `}
     class="no-drag">
         <!-- Text content -->
@@ -143,7 +142,7 @@
                 <br>
             {/each}
         {/if}
-    </div>
+    </span>
 </main>
 
 <style lang="scss">
