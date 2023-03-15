@@ -199,7 +199,7 @@
                 {#if useOverflowX && useOverflowY}
                     <section id="check-container">
                         <input type="checkbox" checked={syncOverflow} on:click={updateOverflowSyncing}>
-                    <img src="./assets/icons/chain.svg" alt="" style="opacity: {syncOverflow ? "1" : "0.5"}">
+                        <img src="./assets/icons/chain.svg" alt="" style="opacity: {syncOverflow ? "1" : "0.5"}">
                     </section>
                 {/if}
             </section>

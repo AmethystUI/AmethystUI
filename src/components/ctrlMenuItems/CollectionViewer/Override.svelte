@@ -52,9 +52,10 @@
             // format the name properly by removing redundant spaces, replacing the spaces with dashes, lower casing all letters, and removing any characters that's not a number or a letter (any symbols or punctuations).
             if (!!$collection[elmntIndex]?.styleOverrides[overrideIndex]) {
                 let name = nameField.textContent
-                    .replace(/[^a-zA-Z0-9\s+\-]/g, "")
-                    .trim()
-                    .replace(/\s+/g, "-")
+                    .replace(/[^a-zA-Z0-9\s+\-]/g, "") // remove any non-alphanumeric characters
+                    .replace(/\-/g, " ") // replace dashes with spaces so we can clear stray dashes
+                    .trim() // trim spaces / dashes
+                    .replace(/\s+/g, "-") // replace multiple spaces with single dash
                 
                 // check to see if name is empty or if the escape key is pressed instead of the enter key.
                 if(name.length === 0 || e.key === "Escape"){
@@ -92,9 +93,10 @@
 
     const changeName = (e:Event):void => {
         let name = nameField.textContent
-            .replace(/[^a-zA-Z0-9\s+\-]/g, "")
-            .trim()
-            .replace(/\s+/g, "-")
+            .replace(/[^a-zA-Z0-9\s+\-]/g, "") // remove any non-alphanumeric characters
+            .replace(/\-/g, " ") // replace dashes with spaces so we can clear stray dashes
+            .trim() // trim spaces / dashes
+            .replace(/\s+/g, "-") // replace multiple spaces with single dash
 
         if($collection[elmntIndex]?.styleOverrides.map(ov => ov.name).indexOf(name) !== -1 && name !== $collection[elmntIndex]?.styleOverrides[overrideIndex].name){
             name = $collection[elmntIndex]?.styleOverrides[overrideIndex].name; // reset name

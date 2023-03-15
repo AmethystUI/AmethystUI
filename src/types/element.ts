@@ -49,7 +49,8 @@ export interface elementStyle{
     outlineOffset? : unitedAttr<number>, // done
 
     USETEXT? : boolean, // done
-    content? : string, // done
+    leadingContent? : string, // done
+    trailingContent? : string, // done
     placeholder? : string, // done
     typeStyle? : typographyStyle, // we have to condense all of these stuff into a single attribute because we have an overlay controlling it. And that requires a single, condensed attr.
     color? : color, // done

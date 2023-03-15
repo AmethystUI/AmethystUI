@@ -34,7 +34,7 @@
 <main class="no-drag">
     <!-- We have do this terribleness if we want to use anything with a united attribute. It's also fast -->
     <!-- If you want a quick guide, "currentStyle.width?" checks if width exist on the current style. If it's undefined, it will default to whatever is after the "??" -->
-    <div style={`
+    <canvas style={`
         width: ${ currentStyle.width?.v ?? "0" }${ currentStyle.width?.u ?? "px" };
         height: ${ currentStyle.height?.v ?? "0" }${ currentStyle.height?.u ?? "px" };
 
@@ -44,21 +44,6 @@
         padding-left: ${ currentStyle.paddingLeft?.v ?? "auto" }${ currentStyle.paddingLeft?.u ?? "" };
 
         opacity:${currentStyle.opacity/100 ?? 1};
-        
-        overflow-x:${currentStyle.overflowX ?? "auto"};
-        overflow-y:${currentStyle.overflowY ?? "auto"};
-
-        ${ // decide whether or not to use the flexbox container by seeing if any flex attribtues are set
-            currentStyle.justifyContent !== "none" || currentStyle.alignItems !== "none" ?`
-                display: flex;
-                ${ // check if justify content is set. If so, use it
-                    currentStyle.justifyContent !== "none" ? `justify-content: ${currentStyle.justifyContent ?? "flex-start"};` : ""
-                }
-                ${ // check if align items is set. If so, use it
-                    currentStyle.alignItems!== "none"? `align-items: ${currentStyle.alignItems?? "flex-start"};` : ""
-                }
-            `: ""
-        }
 
         ${ // only use border styles if border is enabled
             currentStyle["USEBORDER"] ? `
@@ -98,53 +83,14 @@
             ` : ""
         }
 
-        ${ // only use background styles if background is enabled
-            currentStyle["USEBACKGROUND"] ? `
-                background-color: hsla(${currentStyle.backgroundColor.h ?? 0}deg, ${currentStyle.backgroundColor.s ?? 0}%, ${currentStyle.backgroundColor.l ?? 0}%, ${currentStyle.backgroundColor.a ?? 0}%);
-            ` : ""
-        }
-
         ${ // only use shadow styles if background is enabled
             currentStyle["USESHADOW"] ? `
                 box-shadow: ${shadowString};
             ` : ""
         }
-
-        ${ // only use text styles if text is enabled
-            currentStyle["USETEXT"]? `
-                color: hsla(${currentStyle.color.h ?? 0}deg, ${currentStyle.color.s ?? 0}%, ${currentStyle.color.l ?? 0}%, ${currentStyle.color.a ?? 0}%);
-                
-                font-size: ${ currentStyle.typeStyle?.size?.v ?? 14 }${ currentStyle.typeStyle?.size?.u ?? "px" };
-                font-family: "${ currentStyle.typeStyle?.fontObj?.family ?? "Inter" }", Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-                font-weight: ${ currentStyle.typeStyle?.variation ?? "" };
-
-                text-align: ${ currentStyle.typeStyle?.alignment ?? "left" };
-                letter-spacing: ${ currentStyle.typeStyle?.tracking?.v ?? "100%" }${ currentStyle.typeStyle?.tracking?.u ?? "" };
-                line-height: ${ currentStyle.typeStyle?.lineHeight?.v?? "100%" }${ currentStyle.typeStyle?.lineHeight?.u?? "" };
-                text-transform: ${ currentStyle.typeStyle?.casing ?? "none" };
-                ${textUnderlined || textStriked ? // if the text is either underlined or striked
-                    `text-decoration: ${ textUnderlined ? "underline" : "" } ${ textStriked ? "line-through" : "" };
-                    `: ""
-                }
-                font-style: ${textItalisized ? "italic" : ""};
-            ` : ""
-        }
     `}
     class="no-drag">
-        <!-- Text content -->
-        {#if currentStyle.USETEXT}
-            <!-- simulate leading content -->
-            {#each currentStyle.leadingContent.split("\n") as line}
-                {line}
-                <br>
-            {/each}
-            <!-- simulate trailing content -->
-            {#each currentStyle.trailingContent.split("\n") as line}
-                {line}
-                <br>
-            {/each}
-        {/if}
-    </div>
+    </canvas>
 </main>
 
 <style lang="scss">

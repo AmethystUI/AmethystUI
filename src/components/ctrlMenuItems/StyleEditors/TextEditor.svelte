@@ -82,12 +82,15 @@
         }
     }
 
-    let content: string = "";
+    let leadingContent: string = "";
+    let trailingContent: string = "";
     let placeholder: string = "";
 
     // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
     $: useText = $activeStyles.USETEXT;
-    $: useContent = $activeStyles.content;
+    $: useLeadingContent = $activeStyles.leadingContent;
+    $: useTrailingContent = $activeStyles.trailingContent;
+    $: useContent = useLeadingContent || useTrailingContent;
     $: usePlaceholder = $activeStyles.placeholder;
     $: useTypefaceSettings = $activeStyles.typeStyle && $activeStyles.color;
 
@@ -95,7 +98,7 @@
         currentStyle["USETEXT"] = !!currentStyle["USETEXT"];
 
         // text color
-        if(useContent){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
+        if(useTypefaceSettings){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
             if(!currentStyle.color) currentStyle.color = clr;
             clr = currentStyle.color;
 
@@ -105,9 +108,12 @@
         }
 
         // initial text
-        if(useContent){
-            if(currentStyle.content === undefined) currentStyle.content = content;
-            content = currentStyle.content;
+        if(useLeadingContent){
+            if(currentStyle.leadingContent === undefined) currentStyle.leadingContent = leadingContent;
+            leadingContent = currentStyle.leadingContent;
+        } if(useTrailingContent){
+            if(currentStyle.trailingContent === undefined) currentStyle.trailingContent = trailingContent;
+            trailingContent = currentStyle.trailingContent;
         }
 
         // initial place holder
@@ -191,11 +197,14 @@
         $collection = $collection;
     }
 
-    const updateTextContent = (evt:CustomEvent<any>) => {
+    const updateTextContent = (evt:CustomEvent<any>, leading:boolean) => {
         if($selectedOverride !== -1){ // if no override is selected
-            $collection[$selectedComponent].styleOverrides[$selectedOverride].style.content = evt.detail.v;
+            $collection[$selectedComponent]
+            .styleOverrides[$selectedOverride]
+            .style[`${leading ? "leadingContent" : "trailingContent"}`] = evt.detail.v;
         } else {
-            $collection[$selectedComponent].style.content = evt.detail.v;
+            $collection[$selectedComponent]
+            .style[`${leading ? "leadingContent" : "trailingContent"}`] = evt.detail.v;
         }
     }
 
@@ -225,7 +234,13 @@
 
             <!-- Content -->
             {#if useContent}
-                <TextAreaInput name={"Content"} placeHolder={"Lorem ipsum dolor sit amet."} v={content} hasMargin={false} sub={false} currentParenteWidth={currentParentWidth} on:updateValue={updateTextContent}/>
+                <Title name="Auxiliary Content"></Title>
+
+                <div style="height: 1px; margin:0; padding:0"></div>
+
+                <TextAreaInput name={"Leading Text"} placeHolder={"Lorem ipsum dolor sit amet."} v={leadingContent} hasMargin={false} sub={true} currentParenteWidth={currentParentWidth} on:updateValue={e => updateTextContent(e, true)}/>
+                
+                <TextAreaInput name={"Trailing Text"} placeHolder={"Lorem ipsum dolor sit amet."} v={trailingContent} hasMargin={false} sub={true} currentParenteWidth={currentParentWidth} on:updateValue={e => updateTextContent(e, false)}/>
             {/if}
             {#if usePlaceholder}
                 <div class="spacer"></div>

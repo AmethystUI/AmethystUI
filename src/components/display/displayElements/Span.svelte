@@ -48,7 +48,7 @@ class="no-drag">
 
         opacity:${currentStyle.opacity/100 ?? 1};
         
-        overflow-x: visible; overflow-y: visible;
+    overflow-x: visible; overflow-y: visible;
 
         ${ // decide whether or not to use the flexbox container by seeing if any flex attribtues are set
             currentStyle.justifyContent !== "none" || currentStyle.alignItems !== "none" ?`
@@ -137,9 +137,19 @@ class="no-drag">
     class="no-drag">
         <!-- Text content -->
         {#if currentStyle.USETEXT}
-            {#each currentStyle.content.split("\n") as line}
+            <!-- simulate leading content -->
+            {#each currentStyle.leadingContent.split("\n") as line}
                 {line}
-                <br>
+                {#if currentStyle.leadingContent.split("\n").length > 1}
+                    <br>
+                {/if}
+            {/each}
+            <!-- simulate trailing content -->
+            {#each currentStyle.trailingContent.split("\n") as line}
+                {line}
+                {#if currentStyle.trailingContent.split("\n").length > 1}
+                    <br>
+                {/if}
             {/each}
         {/if}
     </span>

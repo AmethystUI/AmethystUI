@@ -30,7 +30,8 @@
                 height: {v: 40, u:"fit-content"},
                 paddingTop: {v: 10, u:"px"}, paddingRight: {v: 10, u:"px"}, paddingBottom: {v: 10, u:"px"}, paddingLeft: {v: 10, u:"px"},
                 justifyContent: "center", alignItems: "center",
-                content: "Special Text",
+                leadingContent: "⚡️",
+                trailingContent: "Special Style Text",
                 USETEXT: true
             }, true)}
         },
@@ -40,13 +41,15 @@
         //     iconSrc : HTMltagInfo["BODY"].iconURI,
         //     desc: "<body>",
         //     cta : () => {addComponent("BODY", {})}
-        // },{ // canvas
-        //     type : "reg",
-        //     title : HTMltagInfo["CANVAS"].name,
-        //     iconSrc : HTMltagInfo["CANVAS"].iconURI,
-        //     desc: "<canvas>",
-        //     cta : () => {addComponent("CANVAS", {})}
         // },
+        
+        { // canvas
+            type : "reg",
+            title : HTMltagInfo["CANVAS"].name,
+            iconSrc : HTMltagInfo["CANVAS"].iconURI,
+            desc: "<canvas>",
+            cta : () => {addComponent("CANVAS", {})}
+        },
         
         { // ==========
             type : "sep",

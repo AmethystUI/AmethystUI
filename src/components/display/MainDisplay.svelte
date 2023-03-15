@@ -1,6 +1,7 @@
 <script lang="ts">
     import { collection, selectedComponent, selectedOverride } from "../../stores/collection";
     import ElementResizer from "./displayControl/ElementResizer.svelte";
+    import Canvas from "./displayElements/Canvas.svelte";
 
     import Div from "./displayElements/Div.svelte";
     import Section from "./displayElements/Section.svelte";
@@ -50,6 +51,8 @@
             <Section/>
         {:else if currentComponent?.type === "SPAN"}
             <Span/>
+        {:else if currentComponent?.type === "CANVAS"}
+            <Canvas/>
         {/if}
     </section>
     
