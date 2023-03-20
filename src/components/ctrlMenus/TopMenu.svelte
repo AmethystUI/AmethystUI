@@ -3,9 +3,6 @@
     import type { elementStyle } from "../../types/element";
     import { HTMltagInfo } from "../../types/general";
 
-    // define default values
-    const defaultDivStyle:elementStyle = {}
-
     // define menus here so we can edit them from outside of this component
     export let addMenuItems:menuItem[] = [
         { // div
@@ -13,13 +10,13 @@
             title : HTMltagInfo["DIV"].name,
             iconSrc : HTMltagInfo["DIV"].iconURI,
             desc: "<div>",
-            cta : () => {addComponent("DIV", {}, true)}
+            cta : () => {addComponent("DIV", {})}
         },{ // section
             type : "reg",
             title : HTMltagInfo["SECTION"].name,
             iconSrc : HTMltagInfo["SECTION"].iconURI,
             desc: "<section>",
-            cta : () => {addComponent("SECTION", {}, true)}
+            cta : () => {addComponent("SECTION", {})}
         }, { // span
             type : "reg",
             title : HTMltagInfo["SPAN"].name,
@@ -30,10 +27,9 @@
                 height: {v: 40, u:"fit-content"},
                 paddingTop: {v: 10, u:"px"}, paddingRight: {v: 10, u:"px"}, paddingBottom: {v: 10, u:"px"}, paddingLeft: {v: 10, u:"px"},
                 justifyContent: "center", alignItems: "center",
-                leadingContent: "⚡️",
-                trailingContent: "Special Style Text",
+                leadingContent: "Special Style Text",
                 USETEXT: true
-            }, true)}
+            })}
         },
         // { // body
         //     type : "reg",
@@ -42,13 +38,16 @@
         //     desc: "<body>",
         //     cta : () => {addComponent("BODY", {})}
         // },
-        
+
         { // canvas
             type : "reg",
             title : HTMltagInfo["CANVAS"].name,
             iconSrc : HTMltagInfo["CANVAS"].iconURI,
             desc: "<canvas>",
-            cta : () => {addComponent("CANVAS", {})}
+            cta : () => {addComponent("CANVAS", {
+                width: {v: 400, u:"px"},
+                height: {v: 250, u:"px"},
+            })}
         },
         
         { // ==========
@@ -197,25 +196,41 @@
         currentID : "",
         active : false,
     }
-    const toggleDropdown = () => {
-        dropdownStatus.active = !dropdownStatus.active;
-        // reset global mouse down
-        document.onmouseup = undefined;
+
+    const closeOverlay = (e?: MouseEvent | KeyboardEvent) => { // this function should close any overlay that is open
+        // prevent event propagation
+        if(e) e.stopPropagation();
+
+        // change activation to false, and then remove all the global listeners for listening to close
+        dropdownStatus.active = false;
         
-        // if active, set global mouseup so that any click outside of the box will togggle again. Give it a bit of delay so it works
-        setTimeout(() => {
-            if(dropdownStatus.active){
-                document.onmouseup = e => {
-                    dropdownStatus.active = false;
-                };
-                return;
-            }
+        setTimeout(() => { // add these at the next tick so the overlay can be opened again
+            document.onmousedown = undefined;
+            document.onkeydown = undefined;
         }, 0);
+    }
+    const openOverlay = () => { // this function should open the overlay that has the matching ID
+        // change activation to true, and then add some global listeners for listening to close
+        dropdownStatus.active = true;
+        
+        setTimeout(() => { // add these at the next tick so that the overlay is not closed before the menu is opened
+            document.onmousedown = e => closeOverlay(e);
+            document.onkeydown = e => closeOverlay(e);
+        }, 0);
+    }
+
+    const toggleDropdown = () => {        
+        // toggle the activation state and open / close the overlay
+        if(dropdownStatus.active){ // our initial state is open. We need to close it
+            closeOverlay();
+        } else {
+            openOverlay();
+        }
     };
-    const forceOpenDropdown = () => {
+    const keepOpenDropdown = () => {
         setTimeout(() => {
             dropdownStatus.active = true;
-        },0)
+        }, 0)
     }
     const updateCurrentID = (evt:CustomEvent<any>) => {
         dropdownStatus.currentID = evt.detail.newID;
@@ -226,7 +241,7 @@
 <main style="position:absolute; width:calc(100vw - {leftMenuWidth}px); position:absolute; left:{leftMenuWidth}px">
     <!-- add elements -->
     <section id="left-ctrl">
-        <DropdownControl imageURI="./assets/icons/plus.svg" alt="Add element" id="addElement" items={addMenuItems} {...dropdownStatus} on:toggleDropdown={toggleDropdown} on:forceOpenDropdown={forceOpenDropdown} on:updateCurrentID={updateCurrentID} evenSpacing={true}/>
+        <DropdownControl imageURI="./assets/icons/plus.svg" alt="Add element" id="addElement" items={addMenuItems} {...dropdownStatus} on:openDropdown={openOverlay} on:closeDropdown={() => closeOverlay()} on:keepOpenDropdown={keepOpenDropdown} on:updateCurrentID={updateCurrentID} evenSpacing={true}/>
     
         <section>
             <FileNameEditor leftMenuWidth={leftMenuWidth} controlSectionWidth={appControlContWidth}/>
@@ -234,7 +249,7 @@
         </section>
     </section>
 
-    <GeneralAppControl on:widthChange={appCtrlContWidthChange} on:toggleDropdown={toggleDropdown}  on:forceOpenDropdown={forceOpenDropdown} on:updateCurrentID={updateCurrentID}/>
+    <GeneralAppControl on:widthChange={appCtrlContWidthChange} on:toggleDropdown={toggleDropdown}  on:forceOpenDropdown={keepOpenDropdown} on:updateCurrentID={updateCurrentID}/>
 </main>
 
 <!-- STYLE -->

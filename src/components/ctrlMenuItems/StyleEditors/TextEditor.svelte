@@ -59,7 +59,7 @@
     // these variables just make the code look nicer
     let clr:color = initializeColorFromHSLA(0, 0, 100, 100); // default text color
 
-    let fontRef: typographyStyle = {
+    const initialFontRef: typographyStyle = {
         fontObj: {
             family: "system-ui",
             appearedName: "System UI",
@@ -81,6 +81,7 @@
             v: 0, u: "px"
         }
     }
+    let fontRef = {...initialFontRef};
 
     let leadingContent: string = "";
     let trailingContent: string = "";
@@ -99,26 +100,38 @@
 
         // text color
         if(useTypefaceSettings){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
-            if(!currentStyle.color) currentStyle.color = clr;
+            if(!currentStyle.color) currentStyle.color = initializeColorFromHSLA(0, 0, 100, 100);
             clr = currentStyle.color;
 
-            // typeface
-            if(!currentStyle.typeStyle) currentStyle.typeStyle = fontRef;
-            fontRef = currentStyle.typeStyle;
+            // typeface setup. We have to do some special initialization 
+            if(!currentStyle.typeStyle){
+                currentStyle.typeStyle = {...initialFontRef};
+                fontRef = currentStyle.typeStyle;
+            } else if (Object.keys(currentStyle.typeStyle).length !== Object.keys(fontRef).length) {
+                for(let i = 0; i < Object.keys(currentStyle?.typeStyle ?? {}).length; i++){
+                    const currentKey = Object.keys(currentStyle.typeStyle)[i];
+                    fontRef[currentKey] = currentStyle.typeStyle[currentKey]; // update our default font object if there is some stuff in the current style already.
+                }
+                // initialize all values
+                currentStyle.typeStyle = fontRef;
+                fontRef = currentStyle.typeStyle;
+            } else {
+                fontRef = currentStyle.typeStyle;
+            }
         }
 
         // initial text
         if(useLeadingContent){
-            if(currentStyle.leadingContent === undefined) currentStyle.leadingContent = leadingContent;
+            if(currentStyle.leadingContent === undefined) currentStyle.leadingContent = "";
             leadingContent = currentStyle.leadingContent;
         } if(useTrailingContent){
-            if(currentStyle.trailingContent === undefined) currentStyle.trailingContent = trailingContent;
+            if(currentStyle.trailingContent === undefined) currentStyle.trailingContent = "";
             trailingContent = currentStyle.trailingContent;
         }
 
         // initial place holder
         if(usePlaceholder){
-            if(currentStyle.placeholder === undefined) currentStyle.placeholder = placeholder;
+            if(currentStyle.placeholder === undefined) currentStyle.placeholder = "";
             placeholder = currentStyle.placeholder;
         }
     }

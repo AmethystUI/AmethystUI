@@ -4,6 +4,7 @@
     import Canvas from "./displayElements/Canvas.svelte";
 
     import Div from "./displayElements/Div.svelte";
+    import H1 from "./displayElements/H1.svelte";
     import Section from "./displayElements/Section.svelte";
     import Span from "./displayElements/Span.svelte";
 
@@ -53,6 +54,8 @@
             <Span/>
         {:else if currentComponent?.type === "CANVAS"}
             <Canvas/>
+        {:else if currentComponent?.type === "H1"}
+            <H1/>
         {/if}
     </section>
     

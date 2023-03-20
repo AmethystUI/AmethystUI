@@ -18,7 +18,7 @@ export let layerBlurLock = writable<boolean>(false); // this is for locking the 
  * @param {elementStyle} [defaultStyle={}] - The default style of the new component to add.
  * @param {boolean} [showOutline=false] - Whether or not to show an outline around the new component.
  */
-export const addComponent = (type:HTMLtags, defaultStyle:elementStyle={}, showOutline=false) => {
+export const addComponent = (type:HTMLtags, defaultStyle:elementStyle={}, showOutline=true) => {
     let currCollection = get(collection);
     // check if type aready exist in currCollection
     for(let i = 0; i < currCollection.length; i++){

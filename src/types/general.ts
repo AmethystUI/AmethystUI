@@ -73,17 +73,17 @@ export interface shadow{ // text shadow (Still need to be implemented)
 }
 
 export interface typographyStyle{
-    fontObj : fontObject, // the font object that contains most of the information we need
-    variation : number, // basically the weight
+    fontObj? : fontObject, // the font object that contains most of the information we need
+    variation? : number, // basically the weight
     
-    textDecorations: textDecoration[],
+    textDecorations? : textDecoration[],
 
-    casing: textCasing,
-    alignment: textAlignment,
+    casing? : textCasing,
+    alignment? : textAlignment,
 
-    size : unitedAttr<number>,
-    tracking :unitedAttr<number>,
-    lineHeight : unitedAttr<number>,
+    size? : unitedAttr<number>,
+    tracking? :unitedAttr<number>,
+    lineHeight? : unitedAttr<number>,
 }
 
 export interface color{

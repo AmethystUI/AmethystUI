@@ -36,8 +36,7 @@
     $: if(!!currentStyle){ // these variables just make the code look nicer
         // size
         if(useWidthAndHeight){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
-
-            if(!currentStyle.width) currentStyle.width = {v:100,u:"px"};            
+            if(!currentStyle.width) currentStyle.width = {v:100,u:"px"};
             cW = currentStyle.width.v;
             cWu = currentStyle.width.u;
             if(!currentStyle.height) currentStyle.height = {v:100,u:"px"};

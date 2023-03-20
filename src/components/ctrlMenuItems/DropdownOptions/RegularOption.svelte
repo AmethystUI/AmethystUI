@@ -2,9 +2,15 @@
     import type { menuItem } from "../GeneralAppControl/DropdownControl.svelte";
 
     export let options : menuItem;
+
+    let hovered = false;
 </script>
 
-<main title={options.title} on:mouseup={options.cta}>
+<main title={options.title} class="{hovered ? "hovered" : ""}"
+    on:mouseup={options.cta}
+    on:mouseover={() => {hovered = true}} on:focus={undefined}
+    on:mouseleave={() => {hovered = false}} on:blur={undefined}>
+
     <section>
         <!-- icons -->
         {#if !!options.iconSrc}
@@ -33,12 +39,7 @@
         cursor:pointer;
         user-select: none; -webkit-user-select: none;
 
-        #desc{
-            color: $secondary !important;
-            opacity: 0.3 !important;
-        }
-
-        &:hover{
+        &.hovered{
             background-color: $accent;
 
             #desc{
@@ -54,6 +55,11 @@
                     color: $secondary
                 }
             }
+        }
+
+        #desc{
+            color: $secondary !important;
+            opacity: 0.3 !important;
         }
 
         section{

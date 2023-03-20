@@ -28,7 +28,7 @@
         // currentStyle["USESHADOW"] = true; // debugging force open
 
         // update shadows
-        if(!currentStyle["boxShadows"]) currentStyle["boxShadows"] = shadows;
+        if(!currentStyle["boxShadows"]) currentStyle["boxShadows"] = [];
         shadows = currentStyle["boxShadows"];
     }
 

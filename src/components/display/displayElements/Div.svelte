@@ -136,12 +136,16 @@
             <!-- simulate leading content -->
             {#each currentStyle.leadingContent.split("\n") as line}
                 {line}
-                <br>
+                {#if currentStyle.leadingContent.split("\n").length > 1}
+                    <br>
+                {/if}
             {/each}
             <!-- simulate trailing content -->
             {#each currentStyle.trailingContent.split("\n") as line}
                 {line}
-                <br>
+                {#if currentStyle.trailingContent.split("\n").length > 1}
+                    <br>
+                {/if}
             {/each}
         {/if}
     </div>

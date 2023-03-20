@@ -5,9 +5,12 @@
 
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
-    onMount(() => {
-        $collection = $collection
-    }); // required to refresh the current style so all the initialized values can load.
+    onMount(() => { $collection = $collection }); // required to refresh the current style so all the initialized values can load.
+    
+    // specific style shortcuts
+    $: textItalisized = !!currentStyle ? currentStyle?.typeStyle?.textDecorations?.includes("italicize") ?? false : false;
+    $: textUnderlined = !!currentStyle ? currentStyle?.typeStyle?.textDecorations?.includes("underline") ?? false : false;
+    $: textStriked = !!currentStyle ? currentStyle?.typeStyle?.textDecorations?.includes("strike") ?? false : false;
 
     const generateShadowString = (shadow: boxShadow):string => {
         return `${shadow.x.v}${shadow.x.u} ` +
@@ -31,7 +34,7 @@
 <main class="no-drag">
     <!-- We have do this terribleness if we want to use anything with a united attribute. It's also fast -->
     <!-- If you want a quick guide, "currentStyle.width?" checks if width exist on the current style. If it's undefined, it will default to whatever is after the "??" -->
-    <section style={`
+    <h1 style={`
         width: ${ currentStyle.width?.v ?? "0" }${ currentStyle.width?.u ?? "px" };
         height: ${ currentStyle.height?.v ?? "0" }${ currentStyle.height?.u ?? "px" };
 
@@ -77,24 +80,6 @@
             ` : ""
         }
 
-        ${ // only use outline styles if outline is enabled
-            currentStyle["USEOUTLINE"] ? `
-                ${!currentStyle["USEBORDER"] ? `
-                    border-radius:
-                        ${ currentStyle.borderRadiusTop?.v ?? 0 }${ currentStyle.borderRadiusTop?.u ?? ""}
-                        ${ currentStyle.borderRadiusRight?.v ?? 0 }${ currentStyle.borderRadiusRight?.u ?? ""}
-                        ${ currentStyle.borderRadiusBottom?.v ?? 0 }${ currentStyle.borderRadiusBottom?.u ?? ""}
-                        ${ currentStyle.borderRadiusLeft?.v ?? 0 }${ currentStyle.borderRadiusLeft?.u ?? ""};
-                ` : ""}
-
-                outline-style: ${ currentStyle.outlineStyle ?? "solid" };
-                outline-width: ${ currentStyle.outlineWidth?.v ?? 0 }${ currentStyle.outlineWidth?.u ?? "" };
-                outline-offset:${ currentStyle.outlineOffset?.v ?? 0 }${ currentStyle.outlineOffset?.u ?? ""};
-                
-                outline-color: hsla(${currentStyle.outlineColor.h ?? 0}deg, ${currentStyle.outlineColor.s ?? 0}%, ${currentStyle.outlineColor.l ?? 0}%, ${currentStyle.outlineColor.a ?? 0}%);
-            ` : ""
-        }
-
         ${ // only use background styles if background is enabled
             currentStyle["USEBACKGROUND"] ? `
                 background-color: hsla(${currentStyle.backgroundColor.h ?? 0}deg, ${currentStyle.backgroundColor.s ?? 0}%, ${currentStyle.backgroundColor.l ?? 0}%, ${currentStyle.backgroundColor.a ?? 0}%);
@@ -103,12 +88,49 @@
 
         ${ // only use shadow styles if background is enabled
             currentStyle["USESHADOW"] ? `
-                box-shadow: ${shadowString};
+                text-shadow: ${shadowString};
+            ` : ""
+        }
+
+        ${ // only use text styles if text is enabled
+            currentStyle["USETEXT"]? `
+                color: hsla(${currentStyle.color.h ?? 0}deg, ${currentStyle.color.s ?? 0}%, ${currentStyle.color.l ?? 0}%, ${currentStyle.color.a ?? 0}%);
+                
+                font-size: ${ currentStyle.typeStyle?.size?.v ?? 14 }${ currentStyle.typeStyle?.size?.u ?? "px" };
+                font-family: "${ currentStyle.typeStyle?.fontObj?.family ?? "Inter" }", Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+                font-weight: ${ currentStyle.typeStyle?.variation ?? "" };
+
+                text-align: ${ currentStyle.typeStyle?.alignment ?? "left" };
+                letter-spacing: ${ currentStyle.typeStyle?.tracking?.v ?? "100%" }${ currentStyle.typeStyle?.tracking?.u ?? "" };
+                line-height: ${ currentStyle.typeStyle?.lineHeight?.v?? "100%" }${ currentStyle.typeStyle?.lineHeight?.u?? "" };
+                text-transform: ${ currentStyle.typeStyle?.casing ?? "none" };
+                ${textUnderlined || textStriked ? // if the text is either underlined or striked
+                    `text-decoration: ${ textUnderlined ? "underline" : "" } ${ textStriked ? "line-through" : "" };
+                    `: ""
+                }
+                font-style: ${textItalisized ? "italic" : ""};
             ` : ""
         }
     `}
     class="no-drag">
-    </section>
+        <!-- Text content -->
+        {#if currentStyle.USETEXT}
+            <!-- simulate leading content -->
+            {#each currentStyle.leadingContent.split("\n") as line}
+                {line}
+                {#if currentStyle.leadingContent.split("\n").length > 1}
+                    <br>
+                {/if}
+            {/each}
+            <!-- simulate trailing content -->
+            {#each currentStyle.trailingContent.split("\n") as line}
+                {line}
+                {#if currentStyle.trailingContent.split("\n").length > 1}
+                    <br>
+                {/if}
+            {/each}
+        {/if}
+    </h1>
 </main>
 
 <style lang="scss">

@@ -86,7 +86,7 @@
 
         // outline style
         if(useStyle){
-            if(!currentStyle["outlineStyle"]) currentStyle["outlineStyle"] = style
+            if(!currentStyle["outlineStyle"]) currentStyle["outlineStyle"] = "solid"
             style = currentStyle["outlineStyle"];
         }
     }

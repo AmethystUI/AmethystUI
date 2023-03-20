@@ -28,14 +28,30 @@
 
     let openLocked = true;
 
-    const toggleDropdown = ():void => { // toggle the dropdown menu through dispatch
-        if(!openLocked){
-            disp("toggleDropdown");
-            openLocked = true;
+    let clickStartTime: number;
+    let clickEndTime: number;
 
-            if(!active) document.addEventListener("keydown", closeOverlay);
+    const openDropdown = ():void => { // toggle the dropdown menu through dispatch
+        disp("openDropdown");
+        // start timing when the user releases the mouse button. We should use this information to determine if the user is doing a long click or not
+        clickStartTime = performance.now();
+    }
+    const closeDropdown = (e):void => {
+        clickEndTime = performance.now();
+        if(Math.abs(clickEndTime - clickStartTime) > 350) { // the delay between click and release is larger than 350ms, which means the user is doing a long click
+            disp("closeDropdown");
         }
-    };
+    }
+    const keepOpenDropdown = ():void => {
+        if(clickEndTime - clickStartTime < 0) clickEndTime = performance.now(); // if the delay is less than 0, the user is probably doing a drag click, as we stopped propagating the event for updating the end time in closeDropdown(). So we need to update the end time here again.
+
+        if(clickEndTime - clickStartTime < 350) { // only keep open the dropdown if the user is not doing a long click (drag click)
+            disp("keepOpenDropdown");
+        } else {
+            disp("closeDropdown");
+        }
+    }
+
     const updateCurrentID = ():void => {
         disp("updateCurrentID", {
             newID : id
@@ -52,7 +68,7 @@
         setTimeout(() => {
             if((!e["key"] && !openLocked) || (!!e["key"] && e["key"] === "Escape")){ // if not locked, remove picker overlay
                 openLocked = true;
-                disp("toggleDropdown");
+                // disp("toggleDropdown");
                 // add event listner to close the overlay
                 document.removeEventListener("mousedown", closeOverlay);
                 document.removeEventListener("mouseup", unlockToggleLock);
@@ -64,12 +80,12 @@
 
 <!-- show the highlight and dropdown menu when active -->
 <main>
-    <section on:mousedown={unlockToggleLock} on:mouseup={toggleDropdown} on:mouseenter={updateCurrentID} title={alt} class="{(active && id === currentID) ? "highlight" : ""} {evenSpacing ? "evenly-spaced" : ""}">
+    <section on:mousedown={openDropdown} on:mouseup={closeDropdown} on:mouseenter={updateCurrentID} title={alt} class="{(active && id === currentID) ? "highlight" : ""} {evenSpacing ? "evenly-spaced" : ""}">
         <img src={imageURI} alt={alt}>
         <img class="more-options" src="./assets/icons/chevron-down.svg" alt="">
     </section>
 
-    <div on:mouseup={() => disp("forceOpenDropdown")} class="optionContainer {active && id === currentID ? "" : "hidden"}">
+    <div on:mousedown={e => e.stopPropagation()} on:mouseup={keepOpenDropdown} class="optionContainer {active && id === currentID ? "" : "hidden"}">
         {#each items as item (item)}
             {#if item.type === "reg"}
                 <RegularOption options={item}/>

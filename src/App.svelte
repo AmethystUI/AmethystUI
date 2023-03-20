@@ -36,7 +36,18 @@
 
     // DEBUG: 
     setTimeout(() => {
-        addComponent("CANVAS", {
+        addComponent("H1", {
+            width: {v: 120, u: "fit-content"},
+            height: {v: 30, u: "fit-content"},
+            justifyContent: "center", alignItems: "flex-start",
+            USETEXT: true,
+            leadingContent: "Title Text",
+            typeStyle: {
+                size: {v: 42, u: "pt"},
+                lineHeight: {v: 120, u: "%"},
+                variation: 700
+            }
+
         }, true);
         // simulate clicking on it
         $selectedComponent = 0;

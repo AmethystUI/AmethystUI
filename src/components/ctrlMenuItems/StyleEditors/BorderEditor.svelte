@@ -99,16 +99,16 @@
 
         // border style
         if(useStyleTop){
-            if(!currentStyle["borderStyleTop"]) currentStyle["borderStyleTop"] = styleTop;
+            if(!currentStyle["borderStyleTop"]) currentStyle["borderStyleTop"] = "solid";
             styleTop = currentStyle["borderStyleTop"];
         } if(useStyleRight){
-            if(!currentStyle["borderStyleRight"]) currentStyle["borderStyleRight"] = styleRight;
+            if(!currentStyle["borderStyleRight"]) currentStyle["borderStyleRight"] = "solid";
             styleRight = currentStyle["borderStyleRight"];
         } if(useStyleBottom){
-            if(!currentStyle["borderStyleBottom"]) currentStyle["borderStyleBottom"] = styleBottom;
+            if(!currentStyle["borderStyleBottom"]) currentStyle["borderStyleBottom"] = "solid";
             styleBottom = currentStyle["borderStyleBottom"];
         } if(useStyleLeft){
-            if(!currentStyle["borderStyleLeft"]) currentStyle["borderStyleLeft"] = styleLeft;
+            if(!currentStyle["borderStyleLeft"]) currentStyle["borderStyleLeft"] = "solid";
             styleLeft = currentStyle["borderStyleLeft"];
         }
     }

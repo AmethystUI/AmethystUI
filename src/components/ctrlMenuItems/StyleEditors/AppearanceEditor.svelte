@@ -93,25 +93,25 @@
         
         // opacity
         if(useOpacity){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
-            if(currentStyle.opacity === undefined) currentStyle.opacity = opacity;
+            if(currentStyle.opacity === undefined) currentStyle.opacity = 100;
             opacity = currentStyle.opacity;
         }
         
         // overflows
         if(useOverflowX){
-            if(!currentStyle.overflowX) currentStyle.overflowX = overflowX;
+            if(!currentStyle.overflowX) currentStyle.overflowX = "auto";
             overflowX = currentStyle.overflowX;
         } if(useOverflowY){
-            if(!currentStyle.overflowY) currentStyle.overflowY = overflowY;
+            if(!currentStyle.overflowY) currentStyle.overflowY = "auto";
             overflowY = currentStyle.overflowY;
         }
 
         // alignments
         if(useAlignX){
-            if(!currentStyle.justifyContent) currentStyle.justifyContent = alignX;
+            if(!currentStyle.justifyContent) currentStyle.justifyContent = "none";
             alignX = currentStyle.justifyContent;
         } if (useAlignY) {
-            if(!currentStyle.alignItems) currentStyle.alignItems = alignY;
+            if(!currentStyle.alignItems) currentStyle.alignItems = "none";
             alignY = currentStyle.alignItems;
         }
     }
