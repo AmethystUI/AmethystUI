@@ -39,8 +39,16 @@
         valueInputField.style.height = (valueInputField.scrollHeight-1)+"px";
     }
 
-    $: if(currentParenteWidth !== undefined){ // update the growth whenever the parent is resized
+    // grow based on change in size
+    $: if(currentParenteWidth !== undefined){
         autoGrow();
+    }
+
+    // grow based on change in value
+    let oldValue = "";
+    $: if(!!valueInputField && v !== valueInputField.value) {
+        valueInputField.value = v; // usually the HTML element will have its value lag behind a bit. So we'll just catch it up here.
+        autoGrow(); // auto grow
     }
 
     // dispatch value changes if v changes

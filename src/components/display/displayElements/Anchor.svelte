@@ -4,8 +4,6 @@
     import type { boxShadow } from "../../../types/general";
     import TextContent from "./util/TextContent.svelte";
 
-    export let headingType: string;
-
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
     onMount(() => { $collection = $collection }); // required to refresh the current style so all the initialized values can load.
@@ -15,7 +13,26 @@
     $: textUnderlined = !!currentStyle ? currentStyle?.typeStyle?.textDecorations?.includes("underline") ?? false : false;
     $: textStriked = !!currentStyle ? currentStyle?.typeStyle?.textDecorations?.includes("strike") ?? false : false;
 
-    $: dynamicStyle = `
+    const generateShadowString = (shadow: boxShadow):string => {
+        return `${shadow.x.v}${shadow.x.u} ` +
+                `${shadow.y.v}${shadow.y.u} ` +
+                `${shadow.radius.v}${shadow.radius.u} ` +
+                `hsla(${shadow.color.h}deg, ${shadow.color.s}%, ${shadow.color.l}%, ${shadow.color.a}%)`;
+    }
+    let shadowString = "";
+    $: if(!!currentStyle.boxShadows && currentStyle.boxShadows.length > 0) {
+        shadowString = generateShadowString(currentStyle.boxShadows[0]);
+        for(let i = 1; i < currentStyle.boxShadows.length; i++){
+            shadowString += ", " + generateShadowString(currentStyle.boxShadows[i]);
+        }
+    } else {
+        shadowString = "none";
+    }
+</script>
+
+<!-- Container transformation to keep the element in the center -->
+<main class="no-drag">
+    <a style={`
         width: ${ !currentStyle.width?.v ? "0" : currentStyle.width?.u === "fit-content" ? "" : currentStyle.width?.v }${ currentStyle.width?.u ?? "px" };
         height: ${ !currentStyle.height?.v ? "0" : currentStyle.height?.u === "fit-content" ? "" : currentStyle.height?.v }${ currentStyle.height?.u ?? "px" };
 
@@ -61,6 +78,24 @@
             ` : ""
         }
 
+        ${ // only use outline styles if outline is enabled
+            currentStyle["USEOUTLINE"] ? `
+                ${!currentStyle["USEBORDER"] ? `
+                    border-radius:
+                        ${ currentStyle.borderRadiusTop?.v ?? 0 }${ currentStyle.borderRadiusTop?.u ?? ""}
+                        ${ currentStyle.borderRadiusRight?.v ?? 0 }${ currentStyle.borderRadiusRight?.u ?? ""}
+                        ${ currentStyle.borderRadiusBottom?.v ?? 0 }${ currentStyle.borderRadiusBottom?.u ?? ""}
+                        ${ currentStyle.borderRadiusLeft?.v ?? 0 }${ currentStyle.borderRadiusLeft?.u ?? ""};
+                ` : ""}
+
+                outline-style: ${ currentStyle.outlineStyle ?? "solid" };
+                outline-width: ${ currentStyle.outlineWidth?.v ?? 0 }${ currentStyle.outlineWidth?.u ?? "" };
+                outline-offset:${ currentStyle.outlineOffset?.v ?? 0 }${ currentStyle.outlineOffset?.u ?? ""};
+                
+                outline-color: hsla(${currentStyle.outlineColor.h ?? 0}deg, ${currentStyle.outlineColor.s ?? 0}%, ${currentStyle.outlineColor.l ?? 0}%, ${currentStyle.outlineColor.a ?? 0}%);
+            ` : ""
+        }
+
         ${ // only use background styles if background is enabled
             currentStyle["USEBACKGROUND"] ? `
                 background-color: hsla(${currentStyle.backgroundColor.h ?? 0}deg, ${currentStyle.backgroundColor.s ?? 0}%, ${currentStyle.backgroundColor.l ?? 0}%, ${currentStyle.backgroundColor.a ?? 0}%);
@@ -87,45 +122,12 @@
                 text-transform: ${ currentStyle.typeStyle?.casing ?? "none" };
                 ${textUnderlined || textStriked ? // if the text is either underlined or striked
                     `text-decoration: ${ textUnderlined ? "underline" : "" } ${ textStriked ? "line-through" : "" };
-                    `: ""
+                    `: "text-decoration: none;"
                 }
-                font-style: ${textItalisized ? "italic" : ""};
+                font-style: ${textItalisized ? "italic" : "none"};
             ` : ""
         }
-    `
-
-    const generateShadowString = (shadow: boxShadow):string => {
-        return `${shadow.x.v}${shadow.x.u} ` +
-                `${shadow.y.v}${shadow.y.u} ` +
-                `${shadow.radius.v}${shadow.radius.u} ` +
-                `hsla(${shadow.color.h}deg, ${shadow.color.s}%, ${shadow.color.l}%, ${shadow.color.a}%)`;
-    }
-    let shadowString = "";
-    $: if(!!currentStyle.boxShadows && currentStyle.boxShadows.length > 0) {
-        shadowString = generateShadowString(currentStyle.boxShadows[0]);
-        for(let i = 1; i < currentStyle.boxShadows.length; i++){
-            shadowString += ", " + generateShadowString(currentStyle.boxShadows[i]);
-        }
-    } else {
-        shadowString = "none";
-    }
-</script>
-
-<!-- Container transformation to keep the element in the center -->
-<main class="no-drag">
-    {#if headingType === "h1"}
-        <h1 style={dynamicStyle} class="no-drag"> <TextContent currentStyle={currentStyle}/> </h1>
-    {:else if headingType === "h2"}
-        <h2 style={dynamicStyle} class="no-drag"> <TextContent currentStyle={currentStyle}/> </h2>
-    {:else if headingType === "h3"}
-        <h3 style={dynamicStyle} class="no-drag"> <TextContent currentStyle={currentStyle}/> </h3>
-    {:else if headingType === "h4"}
-        <h4 style={dynamicStyle} class="no-drag"> <TextContent currentStyle={currentStyle}/> </h4>
-    {:else if headingType === "h5"}
-        <h5 style={dynamicStyle} class="no-drag"> <TextContent currentStyle={currentStyle}/> </h5>
-    {:else if headingType === "h6"}
-        <h6 style={dynamicStyle} class="no-drag"> <TextContent currentStyle={currentStyle}/> </h6>
-    {/if}
+    `} href="./" class="no-drag"> <TextContent currentStyle={currentStyle}/> </a>
 </main>
 
 <style lang="scss">
@@ -134,5 +136,6 @@
     main{
         display: flex; justify-content: center; align-items: center; flex-direction: column;
         overflow: visible;
+        pointer-events: none;
     }
 </style>

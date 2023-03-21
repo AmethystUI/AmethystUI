@@ -4,9 +4,11 @@
     import Canvas from "./displayElements/Canvas.svelte";
 
     import Div from "./displayElements/Div.svelte";
-    import Headings from "./displayElements/Headings.svelte";
+    import Headings from "./displayElements/Texts.svelte";
     import Section from "./displayElements/Section.svelte";
     import Span from "./displayElements/Span.svelte";
+    import Anchor from "./displayElements/Anchor.svelte";
+    import Button from "./displayElements/Button.svelte";
 
     export let leftMenuWidth:number;
     export let rightMenuWidth:number;
@@ -54,8 +56,12 @@
             <Span/>
         {:else if currentComponent?.type === "CANVAS"}
             <Canvas/>
-        {:else if ["H1", "H2", "H3", "H4", "H5", "H6"].includes(currentComponent?.type)}
+        {:else if ["H1", "H2", "H3", "H4", "H5", "H6", "P"].includes(currentComponent?.type)}
             <Headings headingType={ currentComponent?.type.toLowerCase() }/>
+        {:else if currentComponent?.type === "A"}
+            <Anchor />
+        {:else if currentComponent?.type === "BUTTON"}
+            <Button />
         {/if}
     </section>
     

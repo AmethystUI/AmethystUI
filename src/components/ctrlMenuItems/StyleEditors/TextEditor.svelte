@@ -103,8 +103,6 @@
             if(!currentStyle.color) currentStyle.color = initializeColorFromHSLA(0, 0, 100, 100);
             clr = currentStyle.color;
 
-            // BUG: Within heading, the font, weight, size, etc... gets transferred to a newly selected heading element unwantedly. Within everything else, only the tracking gets trasferred for some reason.
-
             // typeface setup. We have to do some special initialization 
             if(!currentStyle.typeStyle){ // if there's no type style, then we need to set it to the default
                 currentStyle.typeStyle = {...initialFontRef}; // set current style's type style to the default type style
@@ -117,7 +115,7 @@
                     const currentKey = Object.keys(currentStyle.typeStyle)[i];
                     fontRef[currentKey] = currentStyle.typeStyle[currentKey]; // update our default font object if there is some stuff in the current style already.
                 }
-                
+
                 // initialize all values
                 currentStyle.typeStyle = {...fontRef}; // we don't want pointers. We just want the values.
             } else { // This is the case where the type style has the same number of properties as the fontRef, which means we're switching from one element to another. We won't update the typestyle at all in this case, and only reflow the fontRef.

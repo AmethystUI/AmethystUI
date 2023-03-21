@@ -7,7 +7,7 @@
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
     onMount(() => { $collection = $collection }); // required to refresh the current style so all the initialized values can load.
-    
+
     // specific style shortcuts
     $: textItalisized = !!currentStyle ? currentStyle?.typeStyle?.textDecorations?.includes("italicize") ?? false : false;
     $: textUnderlined = !!currentStyle ? currentStyle?.typeStyle?.textDecorations?.includes("underline") ?? false : false;
@@ -35,7 +35,7 @@
 <main class="no-drag">
     <!-- We have do this terribleness if we want to use anything with a united attribute. It's also fast -->
     <!-- If you want a quick guide, "currentStyle.width?" checks if width exist on the current style. If it's undefined, it will default to whatever is after the "??" -->
-    <div style={`
+    <button style={`
         width: ${ currentStyle.width?.v ?? "0" }${ currentStyle.width?.u ?? "px" };
         height: ${ currentStyle.height?.v ?? "0" }${ currentStyle.height?.u ?? "px" };
 
@@ -130,11 +130,10 @@
                 font-style: ${textItalisized ? "italic" : "none"};
             ` : ""
         }
-    `}
-    class="no-drag">
+    `} class="no-drag">
         <!-- Text content -->
         <TextContent currentStyle={currentStyle}/>
-    </div>
+    </button>
 </main>
 
 <style lang="scss">

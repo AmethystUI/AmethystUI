@@ -129,7 +129,7 @@ class="no-drag">
                     `text-decoration: ${ textUnderlined ? "underline" : "" } ${ textStriked ? "line-through" : "" };
                     `: ""
                 }
-                font-style: ${textItalisized ? "italic" : ""};
+                font-style: ${textItalisized ? "italic" : "none"};
             ` : ""
         }
 

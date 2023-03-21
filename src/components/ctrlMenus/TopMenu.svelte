@@ -126,15 +126,7 @@
             iconSrc : HTMltagInfo["H5"].iconURI,
             desc: "<h5>",
             cta : () => {addComponent("H5", {
-                width: {v: 500, u: "px"},
-                height: {v: 30, u: "fit-content"}, paddingTop: {v: 10, u:"px"},
-                justifyContent: "flex-start", alignItems: "flex-start",
-                
-                USEBORDER: true,
-                borderWidthTop: {v: 1, u: "px"}, borderWidthRight: {v: 0, u: "px"}, borderWidthLeft: {v: 0, u: "px"},borderWidthBottom: {v: 0, u: "px"},
-                borderRadiusTop: {v: 0, u: "px"}, borderRadiusRight: {v: 0, u: "px"}, borderRadiusLeft: {v: 0, u: "px"},borderRadiusBottom: {v: 0, u: "px"},
-                borderColor: initializeColorFromHSLA(0, 0, 100, 75),
-
+                ...commonHeadingStyles,
                 USETEXT: true,
                 leadingContent: "Heading 3",
                 typeStyle: {
@@ -163,13 +155,40 @@
             title : HTMltagInfo["P"].name,
             iconSrc : HTMltagInfo["P"].iconURI,
             desc: "<p>",
-            cta : () => {addComponent("P", {})}
+            cta : () => {addComponent("P", {
+                width: {v: 200, u: "px"},
+                height: {v: 30, u: "fit-content"},
+                justifyContent: "center", alignItems: "flex-start",
+                
+                USETEXT: true,
+                leadingContent: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt",
+                typeStyle: {
+                    size: {v: 11, u: "pt"},
+                    lineHeight: {v: 130, u: "%"},
+                    variation: 400
+                }
+            })}
         },{ // anchor
             type : "reg",
             title : HTMltagInfo["A"].name,
             iconSrc : HTMltagInfo["A"].iconURI,
             desc: "<a>",
-            cta : () => {addComponent("A", {})}
+            cta : () => {addComponent("A", {
+                width: {v: 80, u: "fit-content"},
+                height: {v: 30, u: "fit-content"},
+                justifyContent: "center", alignItems: "center",
+                
+                color: initializeColorFromHSLA(220, 100, 63, 100),
+
+                USETEXT: true,
+                leadingContent: "Anchor Link",
+                typeStyle: {
+                    size: {v: 11, u: "pt"},
+                    lineHeight: {v: 130, u: "%"},
+                    textDecorations: ["underline"],
+                    variation: 400
+                }
+            })}
         },
         
         { // ==========
@@ -183,7 +202,9 @@
             title : HTMltagInfo["BUTTON"].name,
             iconSrc : HTMltagInfo["BUTTON"].iconURI,
             desc: "<button>",
-            cta : () => {addComponent("BUTTON", {})}
+            cta : () => {addComponent("BUTTON", {
+                
+            })}
         },{ // input
             type : "reg",
             title : HTMltagInfo["INPUT"].name,
