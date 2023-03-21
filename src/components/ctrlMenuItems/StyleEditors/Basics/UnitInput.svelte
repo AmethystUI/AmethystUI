@@ -112,7 +112,6 @@
 
     // update last working v on the change of v
     $: if(v !== lastWorkingV && !isNaN(Number(v)) && String(v).length > 0){
-        console.log("updated")
         lastWorkingV = v;
     }
 

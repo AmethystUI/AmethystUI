@@ -108,13 +108,16 @@
             // typeface setup. We have to do some special initialization 
             if(!currentStyle.typeStyle){ // if there's no type style, then we need to set it to the default
                 currentStyle.typeStyle = {...initialFontRef}; // set current style's type style to the default type style
-                fontRef = currentStyle.typeStyle; // reflow fontRef
+                fontRef = {...currentStyle.typeStyle}; // reflow fontRef
             } else if (Object.keys(currentStyle.typeStyle).length !== Object.keys(fontRef).length) { // if the type style has a different number of properties than the fontRef, we know that we're initializing from an incomplete object. In this case, we need to transfer what we have to the default type style and use that to initialize.
-            
+                fontRef = {...initialFontRef}; // initialize fontRef with a default type style
+
+                // update fontRef as needed
                 for(let i = 0; i < Object.keys(currentStyle?.typeStyle ?? {}).length; i++){
                     const currentKey = Object.keys(currentStyle.typeStyle)[i];
                     fontRef[currentKey] = currentStyle.typeStyle[currentKey]; // update our default font object if there is some stuff in the current style already.
                 }
+                
                 // initialize all values
                 currentStyle.typeStyle = {...fontRef}; // we don't want pointers. We just want the values.
             } else { // This is the case where the type style has the same number of properties as the fontRef, which means we're switching from one element to another. We won't update the typestyle at all in this case, and only reflow the fontRef.

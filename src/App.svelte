@@ -47,21 +47,13 @@
             USETEXT: true,
         }
 
-        addComponent("H2", {
-            ...commonHeadingStyles,
-            leadingContent: "Title Text",
-            typeStyle: {
-                size: {v: 38, u: "pt"},
-                lineHeight: {v: 120, u: "%"},
-                variation: 700
-            }
-        })
-        // simulate clicking on it
-        $selectedComponent = 0;
-        $focusedComponent = 0;
-        $selectedOverride = -1;
-        $focusedOverride = -1;
-        $collection = $collection;
+        // addComponent("H2")
+        // // simulate clicking on it
+        // $selectedComponent = 0;
+        // $focusedComponent = 0;
+        // $selectedOverride = -1;
+        // $focusedOverride = -1;
+        // $collection = $collection;
     }, 50);
 
     $: if(!!currentStyle){

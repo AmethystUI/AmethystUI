@@ -68,12 +68,12 @@
             title : HTMltagInfo["H1"].name,
             iconSrc : HTMltagInfo["H1"].iconURI,
             desc: "<h1>",
-            cta : () => {addComponent("H1", {
+            cta : () => { addComponent("H1", {
                 ...commonHeadingStyles,
-                leadingContent: "Title Text",
+                leadingContent: "Title",
                 typeStyle: {
-                    size: {v: 64, u: "pt"},
-                    lineHeight: {v: 120, u: "%"},
+                    size: {v: 48, u: "pt"},
+                    lineHeight: {v: 105, u: "%"},
                     variation: 700
                 }
             })}
@@ -82,31 +82,82 @@
             title : HTMltagInfo["H2"].name,
             iconSrc : HTMltagInfo["H2"].iconURI,
             desc: "<h2>",
-            cta : () => {addComponent("H2", {})}
+            cta : () => {addComponent("H2", {
+                ...commonHeadingStyles,
+                leadingContent: "Subtitle",
+                typeStyle: {
+                    size: {v: 32, u: "pt"},
+                    lineHeight: {v: 110, u: "%"},
+                    variation: 400
+                }
+            })}
         },{ // h3
             type : "reg",
             title : HTMltagInfo["H3"].name,
             iconSrc : HTMltagInfo["H3"].iconURI,
             desc: "<h3>",
-            cta : () => {addComponent("H3", {})}
+            cta : () => {addComponent("H3", {
+                ...commonHeadingStyles,
+                USETEXT: true,
+                leadingContent: "Heading",
+                typeStyle: {
+                    size: {v: 28, u: "pt"},
+                    lineHeight: {v: 110, u: "%"},
+                    variation: 700
+                }
+            })}
         },{ // h4
             type : "reg",
             title : HTMltagInfo["H4"].name,
             iconSrc : HTMltagInfo["H4"].iconURI,
             desc: "<h4>",
-            cta : () => {addComponent("H4", {})}
+            cta : () => {addComponent("H4", {
+                ...commonHeadingStyles,
+                leadingContent: "Heading 2",
+                typeStyle: {
+                    size: {v: 22, u: "pt"},
+                    lineHeight: {v: 110, u: "%"},
+                    variation: 700
+                }
+            })}
         },{ // h5
             type : "reg",
             title : HTMltagInfo["H5"].name,
             iconSrc : HTMltagInfo["H5"].iconURI,
             desc: "<h5>",
-            cta : () => {addComponent("H5", {})}
+            cta : () => {addComponent("H5", {
+                width: {v: 500, u: "px"},
+                height: {v: 30, u: "fit-content"}, paddingTop: {v: 10, u:"px"},
+                justifyContent: "flex-start", alignItems: "flex-start",
+                
+                USEBORDER: true,
+                borderWidthTop: {v: 1, u: "px"}, borderWidthRight: {v: 0, u: "px"}, borderWidthLeft: {v: 0, u: "px"},borderWidthBottom: {v: 0, u: "px"},
+                borderRadiusTop: {v: 0, u: "px"}, borderRadiusRight: {v: 0, u: "px"}, borderRadiusLeft: {v: 0, u: "px"},borderRadiusBottom: {v: 0, u: "px"},
+                borderColor: initializeColorFromHSLA(0, 0, 100, 75),
+
+                USETEXT: true,
+                leadingContent: "Heading 3",
+                typeStyle: {
+                    size: {v: 18, u: "pt"},
+                    lineHeight: {v: 120, u: "%"},
+                    variation: 400
+                }
+            })}
         },{ // h6
             type : "reg",
             title : HTMltagInfo["H6"].name,
             iconSrc : HTMltagInfo["H6"].iconURI,
             desc: "<h6>",
-            cta : () => {addComponent("H6", {})}
+            cta : () => {addComponent("H6", {
+                ...commonHeadingStyles,
+                leadingContent: "Caption",
+                typeStyle: {
+                    size: {v: 10, u: "pt"},
+                    lineHeight: {v: 120, u: "%"},
+                    casing: "uppercase",
+                    variation: 700
+                }
+            })}
         },{ // paragraph
             type : "reg",
             title : HTMltagInfo["P"].name,
@@ -200,6 +251,7 @@
     import GeneralAppControl from "../ctrlMenuItems/GeneralAppControl.svelte";
     import DropdownControl, { menuItem } from "../ctrlMenuItems/GeneralAppControl/DropdownControl.svelte";
     import { defaultMouseDownAction } from "../../App.svelte";
+    import { initializeColorFromHSLA } from "../../util/colorMaths";
 
     export let leftMenuWidth:number;
     let appControlContWidth = 0;
