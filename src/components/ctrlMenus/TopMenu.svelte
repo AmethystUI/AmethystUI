@@ -1,7 +1,14 @@
 <script lang="ts" context="module">
     import { addComponent } from "../../stores/collection";
     import type { elementStyle } from "../../types/element";
-    import { HTMltagInfo } from "../../types/general";
+    import { HTMltagInfo, units } from "../../types/general";
+
+    const commonHeadingStyles: elementStyle = {
+        width: {v: 120, u: "fit-content"},
+        height: {v: 30, u: "fit-content"},
+        justifyContent: "center", alignItems: "flex-start",
+        USETEXT: true,
+    }
 
     // define menus here so we can edit them from outside of this component
     export let addMenuItems:menuItem[] = [
@@ -61,7 +68,15 @@
             title : HTMltagInfo["H1"].name,
             iconSrc : HTMltagInfo["H1"].iconURI,
             desc: "<h1>",
-            cta : () => {addComponent("H1", {})}
+            cta : () => {addComponent("H1", {
+                ...commonHeadingStyles,
+                leadingContent: "Title Text",
+                typeStyle: {
+                    size: {v: 64, u: "pt"},
+                    lineHeight: {v: 120, u: "%"},
+                    variation: 700
+                }
+            })}
         },{ // h2
             type : "reg",
             title : HTMltagInfo["H2"].name,
@@ -184,6 +199,7 @@
     import FileNameEditor from "../ctrlMenuItems/FileNameEditor.svelte";
     import GeneralAppControl from "../ctrlMenuItems/GeneralAppControl.svelte";
     import DropdownControl, { menuItem } from "../ctrlMenuItems/GeneralAppControl/DropdownControl.svelte";
+    import { defaultMouseDownAction } from "../../App.svelte";
 
     export let leftMenuWidth:number;
     let appControlContWidth = 0;
@@ -198,15 +214,12 @@
     }
 
     const closeOverlay = (e?: MouseEvent | KeyboardEvent) => { // this function should close any overlay that is open
-        // prevent event propagation
-        if(e) e.stopPropagation();
-
         // change activation to false, and then remove all the global listeners for listening to close
         dropdownStatus.active = false;
         
         setTimeout(() => { // add these at the next tick so the overlay can be opened again
-            document.onmousedown = undefined;
-            document.onkeydown = undefined;
+            if(e) defaultMouseDownAction(e); // activate the default mouse down action first because we have technically already clicked.
+            document.onmousedown = defaultMouseDownAction;
         }, 0);
     }
     const openOverlay = () => { // this function should open the overlay that has the matching ID
@@ -215,7 +228,9 @@
         
         setTimeout(() => { // add these at the next tick so that the overlay is not closed before the menu is opened
             document.onmousedown = e => closeOverlay(e);
-            document.onkeydown = e => closeOverlay(e);
+            document.onkeydown = (e) => {
+                if(e.key === "Escape") closeOverlay(e)
+            };
         }, 0);
     }
 

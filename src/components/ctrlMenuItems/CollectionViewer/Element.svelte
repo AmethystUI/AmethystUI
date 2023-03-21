@@ -33,95 +33,95 @@
 
     // event handler for key delete to delete element
     $: if(($focusedComponent !== -1 || $focusedOverride !== -1) && !$layerDeleteLock){
-            document.onkeydown = (e:KeyboardEvent) => {
-                // if delete is pressed, delete this element or override
-                if (e.key === "Backspace") {
-                    // first detect if any override is selected. If it is, delete the override instead of the element
-                    if($selectedOverride === -1){ // the case of if override is not selected
-                        // check what the number of elements after removal is. If it's 0, reset all selected and focused comp index
-                        let selectedComponentSnapshot = $selectedComponent
+        document.onkeydown = (e:KeyboardEvent) => {
+            if(!( ($focusedComponent !== -1 || $focusedOverride !== -1) && !$layerDeleteLock )) return; // do a second check here so we don't accidentally delete when we're not suppose to
 
-                        if($collection.length === 1){ // reset selection index
-                            $selectedComponent = -1;
-                            $focusedComponent = -1;
-                        } else {
-                            $selectedComponent = $collection.length - 2 < $selectedComponent ? $collection.length-1 : $selectedComponent; // update snapshot
+            // if delete is pressed, delete this element or override
+            if (e.key === "Backspace") {
+                // first detect if any override is selected. If it is, delete the override instead of the element
+                if($selectedOverride === -1){ // the case of if override is not selected
+                    // check what the number of elements after removal is. If it's 0, reset all selected and focused comp index
+                    let selectedComponentSnapshot = $selectedComponent
 
-                            // if not empty, set it to be the next one
-                            $selectedComponent = $collection.length - 2 < $selectedComponent ? $collection.length-2 : $selectedComponent;
-                            $focusedComponent = $collection.length - 2 < $selectedComponent ? $collection.length-2 : $selectedComponent;
-                        }
-                        
-                        // self destruct
-                        $collection = [...$collection.slice(0,selectedComponentSnapshot), ...$collection.slice(selectedComponentSnapshot+1,$collection.length)];
-                    } else { // if override IS selected
-                        let styleOverrides = $collection[$selectedComponent].styleOverrides; // create override instance for quick access
-                        
-                        let styleOverrideSnapshot = $selectedOverride;
+                    if($collection.length === 1){ // reset selection index
+                        $selectedComponent = -1;
+                        $focusedComponent = -1;
+                    } else {
+                        $selectedComponent = $collection.length - 2 < $selectedComponent ? $collection.length-1 : $selectedComponent; // update snapshot
 
-                        // update style overrides
-                        styleOverrides = $collection[$selectedComponent].styleOverrides;
-                        
-                        // check what the number of elements after removal is. If it's 0, shift the focus to elmnt, and cancel the selectedOverride
-                        if(styleOverrides.length === 1){ // reset selection index (I don't know why the fuck it would be 1 when it's empty, but if it's 0 the thing won't work. Words cannot describe my fucking confusion)
-                            $selectedOverride = -1;
-                            $focusedOverride = -1;
-                            $focusedComponent = $selectedComponent;
-                        } else {
-                            // if not empty, set it to be the next one
-                            styleOverrideSnapshot = styleOverrides.length-2 < $selectedOverride ? styleOverrides.length-1 : $selectedOverride; // update snapshot
-
-                            $selectedOverride = styleOverrides.length-2 < $selectedOverride ? styleOverrides.length-2 : $selectedOverride;
-                            
-                            $focusedOverride = styleOverrides.length-2 < $selectedOverride ? styleOverrides.length-2 : $selectedOverride;
-                        }
-
-                        // remove override
-                        $collection[$selectedComponent].styleOverrides = [...styleOverrides.slice(0,styleOverrideSnapshot), ...styleOverrides.slice(styleOverrideSnapshot+1,styleOverrides.length)]
-                        $collection = [...$collection];
+                        // if not empty, set it to be the next one
+                        $selectedComponent = $collection.length - 2 < $selectedComponent ? $collection.length-2 : $selectedComponent;
+                        $focusedComponent = $collection.length - 2 < $selectedComponent ? $collection.length-2 : $selectedComponent;
                     }
-                }
+                    
+                    // self destruct
+                    $collection = [...$collection.slice(0,selectedComponentSnapshot), ...$collection.slice(selectedComponentSnapshot+1,$collection.length)];
+                } else { // if override IS selected
+                    let styleOverrides = $collection[$selectedComponent].styleOverrides; // create override instance for quick access
+                    
+                    let styleOverrideSnapshot = $selectedOverride;
 
-                if(e.key === "ArrowUp"){
-                    // move the focus on the override or the elment down
-                    if($selectedOverride !== -1){
-                        // move the override up, given that it can still move up
-                        $selectedOverride -= 1;
-                        $focusedOverride = $selectedOverride;
-
-                        // check if the selected override is -1. If it is, select the elmnt instead
-                        if($selectedOverride === -1){
-                            $focusedComponent = $selectedComponent;
-                        }
-                    } else if ($selectedComponent !== 0) { // select the last override of the previous elmnt if there is an elmnt above the current one
-                        $selectedComponent -= 1;
+                    // update style overrides
+                    styleOverrides = $collection[$selectedComponent].styleOverrides;
+                    
+                    // check what the number of elements after removal is. If it's 0, shift the focus to elmnt, and cancel the selectedOverride
+                    if(styleOverrides.length === 1){ // reset selection index (I don't know why the fuck it would be 1 when it's empty, but if it's 0 the thing won't work. Words cannot describe my fucking confusion)
+                        $selectedOverride = -1;
+                        $focusedOverride = -1;
                         $focusedComponent = $selectedComponent;
+                    } else {
+                        // if not empty, set it to be the next one
+                        styleOverrideSnapshot = styleOverrides.length-2 < $selectedOverride ? styleOverrides.length-1 : $selectedOverride; // update snapshot
 
-                        // set override to be the last one
-                        $selectedOverride = $collection[$selectedComponent].styleOverrides.length-1;
-                        $focusedOverride = $selectedOverride;
-                    } // else do nothing
-                } else if (e.key === "ArrowDown"){
-                    // move the focus on the override or the elment down
-                    if($selectedOverride !== $collection[$selectedComponent].styleOverrides.length-1 || $selectedComponent !== $collection.length-1){
-                        // move the override down, given that it can still move up
-                        $selectedOverride += 1;
-                        $focusedOverride = $selectedOverride;
+                        $selectedOverride = styleOverrides.length-2 < $selectedOverride ? styleOverrides.length-2 : $selectedOverride;
+                        
+                        $focusedOverride = styleOverrides.length-2 < $selectedOverride ? styleOverrides.length-2 : $selectedOverride;
+                    }
 
-                        // check if the selected override is the last one. If it is, select the elmnt instead and set the overrides to -1
-                        if($selectedOverride === $collection[$selectedComponent].styleOverrides.length){
-                            $focusedOverride = $selectedOverride = -1;
+                    // remove override
+                    $collection[$selectedComponent].styleOverrides = [...styleOverrides.slice(0,styleOverrideSnapshot), ...styleOverrides.slice(styleOverrideSnapshot+1,styleOverrides.length)]
+                    $collection = [...$collection];
+                }
+            }
 
-                            // advance to the next elmnt if there is one
-                            $selectedComponent += 1
-                            $focusedComponent = $selectedComponent;
-                        }
+            if(e.key === "ArrowUp"){
+                // move the focus on the override or the elment down
+                if($selectedOverride !== -1){
+                    // move the override up, given that it can still move up
+                    $selectedOverride -= 1;
+                    $focusedOverride = $selectedOverride;
+
+                    // check if the selected override is -1. If it is, select the elmnt instead
+                    if($selectedOverride === -1){
+                        $focusedComponent = $selectedComponent;
+                    }
+                } else if ($selectedComponent !== 0) { // select the last override of the previous elmnt if there is an elmnt above the current one
+                    $selectedComponent -= 1;
+                    $focusedComponent = $selectedComponent;
+
+                    // set override to be the last one
+                    $selectedOverride = $collection[$selectedComponent].styleOverrides.length-1;
+                    $focusedOverride = $selectedOverride;
+                } // else do nothing
+            } else if (e.key === "ArrowDown"){
+                // move the focus on the override or the elment down
+                if($selectedOverride !== $collection[$selectedComponent].styleOverrides.length-1 || $selectedComponent !== $collection.length-1){
+                    // move the override down, given that it can still move up
+                    $selectedOverride += 1;
+                    $focusedOverride = $selectedOverride;
+
+                    // check if the selected override is the last one. If it is, select the elmnt instead and set the overrides to -1
+                    if($selectedOverride === $collection[$selectedComponent].styleOverrides.length){
+                        $focusedOverride = $selectedOverride = -1;
+
+                        // advance to the next elmnt if there is one
+                        $selectedComponent += 1
+                        $focusedComponent = $selectedComponent;
                     }
                 }
             }
-    } else {
-        document.onkeydown = undefined;
-    }
+        }
+    } // otherwise we can just leave the event handler alone and have something else use it if they want. The double checking makes sure we won't accidentally delete anything.
 </script>
 
 <main class={

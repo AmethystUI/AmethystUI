@@ -118,7 +118,7 @@
     <!-- icon + title -->
     <img src="./assets/icons/copy.svg" alt="">
 
-    <p bind:this={nameField} contenteditable={editable} class={`${editable ? "editable" : ""}`} style={`cursor: ${editable ? "text" : "normal"}`} on:blur={() => {editable=false; nameField.scrollLeft = 0}} on:keypress={checkKeyPress} on:blur={changeName}>
+    <p bind:this={nameField} contenteditable={editable} class={`${editable ? "editable" : ""}`} style={`cursor: ${editable ? "text" : "normal"}`} on:blur={e => {editable=false; nameField.scrollLeft = 0; changeName(e)}} on:keypress={checkKeyPress}>
         {$collection[elmntIndex]?.styleOverrides[overrideIndex]?.name ?? ""}
     </p>
 </main>

@@ -4,7 +4,7 @@
     import Canvas from "./displayElements/Canvas.svelte";
 
     import Div from "./displayElements/Div.svelte";
-    import H1 from "./displayElements/H1.svelte";
+    import Headings from "./displayElements/Headings.svelte";
     import Section from "./displayElements/Section.svelte";
     import Span from "./displayElements/Span.svelte";
 
@@ -54,8 +54,8 @@
             <Span/>
         {:else if currentComponent?.type === "CANVAS"}
             <Canvas/>
-        {:else if currentComponent?.type === "H1"}
-            <H1/>
+        {:else if ["H1", "H2", "H3", "H4", "H5", "H6"].includes(currentComponent?.type)}
+            <Headings headingType={ currentComponent?.type.toLowerCase() }/>
         {/if}
     </section>
     

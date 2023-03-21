@@ -1,5 +1,18 @@
+<script lang="ts" context="module">
+    export const defaultMouseDownAction = (e) => { // root event. Essentially just blurs the selection on the elements
+        setTimeout(() => {
+            if(get(layerBlurLock) === true){
+                // if locked, unlock for next time
+                layerBlurLock.set(false);
+                return;
+            }
+            focusedComponent.set(-1);
+            focusedOverride.set(-1);
+        }, 0);
+    }
+</script>
+
 <script lang="ts">
-    import { onDestroy, onMount } from "svelte";
     import { get } from "svelte/store";
     import Overlay from "./components/ctrlMenuItems/StyleEditors/Advanced/Overlay.svelte";
     import LeftMenu from "./components/ctrlMenus/LeftMenu.svelte";
@@ -9,6 +22,7 @@
     import MainDisplay from "./components/display/MainDisplay.svelte";
     import { activeStyles } from "./stores/activeStyles";
     import { addComponent, collection, focusedComponent, focusedOverride, layerBlurLock, selectedComponent, selectedOverride } from "./stores/collection"
+    import type { elementStyle } from "./types/element";
 
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
@@ -22,33 +36,26 @@
         rightMenuWidth = evt.detail.width;
     };
     
-    document.onmousedown = (e) => { // root event
-        setTimeout(() => {
-            if($layerBlurLock === true){
-                // if locked, unlock for next time
-                $layerBlurLock = false;
-                return;
-            }
-            $focusedComponent = -1;
-            $focusedOverride = -1;
-        }, 0);
-    }
+    document.onmousedown = defaultMouseDownAction;
 
     // DEBUG: 
     setTimeout(() => {
-        addComponent("H1", {
+        const commonHeadingStyles: elementStyle = {
             width: {v: 120, u: "fit-content"},
             height: {v: 30, u: "fit-content"},
             justifyContent: "center", alignItems: "flex-start",
             USETEXT: true,
+        }
+
+        addComponent("H2", {
+            ...commonHeadingStyles,
             leadingContent: "Title Text",
             typeStyle: {
-                size: {v: 42, u: "pt"},
+                size: {v: 38, u: "pt"},
                 lineHeight: {v: 120, u: "%"},
                 variation: 700
             }
-
-        }, true);
+        })
         // simulate clicking on it
         $selectedComponent = 0;
         $focusedComponent = 0;

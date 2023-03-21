@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
     import { collection, selectedComponent, selectedOverride } from "../../../stores/collection";
     import type { boxShadow } from "../../../types/general";
+    import TextContent from "./util/TextContent.svelte";
 
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
@@ -112,7 +113,7 @@
 
         ${ // only use text styles if text is enabled
             currentStyle["USETEXT"]? `
-                color: hsla(${currentStyle.color.h ?? 0}deg, ${currentStyle.color.s ?? 0}%, ${currentStyle.color.l ?? 0}%, ${currentStyle.color.a ?? 0}%);
+                color: hsla(${currentStyle.color?.h ?? 0}deg, ${currentStyle.color?.s ?? 0}%, ${currentStyle.color?.l ?? 0}%, ${currentStyle.color?.a ?? 0}%);
                 
                 font-size: ${ currentStyle.typeStyle?.size?.v ?? 14 }${ currentStyle.typeStyle?.size?.u ?? "px" };
                 font-family: "${ currentStyle.typeStyle?.fontObj?.family ?? "Inter" }", Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -132,22 +133,7 @@
     `}
     class="no-drag">
         <!-- Text content -->
-        {#if currentStyle.USETEXT}
-            <!-- simulate leading content -->
-            {#each currentStyle.leadingContent.split("\n") as line}
-                {line}
-                {#if currentStyle.leadingContent.split("\n").length > 1}
-                    <br>
-                {/if}
-            {/each}
-            <!-- simulate trailing content -->
-            {#each currentStyle.trailingContent.split("\n") as line}
-                {line}
-                {#if currentStyle.trailingContent.split("\n").length > 1}
-                    <br>
-                {/if}
-            {/each}
-        {/if}
+        <TextContent currentStyle={currentStyle}/>
     </div>
 </main>
 

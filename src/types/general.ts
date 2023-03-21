@@ -63,7 +63,7 @@ export interface unitedAttr<T>{
     u : units
 }
 
-export interface shadow{ // text shadow (Still need to be implemented)
+export interface shadow{ // text shadow (Still need to be implemented fully. We're not taking full advantage of this structure yet.)
     radius : unitedAttr<number>,
     x : unitedAttr<number>,
     y : unitedAttr<number>,

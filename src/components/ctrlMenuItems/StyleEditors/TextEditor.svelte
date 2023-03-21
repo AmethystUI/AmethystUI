@@ -103,20 +103,22 @@
             if(!currentStyle.color) currentStyle.color = initializeColorFromHSLA(0, 0, 100, 100);
             clr = currentStyle.color;
 
+            // BUG: Within heading, the font, weight, size, etc... gets transferred to a newly selected heading element unwantedly. Within everything else, only the tracking gets trasferred for some reason.
+
             // typeface setup. We have to do some special initialization 
-            if(!currentStyle.typeStyle){
-                currentStyle.typeStyle = {...initialFontRef};
-                fontRef = currentStyle.typeStyle;
-            } else if (Object.keys(currentStyle.typeStyle).length !== Object.keys(fontRef).length) {
+            if(!currentStyle.typeStyle){ // if there's no type style, then we need to set it to the default
+                currentStyle.typeStyle = {...initialFontRef}; // set current style's type style to the default type style
+                fontRef = currentStyle.typeStyle; // reflow fontRef
+            } else if (Object.keys(currentStyle.typeStyle).length !== Object.keys(fontRef).length) { // if the type style has a different number of properties than the fontRef, we know that we're initializing from an incomplete object. In this case, we need to transfer what we have to the default type style and use that to initialize.
+            
                 for(let i = 0; i < Object.keys(currentStyle?.typeStyle ?? {}).length; i++){
                     const currentKey = Object.keys(currentStyle.typeStyle)[i];
                     fontRef[currentKey] = currentStyle.typeStyle[currentKey]; // update our default font object if there is some stuff in the current style already.
                 }
                 // initialize all values
-                currentStyle.typeStyle = fontRef;
-                fontRef = currentStyle.typeStyle;
-            } else {
-                fontRef = currentStyle.typeStyle;
+                currentStyle.typeStyle = {...fontRef}; // we don't want pointers. We just want the values.
+            } else { // This is the case where the type style has the same number of properties as the fontRef, which means we're switching from one element to another. We won't update the typestyle at all in this case, and only reflow the fontRef.
+                fontRef = {...currentStyle.typeStyle}; // we don't want pointers. We just want the values.
             }
         }
 
@@ -173,39 +175,72 @@
     }
 
     const updateAlignment = (e:CustomEvent) => {
-        const val = e.detail.value;
-        // set the value of the alignment to the collection value
-        fontRef.alignment = val;
+        if($selectedOverride !== -1){ // if no override is selected
+            $collection[$selectedComponent]
+            .styleOverrides[$selectedOverride]
+            .style.typeStyle.alignment = e.detail.value;
+        } else {
+            $collection[$selectedComponent]
+            .style.typeStyle.alignment = e.detail.value;
+        }
+        
         // update collection so that svelte can update the associated components
         $collection = $collection;
     }
     
     const updateCasing = (e:CustomEvent) => {
-        const val = e.detail.value;
         // set the value of the casing to the collection value
-        fontRef.casing = val;
+        if($selectedOverride !== -1){ // if no override is selected
+            $collection[$selectedComponent]
+            .styleOverrides[$selectedOverride]
+            .style.typeStyle.casing = e.detail.value;
+        } else {
+            $collection[$selectedComponent]
+            .style.typeStyle.casing = e.detail.value;
+        }
+
         // update collection so that svelte can update the associated components
         $collection = $collection;
     }
     
     const updateDecoration = (e:CustomEvent) => {
         // set the value of the decorations accordingly
-        fontRef.textDecorations = e.detail.values;
+        if($selectedOverride !== -1){ // if no override is selected
+            $collection[$selectedComponent]
+            .styleOverrides[$selectedOverride]
+            .style.typeStyle.textDecorations = e.detail.values;
+        } else {
+            $collection[$selectedComponent]
+            .style.typeStyle.textDecorations = e.detail.values;
+        }
         // update collection so that svelte can update the associated components
         $collection = $collection;
     }
     
     type sizeAttribute = "size" | "tracking" | "lineHeight"; // these correspond to the attributes thats stored in collection
     const updateTextSizing = (att: sizeAttribute, e: CustomEvent) => { // used for font size, tracking and line height only.
-        fontRef[att].v = e.detail.v;
-        fontRef[att].u = e.detail.u;
+        if($selectedOverride !== -1){ // if no override is selected
+            $collection[$selectedComponent]
+            .styleOverrides[$selectedOverride]
+            .style.typeStyle[att] = {v: e.detail.v, u: e.detail.u};
+        } else {
+            $collection[$selectedComponent]
+            .style.typeStyle[att] = {v: e.detail.v, u: e.detail.u};
+        }
         // update collection so that svelte can update the associated components
         $collection = $collection;
     }
 
     const updateTextWeighting = (e:CustomEvent) => {
         // set the value of the weight accordingly
-        fontRef.variation = getFontNameValue(standardizedFontName[e.detail.v], "value") as number;
+        if($selectedOverride !== -1){ // if no override is selected
+            $collection[$selectedComponent]
+            .styleOverrides[$selectedOverride]
+            .style.typeStyle.variation = getFontNameValue(standardizedFontName[e.detail.v], "value") as number;
+        } else {
+            $collection[$selectedComponent]
+            .style.typeStyle.variation = getFontNameValue(standardizedFontName[e.detail.v], "value") as number;
+        }
         // update collection so that svelte can update the associated components
         $collection = $collection;
     }

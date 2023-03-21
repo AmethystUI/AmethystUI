@@ -1,6 +1,34 @@
 import type { activeStylesType } from "../../../stores/activeStyles";
 import type { HTMLtags } from "../../../types/general";
 
+const textSettings = { // this has everything except outlines
+    width: true, height: true,
+
+    marginTop: true, marginBottom: true, marginLeft: true, marginRight: true,
+
+    paddingTop: true, paddingBottom: true, paddingLeft: true, paddingRight: true,
+
+    opacity: true,
+    overflowX: true, overflowY: true,
+    justifyContent: true, alignItems: true,
+
+    USEBACKGROUND: true, backgroundColor: true,
+
+    USEBORDER: true,
+    borderWidthTop: true, borderWidthRight: true, borderWidthBottom: true, borderWidthLeft: true,
+    borderRadiusTop: true, borderRadiusRight: true, borderRadiusBottom: true, borderRadiusLeft: true,
+    borderColor: true,
+    borderStyleTop: true, borderStyleRight: true, borderStyleBottom: true, borderStyleLeft: true,
+
+    USETEXT: true,
+    leadingContent: true, trailingContent: true,
+    color: true,
+    typeStyle: true,
+
+    USESHADOW: true,
+    boxShadows: true,
+}
+
 const enabledStyles: Record<HTMLtags, activeStylesType> =
 {
     "DIV": {
@@ -122,38 +150,22 @@ const enabledStyles: Record<HTMLtags, activeStylesType> =
         boxShadows: true,
     },
     BODY: {},
-    H1: {
-        width: true, height: true,
-
-        marginTop: true, marginBottom: true, marginLeft: true, marginRight: true,
-
-        paddingTop: true, paddingBottom: true, paddingLeft: true, paddingRight: true,
-
-        opacity: true,
-        overflowX: true, overflowY: true,
-        justifyContent: true, alignItems: true,
-
-        USEBACKGROUND: true, backgroundColor: true,
-
-        USEBORDER: true,
-        borderWidthTop: true, borderWidthRight: true, borderWidthBottom: true, borderWidthLeft: true,
-        borderRadiusTop: true, borderRadiusRight: true, borderRadiusBottom: true, borderRadiusLeft: true,
-        borderColor: true,
-        borderStyleTop: true, borderStyleRight: true, borderStyleBottom: true, borderStyleLeft: true,
-
-        USETEXT: true,
-        leadingContent: true, trailingContent: true,
-        color: true,
-        typeStyle: true,
-
-        USESHADOW: true,
-        boxShadows: true,
+    H1: textSettings,
+    H2: textSettings,
+    H3: textSettings,
+    H4: textSettings,
+    H5: textSettings,
+    H6: textSettings,
+    P: textSettings,
+    A: {
+        ...textSettings,
+        
+        USEOUTLINE: true,
+        outlineWidth: true,
+        outlineOffset: true,
+        outlineColor: true,
+        outlineStyle: true,
     },
-    H2: {},
-    H3: {},
-    H4: {},
-    H5: {},
-    H6: {},
     HR: {},
     BUTTON: {},
     INPUT: {},
@@ -161,57 +173,6 @@ const enabledStyles: Record<HTMLtags, activeStylesType> =
     OL: {},
     UL: {},
     PROGRESS: {},
-    P: {},
-    A: {
-        width: true,
-        height: true,
-
-        marginTop: true,
-        marginBottom: true,
-        marginLeft: true,
-        marginRight: true,
-
-        paddingTop: true,
-        paddingBottom: true,
-        paddingLeft: true,
-        paddingRight: true,
-
-        opacity: true,
-        justifyContent: true,
-        alignItems: true,
-
-        USEBACKGROUND: true,
-        backgroundColor: true,
-
-        USEBORDER: true,
-        borderWidthTop: true,
-        borderWidthRight: true,
-        borderWidthBottom: true,
-        borderWidthLeft: true,
-        borderRadiusTop: true,
-        borderRadiusRight: true,
-        borderRadiusBottom: true,
-        borderRadiusLeft: true,
-        borderColor: true,
-        borderStyleTop: true,
-        borderStyleRight: true,
-        borderStyleBottom: true,
-        borderStyleLeft: true,
-
-        USEOUTLINE: true,
-        outlineWidth: true,
-        outlineOffset: true,
-
-        USETEXT : true,
-        leadingContent: true,
-        trailingContent: true,
-        placeholder: true,
-        color: true,
-        typeStyle: true,
-
-        USESHADOW: true,
-        boxShadows: true,
-    },
     TEXTAREA: {}
 };
 

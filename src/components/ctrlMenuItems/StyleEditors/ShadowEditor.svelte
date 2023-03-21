@@ -41,11 +41,11 @@
         // turn useShadow on first
         currentStyle["USESHADOW"] = true;
 
-        // add a new shadow to shadowList
+        // add the new shadow to shadowList
         currentStyle["boxShadows"].push({
-            x: {v:10, u:"px"},
-            y: {v:10, u:"px"},
-            radius: {v:30, u:"px"},
+            x: {v:2, u:"px"},
+            y: {v:2, u:"px"},
+            radius: {v:5, u:"px"},
             color : {
                 type : "hsl",
                 r : 0, g : 0, b : 0,
@@ -119,7 +119,7 @@
     }
 
     const updateShadowProp = (attribute:string, value:number, unit:units, isBaseProp = true) => {
-        if(isBaseProp) shadows[demuxID]["base"][attribute] = {v:value, u:unit}
+        if(isBaseProp) shadows[demuxID][attribute] = {v:value, u:unit}
         else shadows[demuxID][attribute] = {v:value, u:unit}
         $collection = $collection;
     }
