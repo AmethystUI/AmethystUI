@@ -82,7 +82,7 @@ export const hexToRgba = (hex:string):number[] => {
     } else if (hex.length == 6){ // 6 form hex: 2 letters per color channel and no alpha channel
         return [parseInt(hex.substring(0,2), 16), parseInt(hex.substring(2,4), 16), parseInt(hex.substring(4,6), 16), 100];
     } else if (hex.length == 8){ // 8 form hex: 2 letter per channel
-        return [parseInt(hex.substring(0,2), 16), parseInt(hex.substring(2,4), 16), parseInt(hex.substring(4,6), 16), Math.round(parseInt(hex.substring(6,8), 16))];
+        return [parseInt(hex.substring(0,2), 16), parseInt(hex.substring(2,4), 16), parseInt(hex.substring(4,6), 16), Math.round(parseInt(hex.substring(6,8), 16) * (100/255))];
     }
 }
 

@@ -38,7 +38,7 @@
         disp("blurred"); // dispatch the blurred event so the parent component can react to it
     }
 
-    const keyPress = (e:KeyboardEvent) => {
+    const keyPress = (e?:KeyboardEvent) => {
         setTimeout(() => { // wait for the content of the input field to be updated. Basically push this event to the next frame.
             // update lastWorking V and filter it thru our regex. Also cut it down to our charLim
             lastWorkingV = v = valueInputField.value;
@@ -49,7 +49,7 @@
             // cut down to charLim
             if(charLim !== -1) lastWorkingV = lastWorkingV.substring(0, charLim);
             
-            if(e.key === "Enter" || e.key === "Escape"){ // if the user presses enter or escape, blur the input field
+            if(e && (e.key === "Enter" || e.key === "Escape")){ // if the user presses enter or escape, blur the input field
                 e.preventDefault();
                 valueInputField.blur();
                 return;
@@ -80,7 +80,7 @@
 <main style={`${hasMargin ? "margin-right:6px" : ""}; ${maxWidth !== "" ? `max-width:${maxWidth}` : ""}; ${minWidth !== "" ? `min-width:${minWidth}` : ""}`}>
     <Title name={name} sub={sub} align={alignTitle}/>
     
-    <input bind:this={valueInputField} style={`text-align: ${align}`} on:keydown={keyPress} on:paste={keyPress} on:blur={blurred} on:focus={focused} placeholder={placeHolder}/>
+    <input bind:this={valueInputField} style={`text-align: ${align}`} on:keydown={keyPress} on:paste={() => keyPress()} on:blur={blurred} on:focus={focused} placeholder={placeHolder}/>
 </main>
 
 <style lang="scss">
