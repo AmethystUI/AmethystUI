@@ -10,6 +10,7 @@
     import Anchor from "./displayElements/Anchor.svelte";
     import Button from "./displayElements/Button.svelte";
     import Input from "./displayElements/Input.svelte";
+    import Textarea from "./displayElements/Textarea.svelte";
 
     export let leftMenuWidth:number;
     export let rightMenuWidth:number;
@@ -65,6 +66,8 @@
             <Button />
         {:else if currentComponent?.type === "INPUT"}
             <Input />
+        {:else if currentComponent?.type === "TEXTAREA"}
+            <Textarea />
         {/if}
     </section>
     

@@ -1,22 +1,32 @@
 import type { activeStylesType } from "../../../stores/activeStyles";
 import type { HTMLtags } from "../../../types/general";
 
+const margin: activeStylesType = { marginTop: true, marginBottom: true, marginLeft: true, marginRight: true }
+const padding: activeStylesType = { paddingTop: true, paddingBottom: true, paddingLeft: true, paddingRight: true }
+const size: activeStylesType = { width: true, height: true }
+const overflow: activeStylesType = { overflowX: true, overflowY: true, }
+const contentAlignment: activeStylesType = { justifyContent: true, alignItems: true, }
+const borderWidth: activeStylesType = { borderWidthTop: true, borderWidthRight: true, borderWidthBottom: true, borderWidthLeft: true }
+const borderRadius: activeStylesType = { borderRadiusTop: true, borderRadiusRight: true, borderRadiusBottom: true, borderRadiusLeft: true }
+const boderStyle: activeStylesType = { borderStyleTop: true, borderStyleRight: true, borderStyleBottom: true, borderStyleLeft: true } 
+
 const allStyles: activeStylesType = {
-    width: true, height: true,
-    marginTop: true, marginBottom: true, marginLeft: true, marginRight: true,
-    paddingTop: true, paddingBottom: true, paddingLeft: true, paddingRight: true,
+    ...size,
+    ...margin,
+    ...padding,
 
     opacity: true,
-    overflowX: true, overflowY: true,
-    justifyContent: true, alignItems: true,
+    ...overflow,
+    
+    ...contentAlignment,
 
     USEBACKGROUND: true, backgroundColor: true,
 
     USEBORDER: true,
-    borderWidthTop: true, borderWidthRight: true, borderWidthBottom: true, borderWidthLeft: true,
-    borderRadiusTop: true, borderRadiusRight: true, borderRadiusBottom: true, borderRadiusLeft: true,
+    ...borderWidth,
+    ...borderRadius,
     borderColor: true,
-    borderStyleTop: true, borderStyleRight: true, borderStyleBottom: true, borderStyleLeft: true,
+    ...boderStyle,
 
     USEOUTLINE: true,
     outlineWidth: true,
@@ -112,9 +122,10 @@ const enabledStyles: Record<HTMLtags, activeStylesType> =
         leadingContent: false, trailingContent: false,
         justifyContent: false, alignItems: false,
         overflowX: false, overflowY: false,
-        
     },
-    TEXTAREA: {},
+    TEXTAREA: {
+        ...allStyles
+    },
     HR: {},
     PROGRESS: {},
     LABEL: {},

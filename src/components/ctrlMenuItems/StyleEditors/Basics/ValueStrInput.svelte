@@ -1,6 +1,8 @@
 <script lang="ts">
     export let name:string;
     export let v: string;
+    let lastWorkingV = v;
+    let fallbackV = v;
     export let hasMargin: boolean;
     export let maxWidth: string = "";
     export let minWidth: string = "";
@@ -11,48 +13,74 @@
     export let placeHolder: string = "";
     export let allowedCharRegex: RegExp = /^[a-zA-Z0-9]$/;
 
-    import { createEventDispatcher } from 'svelte';
+    import { createEventDispatcher, onMount } from 'svelte';
     import Title from './Title.svelte';
     const disp = createEventDispatcher();
     
     let valueInputField:HTMLInputElement;
-    let dispatchLocked = true;
 
-    const preventNullV = () => {
-        if (!v) v = "";
-        dispatchLocked = true;
-        disp("blurred");
-    }
-    const checkEnterPress = (e:KeyboardEvent) => {
-        dispatchLocked = false;
-        
-        if(e.key === "Enter" || e.key === "Escape" || e.key === "Escape"){
-            e.preventDefault();
-            valueInputField.blur();
-            return;
-        }
+    const focused = () => { // executes when the input field is focused
+        fallbackV = valueInputField.value; // get a fallback in case the input field is empty or something weird happens
+        disp("focused"); // dispatch the focused event so the parent component can react to it
     }
 
-    // dispatch value changes if v changes
-    $: if(v !== null && !dispatchLocked){ // do not send null
-        // clean up V according to regex 
-        for(let i = v.length-1; i > -1; i--){
-            // check if regex matches. If not, remove character
-            if(!allowedCharRegex.test(v[i])) v = v.substring(0,i) + v.substring(i+1,v.length)
+    const blurred = () => {
+        if(lastWorkingV.length === 0){
+            lastWorkingV = fallbackV;
         }
-        // get substring if charLim exists
-        if(charLim !== -1) v = v.substring(0, charLim)
 
-        disp("updateValue", {
-            v:v
+        valueInputField.value = lastWorkingV; // set the value of the input field to the last working value if it's not a valid number
+
+        disp("updateValue", { // dispatch the updateValue event so the parent component can react to it
+            v: lastWorkingV
         })
+
+        disp("blurred"); // dispatch the blurred event so the parent component can react to it
     }
+
+    const keyPress = (e:KeyboardEvent) => {
+        setTimeout(() => { // wait for the content of the input field to be updated. Basically push this event to the next frame.
+            // update lastWorking V and filter it thru our regex. Also cut it down to our charLim
+            lastWorkingV = v = valueInputField.value;
+            for(let i = valueInputField.value.length - 1; i > -1; i--){
+                // check if regex matches. If not, remove character
+                if(!allowedCharRegex.test(lastWorkingV[i])) lastWorkingV = lastWorkingV.substring(0,i) + lastWorkingV.substring(i+1,lastWorkingV.length)
+            }
+            // cut down to charLim
+            if(charLim !== -1) lastWorkingV = lastWorkingV.substring(0, charLim);
+            
+            if(e.key === "Enter" || e.key === "Escape"){ // if the user presses enter or escape, blur the input field
+                e.preventDefault();
+                valueInputField.blur();
+                return;
+            }
+                        
+            disp("updateValue", { // dispatch the updateValue event so the parent component can react to it
+                v: lastWorkingV
+            })
+        }, 0);
+    }
+
+    const attemptUpdateInputField = () => {
+        // if v and lastWorkingV are not equal, the v change must be coming from an external source. So we have to update the input field.
+        if(v !== lastWorkingV){
+            lastWorkingV = v;
+            valueInputField.value = lastWorkingV;
+        }
+    }
+    $: if(v && valueInputField){ // react to any changes in v.
+        attemptUpdateInputField();
+    }
+
+    onMount(() => {
+        valueInputField.value = v;
+    })
 </script>
 
 <main style={`${hasMargin ? "margin-right:6px" : ""}; ${maxWidth !== "" ? `max-width:${maxWidth}` : ""}; ${minWidth !== "" ? `min-width:${minWidth}` : ""}`}>
     <Title name={name} sub={sub} align={alignTitle}/>
     
-    <input bind:this={valueInputField} bind:value={v} style={`text-align: ${align}`} on:keydown={checkEnterPress} on:blur={preventNullV} on:focus={() => disp("focused")} placeholder={placeHolder}/>
+    <input bind:this={valueInputField} style={`text-align: ${align}`} on:keydown={keyPress} on:paste={keyPress} on:blur={blurred} on:focus={focused} placeholder={placeHolder}/>
 </main>
 
 <style lang="scss">

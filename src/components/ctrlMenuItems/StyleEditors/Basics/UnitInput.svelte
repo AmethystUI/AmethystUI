@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { units } from '../../../../types/general';
-    import { createEventDispatcher } from 'svelte';
+    import { createEventDispatcher, onMount } from 'svelte';
     import Title from './Title.svelte';
     const disp = createEventDispatcher();
     
@@ -28,93 +28,6 @@
     let openDirection = "open-top";
     let trackingDir = false;
 
-    let dispatchLocked = true;
-
-    const preventNullV = () => { // prevent a NaN number or an out of range one
-        if (v === undefined || v.length === 0 || v === "-") v = 0;
-        if (v > maxVal) v = maxVal;
-        if (v < minVal) v = minVal;
-        dispatchLocked = true;
-
-        v = lastWorkingV;
-        disp("updateValue", {
-            v: lastWorkingV, u: u
-        })
-        disp("blurred");
-    }
-    const keyPress = (e:KeyboardEvent) => {
-        dispatchLocked = false;
-        
-        let deltaV = 1;
-        if(e.metaKey || e.ctrlKey) deltaV = 0.1;
-        if(e.shiftKey) deltaV = 10;
-        
-        if(e.key === "Enter" || e.key === "Escape" || e.key === "Escape"){
-            e.preventDefault();
-            valueInputField.blur();
-        }        // check when the user use the arrow key
-        else if(e.key === "ArrowUp"){
-            e.preventDefault();
-            if(v+deltaV < maxVal){
-                v += deltaV;
-                v = Math.round(v * 100) / 100; // round to 2 decimal place
-            } else { // prevent overflow
-                v = maxVal;
-            }
-            if(!isNaN(Number(v))) lastWorkingV = v;
-        }
-        else if(e.key === "ArrowDown"){
-            e.preventDefault();
-            if(v-deltaV > minVal){
-                v -= deltaV;
-                v = Math.round(v * 100) / 100; // round to 2 decimal place
-            } else {
-                v = minVal;
-            }
-            if(!isNaN(Number(v))) lastWorkingV = v;
-        }
-    }
-
-    // Dispatch value changes when v changes or u is not null
-    $: if ((v !== undefined && String(v).length > 0 && String(v) !== "-")) {
-        // Check if v is a valid value and not just a change in unit
-        if (v !== undefined && v.length > 0 && v !== "-") {
-            for (let i = v.length - 1; i > -1; i--) { // Clean up every character of v
-                const isNumberOrPeriod = /^[0-9\.]$/.test(v[i]); // Check if the character is a number or period
-                if ((i === 0 && !isNumberOrPeriod && v[i] !== "-") || (i !== 0 && !isNumberOrPeriod)) { 
-                    // Remove the character if it's not a number, period, or dash, unless if it's the first character and the first character is a dash.
-                    v = v.substring(0, i) + v.substring(i + 1, v.length);
-                }
-            }
-
-            // Check if v is a valid number
-            if (!isNaN(Number(v))) {
-                // Round v to within the min/max range and update lastWorkingV
-                if (String(v)[String(v).length - 1] !== ".") {
-                    v = Math.max(Math.min(v, maxVal), minVal);
-                }
-                lastWorkingV = Number(v);
-            }
-        }
-
-        if(!dispatchLocked && String(v).length > 0) disp("updateValue", {
-            v: lastWorkingV,
-            u: u
-        });
-    }
-
-    $: if(u !== null){ // update only the unit
-        disp("updateValue", {
-            v: lastWorkingV,
-            u: u
-        });
-    }
-
-    // update last working v on the change of v
-    $: if(v !== lastWorkingV && !isNaN(Number(v)) && String(v).length > 0){
-        lastWorkingV = v;
-    }
-
     const openUnitSel = () => {
         updateSelectionDirection();
         unitSelOpen = true;
@@ -138,11 +51,9 @@
 
         if(trackingDir) requestAnimationFrame(updateSelectionDirection);
     }
-
     const closeUnitSelOnKey = (e: KeyboardEvent) => {
         if(e.key === "Escape") closeUnitSel();
     }
-
     const closeUnitSel = () => {
         setTimeout(() => {
             unitSelOpen = false;
@@ -159,6 +70,90 @@
             window.removeEventListener("resize", updateSelectionDirection);
         }, 0);
     }
+
+    // ========================== Input Field ==========================
+
+    const focused = () => { // executes when the input field is focused
+        disp("focused"); // dispatch the focused event so the parent component can react to it
+    }
+
+    const blurred = () => {
+        valueInputField.value = lastWorkingV; // set the value of the input field to the last working value if it's not a valid number
+
+        disp("updateValue", { // dispatch the updateValue event so the parent component can react to it
+            v: lastWorkingV, u: u
+        })
+
+        disp("blurred"); // dispatch the blurred event so the parent component can react to it
+    }
+
+    const keyPress = (e:KeyboardEvent) => {
+        setTimeout(() => { // wait for the content of the input field to be updated. Basically push this event to the next frame.
+            let deltaV = 1;
+            if(e.metaKey || e.ctrlKey) deltaV = 0.1;
+            if(e.shiftKey) deltaV = 10;
+    
+            // clamp the value V between the min and max range and update lastWorking V
+            if(!isNaN(Number(valueInputField.value))) lastWorkingV = Math.min(maxVal, Math.max(minVal, Number(valueInputField.value))); 
+            
+            if(e.key === "Enter" || e.key === "Escape"){ // if the user presses enter or escape, blur the input field
+                e.preventDefault();
+                valueInputField.blur();
+                return;
+            }
+    
+            if(e.key === "ArrowUp"){ // check when the user use the arrow key
+                e.preventDefault();
+                // change the value of the input field to the last working one first, then nudge it up by deltaV
+    
+                if(lastWorkingV + deltaV < maxVal){
+                    lastWorkingV += deltaV;
+                    lastWorkingV = Math.round(lastWorkingV * 100) / 100; // round to 2 decimal place
+                } else { // prevent overflow
+                    lastWorkingV = maxVal;
+                }
+
+                valueInputField.value = lastWorkingV; // update the actual value of the input field
+            }
+            else if(e.key === "ArrowDown"){
+                e.preventDefault();
+                if(lastWorkingV - deltaV > minVal){
+                    lastWorkingV -= deltaV;
+                    lastWorkingV = Math.round(lastWorkingV * 100) / 100; // round to 2 decimal place
+                } else {
+                    lastWorkingV = minVal;
+                }
+
+                valueInputField.value = lastWorkingV; // update the actual value of the input field
+            }
+            
+            disp("updateValue", { // dispatch the updateValue event so the parent component can react to it
+                v: lastWorkingV, u: u
+            })
+        }, 0);
+    }
+
+    const attemptUpdateInputField = () => {
+        // if v and lastWorkingV are not equal, the v change must be coming from an external source. So we have to update the input field.
+        if(v !== lastWorkingV){
+            lastWorkingV = v;
+            valueInputField.value = lastWorkingV;
+        }
+    }
+    $: if(v && valueInputField){ // react to any changes in v.
+        attemptUpdateInputField();
+    }
+
+    $: if(u) { // react to any changes in u.
+        // if there is changes in u, we need to dispatch the new unit in
+        disp("updateValue", { // dispatch the updateValue event so the parent component can react to it
+            v: lastWorkingV, u: u
+        })
+    }
+
+    onMount(() => {
+        valueInputField.value = v;
+    })
 </script>
 
 <main style={`${hasMargin ? "margin-right:6px" : ""}; ${maxWidth !== "" ? `max-width:${maxWidth}` : ""}; ${minWidth !== "" ? `min-width:${minWidth}` : ""}`}>
@@ -168,7 +163,7 @@
         
         <!-- do not show input if unit is fit-content -->
         {#if u !== "fit-content"}
-            <input bind:this={valueInputField} bind:value={v} on:keydown={keyPress} on:blur={preventNullV} on:focus={() => disp("focused")}/>
+            <input bind:this={valueInputField} on:keydown={keyPress} on:blur={blurred} on:focus={focused}/>
         {/if}
         
         <!-- unit selection part -->

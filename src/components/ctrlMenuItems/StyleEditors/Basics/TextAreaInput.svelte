@@ -45,7 +45,6 @@
     }
 
     // grow based on change in value
-    let oldValue = "";
     $: if(!!valueInputField && v !== valueInputField.value) {
         valueInputField.value = v; // usually the HTML element will have its value lag behind a bit. So we'll just catch it up here.
         autoGrow(); // auto grow
