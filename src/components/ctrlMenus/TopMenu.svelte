@@ -223,7 +223,7 @@
             iconSrc : HTMltagInfo["INPUT"].iconURI,
             desc: "<input>",
             cta : () => {addComponent("INPUT", {
-                width: {v: 300, u: "px"}, height: {v: 50, u: "fit-content"},
+                width: {v: 296, u: "px"}, height: {v: 50, u: "fit-content"},
                 paddingTop: {v: 2, u:"px"}, paddingRight: {v: 2, u:"px"}, paddingBottom: {v: 2, u:"px"}, paddingLeft: {v: 2, u:"px"},
                 
                 USEBACKGROUND: true, backgroundColor: initializeColorFromHSLA(200, 2, 17, 100),
@@ -235,8 +235,10 @@
 
                 USETEXT: true,
                 placeholder: "⚡︎  Try writing something here",
+                color: initializeColorFromHSLA(0, 0, 90, 100),
                 typeStyle: {
                     alignment: "center",
+                    size: {v: 10, u: "pt"},
                 },
 
                 USESHADOW: true,
@@ -253,7 +255,36 @@
             title : HTMltagInfo["TEXTAREA"].name,
             iconSrc : HTMltagInfo["TEXTAREA"].iconURI,
             desc: "<textarea>",
-            cta : () => {addComponent("TEXTAREA", {})}
+            cta : () => {addComponent("TEXTAREA", {
+                width: {v: 280, u: "px"}, height: {v: 180, u: "px"},
+                paddingTop: {v: 10, u:"px"}, paddingRight: {v: 10, u:"px"}, paddingBottom: {v: 10, u:"px"}, paddingLeft: {v: 10, u:"px"},
+                
+                USEBACKGROUND: true, backgroundColor: initializeColorFromHSLA(200, 2, 17, 100),
+                
+                USEBORDER: true,
+                borderColor: initializeColorFromHSLA(0, 0, 100, 100),
+                borderStyleTop: "hidden", borderStyleRight: "hidden", borderStyleBottom: "hidden", borderStyleLeft: "hidden",
+                borderRadiusTop: {v: 6, u:"pt"}, borderRadiusRight: {v: 6, u:"pt"}, borderRadiusBottom: {v: 6, u:"pt"}, borderRadiusLeft: {v: 6, u:"pt"},
+
+                USETEXT: true,
+                placeholder: `Write your review here:
+
+E.g. "This app fucking sucks."`,
+                color: initializeColorFromHSLA(0, 0, 90, 100),
+                typeStyle: {
+                    size: {v: 10, u: "pt"},
+                    lineHeight: {v: 120, u: "%"},
+                },
+
+                USESHADOW: true,
+                boxShadows: [{
+                    color: initializeColorFromHSLA(0, 0, 0, 30),
+                    x: {v: 10, u:"px"},
+                    y: {v: 10, u:"px"},
+                    radius: {v: 15, u:"px"},
+                    grow: {v: 0, u:"px"},
+                }]
+            })}
         },
         
         // { // label

@@ -22,6 +22,10 @@
     const focused = () => { // executes when the input field is focused
         fallbackV = valueInputField.value; // get a fallback in case the input field is empty or something weird happens
         disp("focused"); // dispatch the focused event so the parent component can react to it
+
+        disp("updateValue", { // do an initial update to get things going
+            v: lastWorkingV
+        })
     }
 
     const blurred = () => {

@@ -40,15 +40,15 @@
 
     // DEBUG: 
     setTimeout(() => {
-        addComponent("DIV", {
-            USEBACKGROUND: true,
-        })
-        // simulate clicking on it
-        $selectedComponent = 0;
-        $focusedComponent = 0;
-        $selectedOverride = -1;
-        $focusedOverride = -1;
-        $collection = $collection;
+        // addComponent("DIV", {
+        //     USEBACKGROUND: true,
+        // })
+        // // simulate clicking on it
+        // $selectedComponent = 0;
+        // $focusedComponent = 0;
+        // $selectedOverride = -1;
+        // $focusedOverride = -1;
+        // $collection = $collection;
     }, 50);
 
     $: if(!!currentStyle){

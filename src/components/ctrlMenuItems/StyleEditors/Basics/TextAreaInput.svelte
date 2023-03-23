@@ -11,7 +11,7 @@
     export let placeHolder: string = "Text";
     export let currentParenteWidth: number = 360;
 
-    import { createEventDispatcher } from 'svelte';
+    import { createEventDispatcher, onMount } from 'svelte';
     import Title from './Title.svelte';
     const disp = createEventDispatcher();
     
@@ -59,6 +59,10 @@
             v:v
         })
     }
+
+    onMount(() => {
+        autoGrow(); // auto fit the size the moment the component is initialized fully.
+    })
 </script>
 
 <main style={`${hasMargin ? "margin-right:6px" : ""}; ${maxWidth !== "" ? `max-width:${maxWidth}` : ""}; ${minWidth !== "" ? `min-width:${minWidth}` : ""}`}>

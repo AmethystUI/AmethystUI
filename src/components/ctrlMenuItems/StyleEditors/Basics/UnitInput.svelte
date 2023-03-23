@@ -75,6 +75,10 @@
 
     const focused = () => { // executes when the input field is focused
         disp("focused"); // dispatch the focused event so the parent component can react to it
+
+        disp("updateValue", { // do an initial update to get things going
+            v: lastWorkingV, u: u
+        })
     }
 
     const blurred = () => {
@@ -140,19 +144,25 @@
             valueInputField.value = lastWorkingV;
         }
     }
+
     $: if(v && valueInputField){ // react to any changes in v.
         attemptUpdateInputField();
+    }
+    $: if(u !== "fit-content" && !!valueInputField){ // if valueInputField's existance changes, update the value of it
+        valueInputField.value = v;
     }
 
     $: if(u) { // react to any changes in u.
         // if there is changes in u, we need to dispatch the new unit in
-        disp("updateValue", { // dispatch the updateValue event so the parent component can react to it
-            v: lastWorkingV, u: u
-        })
+        setTimeout(() => { // make sure this unit update happens AFTER the value has been updated.
+            disp("updateValue", { // dispatch the updateValue event so the parent component can react to it
+                v: lastWorkingV, u: u
+            })
+        }, 0);
     }
 
     onMount(() => {
-        valueInputField.value = v;
+        if(valueInputField) valueInputField.value = v;
     })
 </script>
 

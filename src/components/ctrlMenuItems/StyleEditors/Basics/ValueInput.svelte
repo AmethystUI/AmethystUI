@@ -20,6 +20,10 @@
     
     const focused = () => { // executes when the input field is focused
         disp("focused"); // dispatch the focused event so the parent component can react to it
+
+        disp("updateValue", { // do an initial update to get things going
+            v: lastWorkingV
+        })
     }
 
     const blurred = () => {
