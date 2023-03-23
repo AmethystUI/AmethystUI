@@ -1,6 +1,12 @@
 import type { color, overflow, boxShadow, unitedAttr, borderOutlineStyle, typographyStyle, displayTypes, flexAlignment, flexDirection } from "./general";
 
-// all caps attributes are used as compilation tags
+/**
+ * An object representing the style properties of an HTML element.
+ * 
+ * @property All Caps - Compilation tags and non-style related properties.
+ * @property First Letter Cap - Properties used in the backend as an aid to style elements. Does not directly affect the stylesheet.
+ * @property Normal Camel Case - Properties that will directly affect the styling of the element.
+ */
 export interface elementStyle{
     USEBACKGROUND? : boolean; // done
     backgroundColor? : color, // done
@@ -10,7 +16,7 @@ export interface elementStyle{
     
     USESHADOW? : boolean, // done
     boxShadows? : boxShadow[], // done
-    muxBoxShadClr? : color, // done
+    MuxBoxShadClr? : color, // done
 
     USEBORDER? : boolean,
     borderWidthTop? : unitedAttr<number>, // done

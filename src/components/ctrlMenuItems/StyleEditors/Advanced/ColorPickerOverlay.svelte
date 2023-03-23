@@ -453,8 +453,12 @@
         }
 
         // determine whether to update H or R
-        if(!!colorRef && colorRef[updateValue] !== undefined && updateValue !== "type") colorRef[updateValue] = v;
-        else throw `Value "${updateValue}" does not exist. Check what you're trying to update`;
+        if(!!colorRef && colorRef[updateValue] !== undefined && updateValue !== "type"){
+            colorRef[updateValue] = v;
+        } else{
+            console.error(`Value "${updateValue}" does not exist. Check what you're trying to update`);
+            return;
+        }
 
         if (updateValue === "h" || updateValue === "s" || updateValue === "l"){
             // if changes occured to HSL values, update RGB and HEX values

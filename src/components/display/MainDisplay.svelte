@@ -9,6 +9,7 @@
     import Span from "./displayElements/Span.svelte";
     import Anchor from "./displayElements/Anchor.svelte";
     import Button from "./displayElements/Button.svelte";
+    import Input from "./displayElements/Input.svelte";
 
     export let leftMenuWidth:number;
     export let rightMenuWidth:number;
@@ -62,6 +63,8 @@
             <Anchor />
         {:else if currentComponent?.type === "BUTTON"}
             <Button />
+        {:else if currentComponent?.type === "INPUT"}
+            <Input />
         {/if}
     </section>
     

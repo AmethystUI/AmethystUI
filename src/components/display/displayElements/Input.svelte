@@ -35,7 +35,7 @@
 <main class="no-drag">
     <!-- We have do this terribleness if we want to use anything with a united attribute. It's also fast -->
     <!-- If you want a quick guide, "currentStyle.width?" checks if width exist on the current style. If it's undefined, it will default to whatever is after the "??" -->
-    <button style={`
+    <input style={`
         width: ${ currentStyle.width?.v ?? "0" }${ currentStyle.width?.u ?? "px" };
         height: ${ currentStyle.height?.v ?? "0" }${ currentStyle.height?.u ?? "px" };
 
@@ -130,10 +130,7 @@
                 font-style: ${textItalisized ? "italic" : "none"};
             ` : ""
         }
-    `} class="no-drag">
-        <!-- Text content -->
-        <TextContent currentStyle={currentStyle}/>
-    </button>
+    `} placeholder="{currentStyle.USETEXT ? currentStyle.placeholder : ""}" class="no-drag" />
 </main>
 
 <style lang="scss">
@@ -142,13 +139,5 @@
     main{
         display: flex; justify-content: center; align-items: center; flex-direction: column;
         overflow: visible;
-
-        button{
-            cursor: pointer;
-
-            &:active{
-                filter: brightness(0.8); // temporary
-            }
-        }
     }
 </style>

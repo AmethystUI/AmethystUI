@@ -17,7 +17,7 @@
         $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
     let shadows:boxShadow[] = [];
-    // we don't have a color defined here because we're using muxBoxShadClr as a multiplexer
+    // we don't have a color defined here because we're using MuxBoxShadClr as a multiplexer
 
     // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
     $: useShadow = $activeStyles.boxShadows && $activeStyles.USESHADOW; // only active when both are true. We want to make sure that box shadow is used if we want it to be used. A simple check for fish brained developers
@@ -82,7 +82,7 @@
     $: if($selectedComponent !== undefined || $selectedOverride !== undefined){
         
         // during initialization, the last state trackers may be undefined. In that case, we do not want the code to execute
-        if((lastSelectedComponent !== $selectedComponent || lastSelectedOverride !== $selectedOverride) && $mainColorPickerData.refName === "muxBoxShadClr"){
+        if((lastSelectedComponent !== $selectedComponent || lastSelectedOverride !== $selectedOverride) && $mainColorPickerData.refName === "MuxBoxShadClr"){
             clearColorPickerRef();
         }
 
@@ -101,7 +101,7 @@
         currentColor = shadows[demuxID].color;        
         
         // set mux color to target color. Because this is typescript, we're directly giving the color REFRENCE to the mux. So we don't have to write another funciton for demuxing
-        currentStyle["muxBoxShadClr"] = currentColor;
+        currentStyle["MuxBoxShadClr"] = currentColor;
     }
 
     // color updating. We have to use mutli-plexing for this task as the color picker only works with base level colors.
@@ -112,7 +112,7 @@
         updateDemuxID(demuxIndex);
 
         // open picker (after the update if finished)
-        openColorPicker("muxBoxShadClr", "Shadow", shadowContainer.children[demuxID], {
+        openColorPicker("MuxBoxShadClr", "Shadow", shadowContainer.children[demuxID], {
             trackContinuously:true,
             showInlineHSL: true
         });
@@ -125,12 +125,12 @@
     }
 
     // update color picker based on if the shadow is enabled or not
-    $: if(!currentStyle.USESHADOW && $mainColorPickerData.refName === "muxBoxShadClr"){
+    $: if(!currentStyle.USESHADOW && $mainColorPickerData.refName === "MuxBoxShadClr"){
         // if the current style doesn't use shadow, clear ref
         clearColorPickerRef();
     }
     // if the picker visible and selects the shadow, we should show the indicator. This is true for all cases
-    $: if((!!$mainOverlayData.visible || !!$mainOverlayData.dragLocked) && $mainColorPickerData.refName === "muxBoxShadClr" && shadows.length > 0){
+    $: if((!!$mainOverlayData.visible || !!$mainOverlayData.dragLocked) && $mainColorPickerData.refName === "MuxBoxShadClr" && shadows.length > 0){
         if(!showEditorIndicator) showEditorIndicator = true;
     } else {
         if(showEditorIndicator) showEditorIndicator = false;

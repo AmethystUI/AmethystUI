@@ -178,10 +178,9 @@
                 height: {v: 30, u: "fit-content"},
                 justifyContent: "center", alignItems: "center",
                 
-                color: initializeColorFromHSLA(220, 100, 63, 100),
-
                 USETEXT: true,
                 leadingContent: "Anchor Link",
+                color: initializeColorFromHSLA(220, 100, 63, 100),
                 typeStyle: {
                     size: {v: 11, u: "pt"},
                     lineHeight: {v: 130, u: "%"},
@@ -203,14 +202,52 @@
             iconSrc : HTMltagInfo["BUTTON"].iconURI,
             desc: "<button>",
             cta : () => {addComponent("BUTTON", {
+                width: {v: 105, u: "fit-content"}, height: {v: 38, u: "fit-content"},
+                paddingTop: {v: 10, u:"px"}, paddingRight: {v: 20, u:"px"}, paddingBottom: {v: 10, u:"px"}, paddingLeft: {v: 20, u:"px"},
+                justifyContent: "center", alignItems: "center",
                 
+                USEBACKGROUND: true, backgroundColor: initializeColorFromHSLA(0, 0, 0, 0),
+
+                USEBORDER: true, borderColor: initializeColorFromHSLA(268, 91, 55, 100),
+                
+                USETEXT: true,
+                leadingContent: "Click Me",
+                typeStyle: {
+                    tracking: {v: 0.5, u: "px"},
+                    alignment: "center",
+                }
             })}
         },{ // input
             type : "reg",
             title : HTMltagInfo["INPUT"].name,
             iconSrc : HTMltagInfo["INPUT"].iconURI,
             desc: "<input>",
-            cta : () => {addComponent("INPUT", {})}
+            cta : () => {addComponent("INPUT", {
+                width: {v: 300, u: "px"}, height: {v: 50, u: "fit-content"},
+                paddingTop: {v: 2, u:"px"}, paddingRight: {v: 2, u:"px"}, paddingBottom: {v: 2, u:"px"}, paddingLeft: {v: 2, u:"px"},
+                
+                USEBACKGROUND: true, backgroundColor: initializeColorFromHSLA(200, 2, 17, 100),
+                
+                USEBORDER: true,
+                borderColor: initializeColorFromHSLA(0, 0, 100, 100),
+                borderStyleTop: "hidden", borderStyleRight: "hidden", borderStyleBottom: "hidden", borderStyleLeft: "hidden",
+                borderRadiusTop: {v: 6, u:"pt"}, borderRadiusRight: {v: 6, u:"pt"}, borderRadiusBottom: {v: 6, u:"pt"}, borderRadiusLeft: {v: 6, u:"pt"},
+
+                USETEXT: true,
+                placeholder: "⚡︎  Try writing something here",
+                typeStyle: {
+                    alignment: "center",
+                },
+
+                USESHADOW: true,
+                boxShadows: [{
+                    color: initializeColorFromHSLA(0, 0, 0, 30),
+                    x: {v: 10, u:"px"},
+                    y: {v: 10, u:"px"},
+                    radius: {v: 15, u:"px"},
+                    grow: {v: 0, u:"px"},
+                }]
+            })}
         },{ // textarea
             type : "reg",
             title : HTMltagInfo["TEXTAREA"].name,

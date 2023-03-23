@@ -292,9 +292,8 @@
                 <TextAreaInput name={"Trailing Text"} placeHolder={"Lorem ipsum dolor sit amet."} v={trailingContent} hasMargin={false} sub={true} currentParenteWidth={currentParentWidth} on:updateValue={e => updateTextContent(e, false)}/>
             {/if}
             {#if usePlaceholder}
-                <div class="spacer"></div>
                 <!-- Placeholder -->
-                <TextAreaInput name={"Placeholder"} placeHolder={"Lorem ipsum dolor sit amet."} v={placeholder} hasMargin={false} sub={false} currentParenteWidth={currentParentWidth} on:updateValue={updatePlaceholder}/>
+                <TextAreaInput name={"Placeholder"} placeHolder={"Lorem ipsum dolor sit amet."} v={placeholder} hasMargin={false} sub={true} currentParenteWidth={currentParentWidth} on:updateValue={updatePlaceholder}/>
             {/if}
 
             <!-- Typeface settings. All the text appearnace stuff goes here -->
