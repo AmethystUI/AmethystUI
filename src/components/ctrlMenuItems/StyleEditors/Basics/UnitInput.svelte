@@ -8,6 +8,7 @@
     export let v: any;
     let lastWorkingV = v;
     export let u:units = "px";
+    let lastWorkingU = u;
     export let hasMargin: boolean;
     export let maxWidth:string = "";
     export let minWidth:string = "";
@@ -29,6 +30,7 @@
     let trackingDir = false;
 
     const openUnitSel = () => {
+        focused(); // focus current input field
         updateSelectionDirection();
         unitSelOpen = true;
         
@@ -40,6 +42,7 @@
         trackingDir = true
         requestAnimationFrame(updateSelectionDirection);
     }
+
     const updateSelectionDirection = () => {
         // iterCt prevents stack overflowing
         if(!dropDownElement) return; // keep checking until dropDownElement exists
@@ -73,20 +76,23 @@
 
     // ========================== Input Field ==========================
 
-    const focused = () => { // executes when the input field is focused
-        disp("focused"); // dispatch the focused event so the parent component can react to it
-
+    const dispatchLastWorkingV = () => {
         disp("updateValue", { // do an initial update to get things going
             v: lastWorkingV, u: u
         })
     }
 
+    const focused = () => { // executes when the input field is focused
+        disp("focused"); // dispatch the focused event so the parent component can react to it
+
+        dispatchLastWorkingV();
+    }
+
     const blurred = () => {
         valueInputField.value = lastWorkingV; // set the value of the input field to the last working value if it's not a valid number
 
-        disp("updateValue", { // dispatch the updateValue event so the parent component can react to it
-            v: lastWorkingV, u: u
-        })
+        attemptUpdateInputField();
+        dispatchLastWorkingV();
 
         disp("blurred"); // dispatch the blurred event so the parent component can react to it
     }
@@ -130,10 +136,7 @@
 
                 valueInputField.value = lastWorkingV; // update the actual value of the input field
             }
-            
-            disp("updateValue", { // dispatch the updateValue event so the parent component can react to it
-                v: lastWorkingV, u: u
-            })
+            dispatchLastWorkingV();
         }, 0);
     }
 
@@ -152,12 +155,10 @@
         valueInputField.value = v;
     }
 
-    $: if(u) { // react to any changes in u.
+    $: if(u !== lastWorkingU) { // react to any changes in u.
         // if there is changes in u, we need to dispatch the new unit in
-        setTimeout(() => { // make sure this unit update happens AFTER the value has been updated.
-            disp("updateValue", { // dispatch the updateValue event so the parent component can react to it
-                v: lastWorkingV, u: u
-            })
+        setTimeout(() => { // make sure this unit update happens AFTER the value has been updated.'
+            dispatchLastWorkingV();
         }, 0);
     }
 
@@ -248,7 +249,7 @@
 
         .sel-opened{
             input{
-                z-index:1001;
+                z-index:1000;
             }
             #unit-display{
                 z-index: 1001;
@@ -276,13 +277,13 @@
             position:relative;
 
             #unit-sel-container{
-                position:absolute;
+                position: absolute;
                 width:calc(100% - 1px); height:fit-content; // the reason why we do -1 px is to account for the rendering gap
                 background-color: hsla(200,5%,21%,50%);
                 backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
                 overflow:hidden;
                 display:flex; flex-direction: column;
-                z-index: 1000;
+                z-index: 10000;
                 cursor:pointer;
 
                 &.open-bottom{

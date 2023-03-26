@@ -223,14 +223,15 @@
             iconSrc : HTMltagInfo["INPUT"].iconURI,
             desc: "<input>",
             cta : () => {addComponent("INPUT", {
-                width: {v: 296, u: "px"}, height: {v: 50, u: "fit-content"},
-                paddingTop: {v: 2, u:"px"}, paddingRight: {v: 2, u:"px"}, paddingBottom: {v: 2, u:"px"}, paddingLeft: {v: 2, u:"px"},
+                width: {v: 286, u: "px"}, height: {v: 50, u: "fit-content"},
+                paddingTop: {v: 8, u:"px"}, paddingRight: {v: 10, u:"px"}, paddingBottom: {v: 8, u:"px"}, paddingLeft: {v: 10, u:"px"},
                 
                 USEBACKGROUND: true, backgroundColor: initializeColorFromHSLA(200, 2, 17, 100),
                 
                 USEBORDER: true,
-                borderColor: initializeColorFromHSLA(0, 0, 100, 100),
-                borderStyleTop: "hidden", borderStyleRight: "hidden", borderStyleBottom: "hidden", borderStyleLeft: "hidden",
+                borderColor: initializeColorFromHSLA(0, 0, 100, 14),
+                borderStyleTop: "solid", borderStyleRight: "solid", borderStyleBottom: "solid", borderStyleLeft: "solid",
+                borderWidthTop: {v: 1, u: "px"}, borderWidthRight: {v: 1, u: "px"}, borderWidthBottom: {v: 1, u: "px"}, borderWidthLeft: {v: 1, u: "px"},
                 borderRadiusTop: {v: 6, u:"pt"}, borderRadiusRight: {v: 6, u:"pt"}, borderRadiusBottom: {v: 6, u:"pt"}, borderRadiusLeft: {v: 6, u:"pt"},
 
                 USETEXT: true,
@@ -262,8 +263,9 @@
                 USEBACKGROUND: true, backgroundColor: initializeColorFromHSLA(200, 2, 17, 100),
                 
                 USEBORDER: true,
-                borderColor: initializeColorFromHSLA(0, 0, 100, 100),
-                borderStyleTop: "hidden", borderStyleRight: "hidden", borderStyleBottom: "hidden", borderStyleLeft: "hidden",
+                borderColor: initializeColorFromHSLA(0, 0, 100, 14),
+                borderStyleTop: "solid", borderStyleRight: "solid", borderStyleBottom: "solid", borderStyleLeft: "solid",
+                borderWidthTop: {v: 1, u: "px"}, borderWidthRight: {v: 1, u: "px"}, borderWidthBottom: {v: 1, u: "px"}, borderWidthLeft: {v: 1, u: "px"},
                 borderRadiusTop: {v: 6, u:"pt"}, borderRadiusRight: {v: 6, u:"pt"}, borderRadiusBottom: {v: 6, u:"pt"}, borderRadiusLeft: {v: 6, u:"pt"},
 
                 USETEXT: true,
@@ -324,14 +326,23 @@ E.g. "This app fucking sucks."`,
             title : HTMltagInfo["HR"].name,
             iconSrc : HTMltagInfo["HR"].iconURI,
             desc: "<hr>",
-            cta : () => {addComponent("HR", {})}
-        },{ // progress
-            type : "reg",
-            title : HTMltagInfo["PROGRESS"].name,
-            iconSrc : HTMltagInfo["PROGRESS"].iconURI,
-            desc: "<progress>",
-            cta : () => {addComponent("PROGRESS", {})}
+            cta : () => {addComponent("HR", {
+                width: {v: 300, u: "px"}, height: {v: 0, u: "fit-content"},
+                marginTop: {v: 10, u:"px"}, marginBottom: {v: 10, u:"px"}, marginLeft: {v: 15, u:"px"}, marginRight: {v: 15, u:"px"},
+
+                USEBORDER: true,
+                borderColor: initializeColorFromHSLA(0, 0, 100, 100),
+                borderRadiusTop: {v: 6, u:"pt"}, borderRadiusRight: {v: 6, u:"pt"}, borderRadiusBottom: {v: 6, u:"pt"}, borderRadiusLeft: {v: 6, u:"pt"},
+                borderWidthTop: {v: 1, u:"px"}, borderWidthRight: {v: 1, u:"px"}, borderWidthBottom: {v: 1, u:"px"}, borderWidthLeft: {v: 1, u:"px"},
+            })}
         },
+        // { // progress
+        //     type : "reg",
+        //     title : HTMltagInfo["PROGRESS"].name,
+        //     iconSrc : HTMltagInfo["PROGRESS"].iconURI,
+        //     desc: "<progress>",
+        //     cta : () => {addComponent("PROGRESS", {})}
+        // },
     ]
 </script>
 

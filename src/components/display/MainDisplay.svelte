@@ -11,6 +11,7 @@
     import Button from "./displayElements/Button.svelte";
     import Input from "./displayElements/Input.svelte";
     import Textarea from "./displayElements/Textarea.svelte";
+    import HorizontalLine from "./displayElements/HorizontalLine.svelte";
 
     export let leftMenuWidth:number;
     export let rightMenuWidth:number;
@@ -68,6 +69,8 @@
             <Input />
         {:else if currentComponent?.type === "TEXTAREA"}
             <Textarea />
+        {:else if currentComponent?.type === "HR"}
+            <HorizontalLine />
         {/if}
     </section>
     

@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { collection, selectedComponent, selectedOverride } from "../../../stores/collection";
     import type { boxShadow } from "../../../types/general";
-    import TextContent from "./util/TextContent.svelte";
+
 
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
@@ -46,21 +46,6 @@
 
         opacity:${currentStyle.opacity/100 ?? 1};
         
-        overflow-x:${currentStyle.overflowX ?? "auto"};
-        overflow-y:${currentStyle.overflowY ?? "auto"};
-
-        ${ // decide whether or not to use the flexbox container by seeing if any flex attribtues are set
-            currentStyle.justifyContent !== "none" || currentStyle.alignItems !== "none" ?`
-                display: flex;
-                ${ // check if justify content is set. If so, use it
-                    currentStyle.justifyContent !== "none" ? `justify-content: ${currentStyle.justifyContent ?? "flex-start"};` : ""
-                }
-                ${ // check if align items is set. If so, use it
-                    currentStyle.alignItems!== "none"? `align-items: ${currentStyle.alignItems?? "flex-start"};` : ""
-                }
-            `: ""
-        }
-
         ${ // only use border styles if border is enabled
             currentStyle["USEBORDER"] ? `
                 border-style: ${currentStyle.borderStyleTop ?? "solid"} ${currentStyle.borderStyleRight ?? "solid"} ${currentStyle.borderStyleBottom ?? "solid"} ${currentStyle.borderStyleLeft ?? "solid"};

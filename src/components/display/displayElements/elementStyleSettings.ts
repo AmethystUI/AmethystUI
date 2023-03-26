@@ -8,7 +8,8 @@ const overflow: activeStylesType = { overflowX: true, overflowY: true, }
 const contentAlignment: activeStylesType = { justifyContent: true, alignItems: true, }
 const borderWidth: activeStylesType = { borderWidthTop: true, borderWidthRight: true, borderWidthBottom: true, borderWidthLeft: true }
 const borderRadius: activeStylesType = { borderRadiusTop: true, borderRadiusRight: true, borderRadiusBottom: true, borderRadiusLeft: true }
-const boderStyle: activeStylesType = { borderStyleTop: true, borderStyleRight: true, borderStyleBottom: true, borderStyleLeft: true } 
+const borderStyle: activeStylesType = { borderStyleTop: true, borderStyleRight: true, borderStyleBottom: true, borderStyleLeft: true } 
+const outlineStyle: activeStylesType = { outlineWidth: true, outlineOffset: true, outlineColor: true, outlineStyle: true }
 
 const allStyles: activeStylesType = {
     ...size,
@@ -26,13 +27,10 @@ const allStyles: activeStylesType = {
     ...borderWidth,
     ...borderRadius,
     borderColor: true,
-    ...boderStyle,
+    ...borderStyle,
 
     USEOUTLINE: true,
-    outlineWidth: true,
-    outlineOffset: true,
-    outlineColor: true,
-    outlineStyle: true,
+    ...outlineStyle,
 
     USETEXT: true,
     leadingContent: true, trailingContent: true, placeholder: true,
@@ -86,23 +84,20 @@ const enabledStyles: Record<HTMLtags, activeStylesType> =
         overflowX: false, overflowY: false,
     },
     CANVAS: {
-        width: true, height: true,
-        marginLeft: true, marginRight: true, marginTop: true, marginBottom: true,
-        paddingLeft: true, paddingRight: true, paddingTop: true, paddingBottom: true,
+        ...size,
+        ...margin,
+        ...padding,
 
         opacity: true,
         
         USEBORDER: true,
-        borderWidthTop: true, borderWidthRight: true, borderWidthBottom: true, borderWidthLeft: true,
-        borderRadiusTop: true, borderRadiusRight: true, borderRadiusBottom: true, borderRadiusLeft: true,
+        ...borderWidth,
+        ...borderRadius,
         borderColor: true,
-        borderStyleTop: true, borderStyleRight: true, borderStyleBottom: true, borderStyleLeft: true,
+        ...borderStyle,
 
         USEOUTLINE: true,
-        outlineWidth: true,
-        outlineOffset: true,
-        outlineColor: true,
-        outlineStyle: true,
+        ...outlineStyle,
 
         USESHADOW: true,
         boxShadows: true,
@@ -124,9 +119,18 @@ const enabledStyles: Record<HTMLtags, activeStylesType> =
         overflowX: false, overflowY: false,
     },
     TEXTAREA: {
-        ...allStyles
+        ...allStyles,
+        leadingContent: false, trailingContent: false,
+        justifyContent: false, alignItems: false,
+        overflowX: false, overflowY: false,
     },
-    HR: {},
+    HR: {
+        ...allStyles,
+        overflowX: false, overflowY: false,
+        justifyContent: false, alignItems: false,
+        USEOUTLINE: false,
+        USETEXT: false,
+    },
     PROGRESS: {},
     LABEL: {},
     UL: {},

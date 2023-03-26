@@ -41,8 +41,10 @@
         // turn useShadow on first
         currentStyle["USESHADOW"] = true;
 
+        console.log("ADD EVENT");
+
         // add the new shadow to shadowList
-        currentStyle["boxShadows"].push({
+        currentStyle["boxShadows"] = [...currentStyle["boxShadows"], {
             x: {v:2, u:"px"},
             y: {v:2, u:"px"},
             radius: {v:5, u:"px"},
@@ -53,7 +55,7 @@
                 a : 50, hex : "00000080"
             },
             grow : {v:0, u:"px"}
-        })
+        }];
 
         $collection = $collection;
     }
@@ -72,6 +74,16 @@
             updateDemuxID(newID);
         }
     }
+
+    $: if(currentStyle["boxShadows"]){
+        console.log(currentStyle["boxShadows"].map(s => s.x?.v + " " + s.y?.v));
+        console.trace();
+        console.log("========================");
+    }
+
+    collection.subscribe(newValue => {
+        console.trace('component updated:', newValue);
+    });
 
 
     // we have to add element and overlay tracking to make sure that when the element/override switches, we clear the color references along with the multiplex indexes
@@ -118,9 +130,8 @@
         });
     }
 
-    const updateShadowProp = (attribute:string, value:number, unit:units, isBaseProp = true) => {
-        if(isBaseProp) shadows[demuxID][attribute] = {v:value, u:unit}
-        else shadows[demuxID][attribute] = {v:value, u:unit}
+    const updateShadowProp = (attribute:string, value:number, unit:units) => { // BUG: Problematic line at this, 85, 34, 135, 241
+        currentStyle.boxShadows[demuxID][attribute] = {v: value, u: unit};
         $collection = $collection;
     }
 
@@ -166,17 +177,11 @@
                     <!-- the list of shadows -->
                     {#each shadows as shadow, i (shadow)}
                         <!-- a single container -->
-                        <section class="shadow-editor-container">
+                        <section class="shadow-editor-container" style="{i === demuxID ? "z-index: 2" : "z-index: 0"}">
                             <!-- the color preview & button. Bind all elements that matches the demux ID. We can also use this feature to highlight the blocks or do something special with it -->
-                            {#if i === demuxID}
-                                <div class="color-preview">
-                                    <div style={`background-color: rgba(${shadow.color.r}, ${shadow.color.g}, ${shadow.color.b}, ${shadow.color.a}%)`} on:mousedown={()=>{openOverlay(i)}}></div>
-                                </div>
-                            {:else}
-                                <div class="color-preview">
-                                    <div style={`background-color: rgba(${shadow.color.r}, ${shadow.color.g}, ${shadow.color.b}, ${shadow.color.a}%)`} on:mousedown={()=>{openOverlay(i)}}></div>
-                                </div>
-                            {/if}
+                            <div class="color-preview">
+                                <div style={`background-color: rgba(${shadow.color.r}, ${shadow.color.g}, ${shadow.color.b}, ${shadow.color.a}%)`} on:mousedown={()=>{openOverlay(i)}}></div>
+                            </div>
                             
                             <UnitInput
                                 name={"X"}
@@ -226,7 +231,7 @@
                                 maxVal={100}
                                 useFC={false}
                                 textClrOverride={i === demuxID && showEditorIndicator ? "#fff" : ""}
-                                on:updateValue={e=>{updateShadowProp("grow", e.detail.v, e.detail.u, false)}}
+                                on:updateValue={e=>{updateShadowProp("grow", e.detail.v, e.detail.u)}}
                                 on:focused={() => {updateDemuxID(i)}}
                                 hasMargin={true} sub={true}/>
     
@@ -265,7 +270,7 @@
 
         #shadow-container{
             flex-direction: column; justify-content: flex-start;
-            overflow:hidden;
+            overflow:visible;
         }
 
         .shadow-editor-container{

@@ -23,6 +23,7 @@
         fallbackV = valueInputField.value; // get a fallback in case the input field is empty or something weird happens
         disp("focused"); // dispatch the focused event so the parent component can react to it
 
+        attemptUpdateInputField();
         disp("updateValue", { // do an initial update to get things going
             v: lastWorkingV
         })

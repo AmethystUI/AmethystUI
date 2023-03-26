@@ -296,6 +296,8 @@
             ${currentStyle.paddingBottom?.v ?? 0}${currentStyle.paddingBottom?.u ?? "px"}
         );
     `}
+
+    transform: translate3d(calc(${cBR/2}${cBRu} + ${cBL/2}${cBLu}), calc(${cBT/2}${cBTu} + ${cBB/2}${cBBu}), 0px);
 `}>
     {#if $activeStyles.width || $activeStyles.height}
         <!-- size handlers -->
@@ -404,7 +406,7 @@
 
         .dark-overlay{
             position: fixed;
-            width: 100vw; height: 100vh; top:0; left:0;
+            width: 200vw; height: 200vh; top:-100vh; left:-100vw; // this is fucking stupid but it works for now
             background-color: $primary;
             opacity: 0;
             transition: opacity 140ms linear;

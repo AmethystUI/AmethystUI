@@ -29,6 +29,7 @@
     const blurred = () => {
         valueInputField.value = lastWorkingV; // set the value of the input field to the last working value if it's not a valid number
 
+        attemptUpdateInputField();
         disp("updateValue", { // dispatch the updateValue event so the parent component can react to it
             v: lastWorkingV
         })
