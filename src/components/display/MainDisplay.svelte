@@ -12,6 +12,7 @@
     import Input from "./displayElements/Input.svelte";
     import Textarea from "./displayElements/Textarea.svelte";
     import HorizontalLine from "./displayElements/HorizontalLine.svelte";
+    import { canvasStatus } from "../../stores/canvasStatus";
 
     export let leftMenuWidth:number;
     export let rightMenuWidth:number;
@@ -31,7 +32,7 @@
 </script>
 
 <!-- HTML -->
-<main class="no-drag" style="position:absolute; width:calc(100vw - {leftMenuWidth+1}px - {rightMenuWidth-1}px); left: {leftMenuWidth+1}px; overflow:visible">
+<main class="no-drag {$canvasStatus.darkCanvas ? "darkMode" : "lightMode"}" style="position:absolute; width:calc(100vw - {leftMenuWidth+1}px - {rightMenuWidth-1}px); left: {leftMenuWidth+1}px; overflow:visible">
     <!-- if no component or override is selected, show the app hint -->
     {#if $selectedComponent === -1 && $selectedOverride === -1}
     
@@ -83,10 +84,39 @@
     $outline-color: $secondarys7;
 
     main{
-        height:calc(100vh - 65px);
-        background:none;
-        top:65px;
+        $transitionDuration: 200ms;
+
+        height:calc(100vh - 65px); top:65px;
         display: flex; justify-content: center; align-items: center; flex-direction: column;
+        transition: all $transitionDuration linear;
+
+        &.darkMode{
+            background-color: hsla(0deg, 0%, 98%, 0%);
+            
+            #app-hint-add-elmnt{
+                p{
+                    color: $primaryl6;
+
+                    span{
+                        color: $primary;
+                        background-color: $secondarys6;
+                    }
+                }
+            }
+        } &.lightMode{
+            background-color: hsla(0deg, 0%, 98%, 100%);
+            
+            #app-hint-add-elmnt{
+                p{
+                    color: $secondarys4;
+
+                    span{
+                        color: hsla(0deg, 0%, 98%, 100%);
+                        background-color: $secondarys4;
+                    }
+                }
+            }
+        }
 
         #app-hint-add-elmnt{
             position:absolute; top: 50%; left:50%;
@@ -94,14 +124,13 @@
             user-select: none; -webkit-user-select: none;
 
             p{
+                transition: all $transitionDuration linear;
                 text-align: center;
-                color: $secondarys6;
                 font-size: 16px;
                 line-height: 24px;
 
                 span{
-                    background-color: $secondarys6;
-                    color: $primaryl1;
+                    transition: all $transitionDuration linear;
                     padding: 0px 9px 0px 9px;
                     border-radius: 5px;
                     font-family: "Fira Code";

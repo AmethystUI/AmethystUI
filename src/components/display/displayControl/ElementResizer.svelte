@@ -1,5 +1,6 @@
 <script lang="ts">
     import { activeStyles } from "../../../stores/activeStyles";
+    import { canvasStatus } from "../../../stores/canvasStatus";
     import { collection, selectedComponent, selectedOverride } from "../../../stores/collection";
 
     let icx = 0; // initial cursor x
@@ -268,6 +269,9 @@
         document.removeEventListener('mousemove', trackCornerDrag);
         document.removeEventListener('mouseup', endDrag);
     }
+
+    $: defaultKnobLightness = $canvasStatus.darkCanvas ? 30 : 80;
+    $: cornerKnobLightness = currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? defaultKnobLightness : defaultKnobLightness
 </script>
 
 <main style={`
@@ -304,45 +308,37 @@
 
         <!-- Top and bottoms -->
         {#if (currentStyle?.height?.u !== "fit-content")}
-            <div class="corner-drag {hovered ? "visible" : ""}"
+            <div class="corner-drag {hovered ? "visible" : ""} {$canvasStatus.darkCanvas ? "darkmode" : "lightmode"}"
                 id="corner-tm"
-                style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
                 on:mousedown={e => startCornerDrag(e, false, false, false, true)}></div>
-            <div class="corner-drag {hovered ? "visible" : ""}"
+            <div class="corner-drag {hovered ? "visible" : ""} {$canvasStatus.darkCanvas ? "darkmode" : "lightmode"}"
                 id="corner-bm"
-                style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
                 on:mousedown={e => startCornerDrag(e, false, true, false, true)}></div>
         {/if}
 
         <!-- Left and Right -->
         {#if (currentStyle?.width?.u !== "fit-content")}
-            <div class="corner-drag {hovered ? "visible" : ""}"
+            <div class="corner-drag {hovered ? "visible" : ""} {$canvasStatus.darkCanvas ? "darkmode" : "lightmode"}"
                 id="corner-ml"
-                style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
                 on:mousedown={e => startCornerDrag(e, false, false, true, false)}></div>
-            <div class="corner-drag {hovered ? "visible" : ""}"
+            <div class="corner-drag {hovered ? "visible" : ""} {$canvasStatus.darkCanvas ? "darkmode" : "lightmode"}"
                 id="corner-mr"
-                style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
                 on:mousedown={e => startCornerDrag(e, true, false, true, false)}></div>
         {/if}
 
         <!-- The corner ones -->
         {#if (currentStyle?.width?.u !== "fit-content") || (currentStyle?.height?.u !== "fit-content")}
-            <div class="corner-drag {hovered ? "visible" : ""}"
+            <div class="corner-drag {hovered ? "visible" : ""} {$canvasStatus.darkCanvas ? "darkmode" : "lightmode"}"
                 id="corner-tl"
-                style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
                 on:mousedown={e => startCornerDrag(e, false, false, true, true)}></div>
-            <div class="corner-drag {hovered ? "visible" : ""}"
+            <div class="corner-drag {hovered ? "visible" : ""} {$canvasStatus.darkCanvas ? "darkmode" : "lightmode"}"
                 id="corner-tr"
-                style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
                 on:mousedown={e => startCornerDrag(e, true, false, true, true)}></div>
-            <div class="corner-drag {hovered ? "visible" : ""}"
+            <div class="corner-drag {hovered ? "visible" : ""} {$canvasStatus.darkCanvas ? "darkmode" : "lightmode"}"
                 id="corner-bl"
-                style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
                 on:mousedown={e => startCornerDrag(e, false, true, true, true)}></div>
-            <div class="corner-drag {hovered ? "visible" : ""}"
+            <div class="corner-drag {hovered ? "visible" : ""} {$canvasStatus.darkCanvas ? "darkmode" : "lightmode"}"
                 id="corner-br"
-                style="background: hsl(0deg,0%,{currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? 30 : 30}%)"
                 on:mousedown={e => startCornerDrag(e, true, true, true, true)}></div>
         {/if}
     {/if}
@@ -350,32 +346,29 @@
     <!-- margin resizers -->
     {#if $activeStyles.marginTop || $activeStyles.marginBottom || $activeStyles.marginLeft || $activeStyles.marginRight}
         <!-- top -->
-        <div class="margin-handle vert-margins" id="top" style={`
-            transform: translate3d(0,calc(${-cMT-1}${cMTu} + ${-cBT}${cBTu}),0); min-width:min(${cML}${cMLu}, ${cMR}${cMRu}); opacity:${cMT < 1 ? 0 : 0.2}; cursor: ${cMT > 0 ? "ns-resize" : "n-resize"}
+        <div class="margin-handle vert-margins {$canvasStatus.darkCanvas ? "darkmode" : "lightmode"}" id="top" style={`
+            transform: translate3d(0,calc(${-cMT-1}${cMTu} + ${-cBT}${cBTu}),0); min-width:min(${cML}${cMLu}, ${cMR}${cMRu}); opacity:${cMT < 1 ? 0 : 1}; cursor: ${cMT > 0 ? "ns-resize" : "n-resize"};
             `} on:mousedown={startMTDrag}></div>
         <!-- right -->
-        <div class="margin-handle hori-margins" id="right" style={`
-            transform: translate3d(calc(${cMR}${cMRu} + ${cBR}${cBRu}),0,0); min-height:min(${cMT}${cMTu}, ${cMB}${cMBu}); opacity:${cMR < 1 ? 0 : 0.2}; cursor: ${cMR > 0 ? "ew-resize" : "e-resize"}
+        <div class="margin-handle hori-margins {$canvasStatus.darkCanvas ? "darkmode" : "lightmode"}" id="right" style={`
+            transform: translate3d(calc(${cMR}${cMRu} + ${cBR}${cBRu}),0,0); min-height:min(${cMT}${cMTu}, ${cMB}${cMBu}); opacity:${cMR < 1 ? 0 : 1}; cursor: ${cMR > 0 ? "ew-resize" : "e-resize"};
             `} on:mousedown={startMRDrag}></div>
         <!-- bottom -->
-        <div class="margin-handle vert-margins" id="bottom" style={`
-            transform: translate3d(0,calc(${cMB}${cMBu} + ${cBB}${cBBu}),0); min-width:min(${cML}${cMLu}, ${cMR}${cMRu}); opacity:${cMB < 1 ? 0 : 0.2}; cursor: ${cMB > 0 ? "ns-resize" : "s-resize"}
+        <div class="margin-handle vert-margins {$canvasStatus.darkCanvas ? "darkmode" : "lightmode"}" id="bottom" style={`
+            transform: translate3d(0,calc(${cMB}${cMBu} + ${cBB}${cBBu}),0); min-width:min(${cML}${cMLu}, ${cMR}${cMRu}); opacity:${cMB < 1 ? 0 : 1}; cursor: ${cMB > 0 ? "ns-resize" : "s-resize"};
             `} on:mousedown={startMBDrag}></div>
         <!-- left -->
-        <div class="margin-handle hori-margins" id="left" style={`
-            transform: translate3d(calc(${-cML-1}${cMLu} + ${-cBL}${cBLu}),0,0); min-height:min(${cMT}${cMTu}, ${cMB}${cMBu}); opacity:${cML < 1 ? 0 : 0.2}; cursor: ${cML > 0 ? "ew-resize" : "w-resize"}
+        <div class="margin-handle hori-margins {$canvasStatus.darkCanvas ? "darkmode" : "lightmode"}" id="left" style={`
+            transform: translate3d(calc(${-cML-1}${cMLu} + ${-cBL}${cBLu}),0,0); min-height:min(${cMT}${cMTu}, ${cMB}${cMBu}); opacity:${cML < 1 ? 0 : 1}; cursor: ${cML > 0 ? "ew-resize" : "w-resize"};
             `} on:mousedown={startMLDrag}></div>
     {/if}
-
-    <!-- dark overlay -->
-    <div class="dark-overlay"></div>
 </main>
 
 <style lang="scss">
     @import "../../../../public/guideline";
 
     main{
-        $corner-offset: -2px;
+        $corner-offset: -3.5px;
 
         position: absolute;
         background: none;
@@ -386,32 +379,20 @@
 
         &:active{
             .corner-drag{
-                background-color: $accent !important;
+                &.darkmode{ border-color: $secondary !important }
+                &.lightmode { border-color: $primary !important }
                 opacity: 1;
             }
             .margin-handle{
                 opacity: 1 !important;
-                background-color: $accent;
-            }
-
-            .dark-overlay{
-                opacity: 0.8;
+                &.darkmode{ background-color: $secondary !important }
+                &.lightmode { background-color: $primary !important }
             }
         }
         &:hover{
             .corner-drag{
                 opacity: 1;
             }
-        }
-
-        .dark-overlay{
-            position: fixed;
-            width: 200vw; height: 200vh; top:-100vh; left:-100vw; // this is fucking stupid but it works for now
-            background-color: $primary;
-            opacity: 0;
-            transition: opacity 140ms linear;
-            pointer-events: none;
-            z-index: 500;
         }
     
         .corner-drag{
@@ -422,16 +403,26 @@
             opacity: 0;
             transition: opacity ease 100ms;
 
-            box-shadow: 1px 1px 4px hsla(0deg, 0%, 0%, 70%);
+            &.darkmode{
+                background-color: $primary;
+                box-shadow: 0px 0px 0px 2px $primary;
+                border: 1px solid $secondary;
+            } &.lightmode{
+                background-color: hsla(0%, 0%, 98%, 100%);
+                box-shadow: 0px 0px 0px 2px hsla(0%, 0%, 98%, 100%);
+                border: 1px solid $primary;
+            }
 
             &:hover{
-                background-color: $accent !important;
                 opacity: 1 !important;
+                &.darkmode{ background-color: $secondary }
+                &.lightmode{ background-color: $primary }
             }
 
             &:active{
                 z-index: 4000;
-                background-color: $accent !important;
+                &.darkmode{ background-color: $secondary }
+                &.lightmode{ background-color: $primary }
 
                 &::before{
                     width: 100vw !important; height: 100vh !important;
@@ -506,18 +497,29 @@
 
         .margin-handle{
             transition: opacity ease 100ms background-color ease 100ms;
-            background-color: $secondary;
 
             position:absolute;
             pointer-events: all;
             z-index: 999;
 
+            &.darkmode{
+                background-color: hsla(0%, 0%, 100%, 20%);
+                &:hover{
+                    background-color: $secondary;
+                }
+            } &.lightmode{
+                background-color: hsla(0%, 0%, 0%, 20%);
+                &:hover{
+                    background-color: $primary;
+                }
+            }
+
             &:hover{
                 opacity: 1 !important;
-                background-color: $accent;
             }
             &:active{
                 z-index: 4000;
+
                 &::before{
                     width: 100vw; height: 100vh;
                     left: -50vw; top: -50vh;
@@ -533,7 +535,7 @@
         }
 
         .vert-margins{
-            width: calc(90% - 20px); height:1.5px;
+            width: calc(70% + 10px); height:1.5px;
             cursor:ns-resize;
 
             &::before{
@@ -544,7 +546,7 @@
             }
         }
         .hori-margins{
-            width: 1.5px; height: calc(90% - 20px);
+            width: 1.5px; height: calc(70% + 10px);
             cursor:ew-resize;
 
             &::before{

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
+    import { canvasStatus } from "../../stores/canvasStatus";
     import RegularControl from "./GeneralAppControl/RegularControl.svelte";
-    import ZoomControl from "./GeneralAppControl/ZoomControl.svelte";
     const disp = createEventDispatcher();
     
     let mainContainer:HTMLElement;
@@ -13,6 +13,9 @@
         disp("updateCurrentID", evt.detail);
     };
     
+    const toggleCanvasApperance = () => {
+        $canvasStatus.darkCanvas = !$canvasStatus.darkCanvas;
+    }
 
     $: if(!!mainContainer){
         disp("widthChange", {
@@ -29,17 +32,20 @@
     <!-- export -->
     <RegularControl imageURI="./assets/icons/share.svg" alt="Export" />
 
-    <!-- check list -->
-    <RegularControl imageURI="./assets/icons/expand.svg" alt="Checklist" />
+    <!-- full screen -->
+    <!-- <RegularControl imageURI="./assets/icons/expand.svg" alt="Checklist" /> -->
 
     <!-- toggle light & dark mode -->
-    <RegularControl imageURI="./assets/icons/sun.svg" alt="Toggle dark mode" />
+    <RegularControl
+        imageURI="./assets/icons/{$canvasStatus.darkCanvas ? "sun" : "moon"}.svg"
+        alt="Use {$canvasStatus.darkCanvas ? "light" : "dark"} canvas"
+        cta={toggleCanvasApperance}/>
 
     <!-- spacer -->
     <div style="width:10px"></div>
 
     <!-- zoom control -->
-    <ZoomControl />
+    <!-- <ZoomControl /> -->
 </main>
 
 <!-- STYLE -->

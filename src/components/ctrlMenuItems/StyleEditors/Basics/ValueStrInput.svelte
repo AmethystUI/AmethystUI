@@ -23,6 +23,15 @@
         fallbackV = valueInputField.value; // get a fallback in case the input field is empty or something weird happens
         disp("focused"); // dispatch the focused event so the parent component can react to it
 
+        // update lastWorking V and filter it thru our regex. Also cut it down to our charLim
+        lastWorkingV = v = valueInputField.value;
+        for(let i = valueInputField.value.length - 1; i > -1; i--){
+            // check if regex matches. If not, remove character
+            if(!allowedCharRegex.test(lastWorkingV[i])) lastWorkingV = lastWorkingV.substring(0,i) + lastWorkingV.substring(i+1,lastWorkingV.length)
+        }
+        // cut down to charLim
+        if(charLim !== -1) lastWorkingV = lastWorkingV.substring(0, charLim);
+
         attemptUpdateInputField();
         disp("updateValue", { // do an initial update to get things going
             v: lastWorkingV

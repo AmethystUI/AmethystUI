@@ -85,6 +85,9 @@
     const focused = () => { // executes when the input field is focused
         disp("focused"); // dispatch the focused event so the parent component can react to it
 
+        // clamp the value V between the min and max range and update lastWorking V
+        if(valueInputField && !isNaN(Number(valueInputField.value))) lastWorkingV = Math.min(maxVal, Math.max(minVal, Number(valueInputField.value)));
+
         dispatchLastWorkingV();
     }
 
@@ -104,7 +107,7 @@
             if(e.shiftKey) deltaV = 10;
     
             // clamp the value V between the min and max range and update lastWorking V
-            if(!isNaN(Number(valueInputField.value))) lastWorkingV = Math.min(maxVal, Math.max(minVal, Number(valueInputField.value))); 
+            if(!isNaN(Number(valueInputField.value))) lastWorkingV = Math.min(maxVal, Math.max(minVal, Number(valueInputField.value)));
             
             if(e.key === "Enter" || e.key === "Escape"){ // if the user presses enter or escape, blur the input field
                 e.preventDefault();

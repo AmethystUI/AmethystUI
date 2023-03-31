@@ -21,6 +21,7 @@
     import getStyleSetting from "./components/display/displayElements/elementStyleSettings";
     import MainDisplay from "./components/display/MainDisplay.svelte";
     import { activeStyles } from "./stores/activeStyles";
+    import { canvasStatus } from "./stores/canvasStatus";
     import { addComponent, collection, focusedComponent, focusedOverride, layerBlurLock, selectedComponent, selectedOverride } from "./stores/collection"
     import type { elementStyle } from "./types/element";
 
@@ -73,7 +74,7 @@
 
     main{
         width:100vw; height:100vh;
-        background-color: $primary;
         z-index: 1;
+        background-color: $primary;
     }
 </style>

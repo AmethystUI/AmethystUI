@@ -44,7 +44,7 @@
         console.log("ADD EVENT");
 
         // add the new shadow to shadowList
-        currentStyle["boxShadows"] = [...currentStyle["boxShadows"], {
+        currentStyle["boxShadows"] = [{
             x: {v:2, u:"px"},
             y: {v:2, u:"px"},
             radius: {v:5, u:"px"},
@@ -55,7 +55,7 @@
                 a : 50, hex : "00000080"
             },
             grow : {v:0, u:"px"}
-        }];
+        }, ...currentStyle["boxShadows"]];
 
         $collection = $collection;
     }
@@ -74,17 +74,6 @@
             updateDemuxID(newID);
         }
     }
-
-    $: if(currentStyle["boxShadows"]){
-        console.log(currentStyle["boxShadows"].map(s => s.x?.v + " " + s.y?.v));
-        console.trace();
-        console.log("========================");
-    }
-
-    collection.subscribe(newValue => {
-        console.trace('component updated:', newValue);
-    });
-
 
     // we have to add element and overlay tracking to make sure that when the element/override switches, we clear the color references along with the multiplex indexes
     let lastSelectedComponent = $selectedComponent;
@@ -130,7 +119,7 @@
         });
     }
 
-    const updateShadowProp = (attribute:string, value:number, unit:units) => { // BUG: Problematic line at this, 85, 34, 135, 241
+    const updateShadowProp = (attribute:string, value:number, unit:units) => {
         currentStyle.boxShadows[demuxID][attribute] = {v: value, u: unit};
         $collection = $collection;
     }

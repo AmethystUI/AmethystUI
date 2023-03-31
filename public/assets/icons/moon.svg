@@ -1,1 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g data-name="Layer 2"><g data-name="moon"><rect width="24" height="24" opacity="0"/><path d="M12.3 22h-.1a10.31 10.31 0 0 1-7.34-3.15 10.46 10.46 0 0 1-.26-14 10.13 10.13 0 0 1 4-2.74 1 1 0 0 1 1.06.22 1 1 0 0 1 .24 1 8.4 8.4 0 0 0 1.94 8.81 8.47 8.47 0 0 0 8.83 1.94 1 1 0 0 1 1.27 1.29A10.16 10.16 0 0 1 19.6 19a10.28 10.28 0 0 1-7.3 3z"/></g></g></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(0.839335,0,0,0.839335,1.92798,1.92798)">
+        <g>
+            <rect x="0" y="0" width="24" height="24" style="fill-opacity:0;"/>
+            <path d="M12.3,22L12.2,22C9.431,21.979 6.783,20.843 4.86,18.85C1.22,14.958 1.107,8.875 4.6,4.85C5.692,3.626 7.065,2.686 8.6,2.11C8.965,1.969 9.381,2.056 9.66,2.33C9.918,2.593 10.011,2.978 9.9,3.33C8.783,6.389 9.541,9.833 11.84,12.14C14.159,14.431 17.604,15.188 20.67,14.08C20.777,14.042 20.889,14.023 21.002,14.023C21.551,14.023 22.002,14.475 22.002,15.023C22.002,15.142 21.981,15.259 21.94,15.37C21.429,16.734 20.631,17.972 19.6,19C17.664,20.931 15.035,22.011 12.3,22Z" style="fill-rule:nonzero;"/>
+        </g>
+    </g>
+</svg>

@@ -134,13 +134,13 @@
                 filter: invert(1); opacity: 0.5;
                 height:24px;
                 transition: filter 200ms ease;
-                transform: translate3d(6px,0px,0px);
+                transform: translate3d(3px,0px,0px);
                 user-select: none; -webkit-user-select: none; -webkit-user-drag: none;
             }
 
             .more-options{
                 height:20px;
-                transform: translate3d(6px,0px,0px);
+                transform: translate3d(3px,0px,0px);
             }
         }
 
