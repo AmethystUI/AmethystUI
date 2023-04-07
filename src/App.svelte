@@ -18,12 +18,12 @@
     import LeftMenu from "./components/ctrlMenus/LeftMenu.svelte";
     import RightMenu from "./components/ctrlMenus/RightMenu.svelte";
     import TopMenu from "./components/ctrlMenus/TopMenu.svelte";
+    import ComponentDisplay from "./components/display/ComponentDisplay.svelte";
     import getStyleSetting from "./components/display/displayElements/elementStyleSettings";
-    import MainDisplay from "./components/display/MainDisplay.svelte";
+    import ElementDisplay from "./components/display/ElementDisplay.svelte";
     import { activeStyles } from "./stores/activeStyles";
-    import { canvasStatus } from "./stores/canvasStatus";
-    import { addComponent, collection, focusedComponent, focusedOverride, layerBlurLock, selectedComponent, selectedOverride } from "./stores/collection"
-    import type { elementStyle } from "./types/element";
+    import { collection, focusedComponent, focusedOverride, layerBlurLock, selectedComponent, selectedOverride } from "./stores/collection"
+    import { currentView } from "./stores/viewingMode";
 
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
@@ -32,7 +32,7 @@
         leftMenuWidth = evt.detail.width;
     };
 
-    let rightMenuWidth = 360;
+    let rightMenuWidth = 330;
     const rightMenuWidthChange = (evt:CustomEvent<any>):void => {
         rightMenuWidth = evt.detail.width;
     };
@@ -60,10 +60,18 @@
 
 <main>
     <LeftMenu on:widthChange={leftMenuWidthChange}/> 
-    <TopMenu leftMenuWidth={leftMenuWidth}/> 
+    <TopMenu leftMenuWidth={leftMenuWidth}/>
     <RightMenu on:widthChange={rightMenuWidthChange}/>
 
-    <MainDisplay leftMenuWidth={leftMenuWidth} rightMenuWidth={rightMenuWidth}/>
+    {#if $currentView === "element"}
+        <section>
+            <ElementDisplay leftMenuWidth={leftMenuWidth} rightMenuWidth={rightMenuWidth}/>
+        </section>
+    {:else}
+        <section>
+            <ComponentDisplay leftMenuWidth={leftMenuWidth} rightMenuWidth={rightMenuWidth}/>
+        </section>
+    {/if}
 
     <!-- color picker overlay -->
     <Overlay />

@@ -1,18 +1,16 @@
 <script lang="ts">
-    import { currentView } from "../../stores/viewingMode";
-    import { get } from "svelte/store";
+    import { currentView, viewTypes } from "../../stores/viewingMode";
     import MultiToggle, { multiToggleSelection } from "./StyleEditors/Basics/MultiToggle.svelte";
 
-    const componentUUID = crypto.randomUUID();
-    const viewToggleElements:multiToggleSelection<string>[] = [
+    const viewToggleElements:multiToggleSelection<viewTypes>[] = [
         {
-            iconDir : "./assets/icons/cube.svg",
-            val : "edit",
-            alt : "Edit"
+            iconDir : "./assets/icons/single-layer.svg",
+            val : "element",
+            alt : "Elements & Overrides"
         }, {
-            iconDir : "./assets/icons/pantone.svg",
-            val : "palette",
-            alt : "Palette"
+            iconDir : "./assets/icons/layers-horizontal-solid.svg",
+            val : "component",
+            alt : "Component composition"
         }
     ]
 
@@ -42,16 +40,16 @@
         display:flex; justify-content: space-between; align-items: center;
 
         section{
-            display: flex; justify-content: center;align-items: center;
+            display: flex; justify-content: center; align-items: center;
         }
 
         a{
-            opacity:0.2;
+            opacity:0.25;
             transition: opacity 100ms ease;
             user-select: none; -webkit-user-select: none; -webkit-user-drag: none;
 
             img{
-                height:30px;
+                height:26px;
                 padding:15px;
                 user-select: none; -webkit-user-select: none; -webkit-user-drag: none;
             }

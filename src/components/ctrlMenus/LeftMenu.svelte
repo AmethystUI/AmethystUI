@@ -2,6 +2,9 @@
     import CollectionViewer from '../ctrlMenuItems/CollectionViewer.svelte';
     import ViewSwitcher from '../ctrlMenuItems/ViewSwitcher.svelte';
     import { createEventDispatcher } from 'svelte';
+    import { currentView } from '../../stores/viewingMode';
+    import { fade, fly } from 'svelte/transition';
+    import { quartOut } from 'svelte/easing';
     const disp = createEventDispatcher();
 
     let dragSpace:HTMLDivElement;
@@ -31,8 +34,15 @@
 <main style="width: {currentWidth}px; position:absolute">
     <ViewSwitcher />
 
-    <!-- collection viewing system -->
-    <CollectionViewer containerWidth={currentWidth}/>
+    <!-- We're setting display to none instead of using an if block here because we don't want initializing animations to play again -->
+    <section style={$currentView === "element" ? "" : "display: none"}>
+        <!-- collection viewing system -->
+        <CollectionViewer containerWidth={currentWidth}/>
+    </section>
+
+    <section style={$currentView === "component" ? "" : "display: none"}>
+
+    </section>
 
     <!-- resize trigger -->
     <div bind:this={dragSpace} id="drag-space"></div>
@@ -50,6 +60,9 @@
         border-right: 1px solid $primaryl4;
         position:absolute; top:0; left:0;
         
+        -webkit-backdrop-filter: blur(100px);
+        backdrop-filter: blur(100px);
+        
         z-index: 9999;
         user-select: none; -webkit-user-select: none; -webkit-user-drag: none;
 
@@ -57,8 +70,6 @@
             content: "";
             width:100%; height:100%;
             position:absolute;
-            -webkit-backdrop-filter: blur(100px);
-            backdrop-filter: blur(100px);
         }
 
         // @supports (-moz-appearance:none) { // disable transparency on firefox because fuck them

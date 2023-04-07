@@ -352,11 +352,12 @@ E.g. "This app fucking sucks."`,
     import DropdownControl, { menuItem } from "../ctrlMenuItems/GeneralAppControl/DropdownControl.svelte";
     import { defaultMouseDownAction } from "../../App.svelte";
     import { initializeColorFromHSLA } from "../../util/colorMaths";
+    import { currentView } from "../../stores/viewingMode";
 
     export let leftMenuWidth:number;
     let appControlContWidth = 0;
     const appCtrlContWidthChange = (evt:CustomEvent<any>):void => {
-        appControlContWidth = evt.detail.width;
+        appControlContWidth = evt.detail.width + 40;
     };
 
     // dropdown control stuff
@@ -408,7 +409,11 @@ E.g. "This app fucking sucks."`,
 <main style="position:absolute; width:calc(100vw - {leftMenuWidth}px); position:absolute; left:{leftMenuWidth}px">
     <!-- add elements -->
     <section id="left-ctrl">
-        <DropdownControl imageURI="./assets/icons/plus.svg" alt="Add element" id="addElement" items={addMenuItems} {...dropdownStatus} on:openDropdown={openOverlay} on:closeDropdown={() => closeOverlay()} on:keepOpenDropdown={keepOpenDropdown} on:updateCurrentID={updateCurrentID} evenSpacing={true}/>
+        {#if $currentView === "element"}
+            <DropdownControl imageURI="./assets/icons/plus.svg" alt="Add element" id="addElement" items={addMenuItems} {...dropdownStatus} on:openDropdown={openOverlay} on:closeDropdown={() => closeOverlay()} on:keepOpenDropdown={keepOpenDropdown} on:updateCurrentID={updateCurrentID} evenSpacing={true}/>
+        {:else}
+            <div style="width:15px"></div>
+        {/if}
     
         <section>
             <FileNameEditor leftMenuWidth={leftMenuWidth} controlSectionWidth={appControlContWidth}/>

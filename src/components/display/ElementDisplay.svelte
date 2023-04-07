@@ -20,24 +20,15 @@
     $: currentComponent = $collection[$selectedComponent];
     $: currentOverride = $selectedOverride !== -1 ? $collection[$selectedComponent].styleOverrides[$selectedOverride] : undefined;
     $: currentStyle = (currentOverride?.style ?? currentComponent?.style) ?? undefined;
-
-    // style={`
-    //     width: calc(${currentStyle.width?.v ?? "0"}${currentStyle.width?.u ?? "px"}
-    //         + ${currentStyle.paddingLeft?.v ?? "0"}${currentStyle.paddingLeft?.u ?? "px"}
-    //         + ${currentStyle.paddingRight?.v ?? "0"}${currentStyle.paddingRight?.u ?? "px"});
-    //     height: calc(${currentStyle.height?.v ?? "0"}${currentStyle.height?.u ?? "px"}
-    //         + ${currentStyle.paddingTop?.v ?? "0"}${currentStyle.paddingTop?.u ?? "px"}
-    //         + ${currentStyle.paddingBottom?.v ?? "0"}${currentStyle.paddingBottom?.u ?? "px"});
-    // `}
 </script>
 
 <!-- HTML -->
-<main class="no-drag {$canvasStatus.darkCanvas ? "darkMode" : "lightMode"}" style="position:absolute; width:calc(100vw - {leftMenuWidth+1}px - {rightMenuWidth-1}px); left: {leftMenuWidth+1}px; overflow:visible">
+<main class="no-drag {$canvasStatus.darkCanvas ? "darkMode" : "lightMode"}" style="position:absolute; width:calc(100vw - {leftMenuWidth+1}px - {rightMenuWidth-1}px); left: {leftMenuWidth+1}px;">
     <!-- if no component or override is selected, show the app hint -->
     {#if $selectedComponent === -1 && $selectedOverride === -1}
     
-    <section id="app-hint-add-elmnt">
-        <p>Click <span>+</span> to add components for customization</p>
+    <section id="hinting-text">
+        <p>Click <span>+</span> to add elements for customization.</p>
     </section>
     
     {:else} <!-- this is where we display our shit -->
@@ -88,12 +79,12 @@
 
         height:calc(100vh - 65px); top:65px;
         display: flex; justify-content: center; align-items: center; flex-direction: column;
-        transition: all $transitionDuration linear;
+        transition: background-color $transitionDuration linear;
 
         &.darkMode{
             background-color: hsla(0deg, 0%, 98%, 0%);
             
-            #app-hint-add-elmnt{
+            #hinting-text{
                 p{
                     color: $primaryl6;
 
@@ -106,7 +97,7 @@
         } &.lightMode{
             background-color: hsla(0deg, 0%, 98%, 100%);
             
-            #app-hint-add-elmnt{
+            #hinting-text{
                 p{
                     color: $secondarys4;
 
@@ -118,7 +109,7 @@
             }
         }
 
-        #app-hint-add-elmnt{
+        #hinting-text{
             position:absolute; top: 50%; left:50%;
             transform: translate3d(-50%, -50%, 0px);
             user-select: none; -webkit-user-select: none;

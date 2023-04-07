@@ -3,7 +3,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900');
 
-h1,h2,h3,h4,h5,h6,p{ /* all text */
+h1,h2,h3,h4,h5,h6,p,a { /* all text */
     --font-offset: 0.25em;
     width: fit-content;
     margin:0;
@@ -35,7 +35,7 @@ h6{
     font-size: calc(1em + var(--font-offset));
 }
 
-p{    
+p, a{    
     font-family: "Inter", 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: calc(1em + var(--font-offset));
     color: hsl(0, 0%, 77%);

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { collection, selectedComponent, selectedOverride, focusedOverride, layerDeleteLock } from "../../stores/collection";
+    import { selectedComponent, selectedOverride, focusedOverride, layerDeleteLock } from "../../stores/collection";
 
     import BoundingBoxEditor from "../ctrlMenuItems/StyleEditors/BoundingBoxEditor.svelte";
     import BorderEditor from "../ctrlMenuItems/StyleEditors/BorderEditor.svelte";
@@ -7,16 +7,13 @@
     import BackgroundEditor from "../ctrlMenuItems/StyleEditors/BackgroundEditor.svelte";
     import AppearanceEditor from "../ctrlMenuItems/StyleEditors/AppearanceEditor.svelte";
     
-    import { createEventDispatcher } from 'svelte';
+    import { createEventDispatcher, onDestroy, onMount } from 'svelte';
     import ShadowEditor from "../ctrlMenuItems/StyleEditors/ShadowEditor.svelte";
     import TextEditor from "../ctrlMenuItems/StyleEditors/TextEditor.svelte";
     const disp = createEventDispatcher();
 
     let dragSpace:HTMLDivElement;
-    let currentWidth = 360;
-    let currentHeight = 0;
-    
-    $: currentComponent = $collection[$selectedComponent];
+    let currentWidth = 330;
 
     $: if(!!dragSpace){ // as soon as dragSpace is initialized, add the drag event listener for resize
         dragSpace.onmousedown = ():void => { // when dragging
@@ -27,7 +24,7 @@
                     currentWidth = window.innerWidth - e.clientX;
                     disp("widthChange", {
                         width: currentWidth
-                    });                    
+                    });
                 }
             }
         };
@@ -36,10 +33,22 @@
             document.onmousemove = undefined
         }
     }
+
+    onMount(() => {
+        disp("widthChange", {
+            width: currentWidth
+        });
+    })
+
+    onDestroy(() => {
+        disp("widthChange", {
+            width: 0
+        });
+    })
 </script>
 
 <!-- HTML -->
-<main bind:clientHeight={currentHeight} style="width: {currentWidth}px; max-width: {currentWidth}px; position: absolute">
+<main style="width: {currentWidth}px; max-width: {currentWidth}px; position: absolute">
     <!-- resize trigger -->
     <div bind:this={dragSpace} id="drag-space" style={`top:0; right:${currentWidth-3}px`}></div>
 

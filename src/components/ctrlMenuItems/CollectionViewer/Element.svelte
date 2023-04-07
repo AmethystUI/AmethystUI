@@ -129,7 +129,7 @@
             ${($focusedComponent !== elmntIndex && $selectedComponent === elmntIndex) || ($selectedOverride !== -1 && $selectedComponent === elmntIndex) ? "blurred" : ""}`
             }
         style="min-height: {height}px; margin-bottom:10px; min-width:{width}px"
-        in:fly={{x:100, duration:300}} on:mousedown={focusComponent}>
+        in:fly={{x:50, duration:300}} on:mousedown={focusComponent}>
     <!-- arrow -->
     <div on:click={toggleShow}>
         <img src="./assets/icons/arrow-ios-forward.svg" class={$collection[elmntIndex].showing ? "showArrow" : ""} alt=""
