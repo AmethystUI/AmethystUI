@@ -21,6 +21,8 @@
     export let active : boolean;
     export let currentID : string;
     export let id : string;
+    export let showArrow = true;
+    export let showHoverEffect = true;
 
     export let items : menuItem[];
 
@@ -80,9 +82,11 @@
 
 <!-- show the highlight and dropdown menu when active -->
 <main>
-    <section on:mousedown={openDropdown} on:mouseup={closeDropdown} on:mouseenter={updateCurrentID} title={alt} class="{(active && id === currentID) ? "highlight" : ""} {evenSpacing ? "evenly-spaced" : ""}">
-        <img src={imageURI} alt={alt}>
-        <img class="more-options" src="./assets/icons/chevron-down.svg" alt="">
+    <section on:mousedown={openDropdown} on:mouseup={closeDropdown} on:mouseenter={updateCurrentID} title={alt} class="{(active && id === currentID) ? "highlight" : ""} {evenSpacing ? "evenly-spaced" : ""}" style={showHoverEffect ? "" : "background:none"}>
+        <img style="transform: translate3d({showArrow ? "3px" : "0px"}, 0px, 0px); {showHoverEffect ? "" : "opacity: 1"}" src={imageURI} alt={alt}>
+        {#if showArrow}
+            <img class="more-options" src="./assets/icons/chevron-down.svg" alt="">
+        {/if}
     </section>
 
     <div on:mousedown={e => e.stopPropagation()} on:mouseup={keepOpenDropdown} class="optionContainer {active && id === currentID ? "" : "hidden"}">
@@ -134,7 +138,6 @@
                 filter: invert(1); opacity: 0.5;
                 height:24px;
                 transition: filter 200ms ease;
-                transform: translate3d(3px,0px,0px);
                 user-select: none; -webkit-user-select: none; -webkit-user-drag: none;
             }
 

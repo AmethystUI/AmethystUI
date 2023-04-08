@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import { fileStat } from "../../stores/fileStatus";
 
     export let leftMenuWidth = 260;
@@ -8,25 +9,49 @@
     const preventNewline = (e:KeyboardEvent):void =>{
         if(e.key === "Enter" || e.key === "Escape"){
             e.preventDefault();
+            $fileStat.name = trimName(fileNameField.textContent)
+            fileNameField.textContent = $fileStat.name;
             fileNameField.blur();
-            return;
-        }
-        if(fileNameField.innerHTML.length > 50){
-            e.preventDefault();
             return;
         }
     };
 
-    $: if(!!fileNameField){ // once initialized
+    const trimName = (name: string) => {
+        // trim the name to 50 characters
+        return name.trim().substring(0, 50);
+    }
+
+    const pastePlainText = (e: ClipboardEvent):void =>{ // idk how this works but it works so don't touch it
+        // Prevent the default action
+        e.preventDefault();
+
+        // Get the copied text from the clipboard
+        const text = e.clipboardData.getData('text/plain');
+
+        // Insert text at the current position of caret
+        const range = document.getSelection().getRangeAt(0);
+        range.deleteContents();
+
+        const textNode = document.createTextNode(text);
+        range.insertNode(textNode);
+        range.selectNodeContents(textNode);
+        range.collapse(false);
+
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+
+    onMount(() => { // once initialized
         fileNameField.onblur = ():void => {
             fileNameField.scrollLeft = 0;
         }
-    }
+    })
 </script>
 
 <!-- HTML -->
 <main>
-    <span contenteditable=true placeholder="Untitled" on:keypress={preventNewline} on:paste={(e) => e.preventDefault()} bind:this={fileNameField} style="max-width:calc(100vw - {leftMenuWidth}px - {controlSectionWidth}px)">{$fileStat.name}</span>
+    <span contenteditable=true placeholder="Untitled" on:keypress={preventNewline} on:paste={pastePlainText} bind:this={fileNameField} style="max-width:calc(100vw - {leftMenuWidth}px - {controlSectionWidth}px)">{$fileStat.name}</span>
 
     {#if $fileStat.alwaysShowSaveStatus}
         {#if !$fileStat.saved}
