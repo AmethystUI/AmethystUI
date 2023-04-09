@@ -1,7 +1,40 @@
+<script lang="ts" context="module">
+    import { addComponent } from "../../stores/collection";
+    import type { elementStyle } from "../../types/element";
+    import { HTMltagInfo } from "../../types/general";
+
+    // define menus here so we can edit them from outside of this component
+    export let accountItems:menuItem[] = [
+        { // div
+            type : "reg",
+            title : HTMltagInfo["DIV"].name,
+            iconSrc : HTMltagInfo["DIV"].iconURI,
+            desc: "<div>",
+            cta : () => {addComponent("DIV", {})}
+        },
+        { // ==========
+            type : "sep",
+            title : "",
+            cta : () => {}
+        },
+    ]
+</script>
+
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
     import { canvasStatus } from "../../stores/canvasStatus";
     import RegularControl from "./GeneralAppControl/RegularControl.svelte";
+    import DropdownControl, { menuItem } from "./GeneralAppControl/DropdownControl.svelte";
+    import { dropdownStatusType } from "../ctrlMenus/TopMenu.svelte";
+
+    export let dropdownStatus: dropdownStatusType = {
+        currentID : "",
+        active : false,
+    };
+    export let openOverlay: () => void;
+    export let closeOverlay: (e?: MouseEvent | KeyboardEvent) => void;
+    export let keepOpenDropdown: () => void;
+
     const disp = createEventDispatcher();
     
     let mainContainer:HTMLElement;
@@ -27,6 +60,7 @@
 <!-- HTML -->
 <main bind:this={mainContainer}>
     <!-- TODO: contact server later to get pfp -->
+    <DropdownControl imageURI="./assets/icons/plus.svg" alt="Add element" id="accountConfig" items={accountItems} {...dropdownStatus} on:openDropdown={openOverlay} on:closeDropdown={() => closeOverlay()} on:keepOpenDropdown={keepOpenDropdown} on:updateCurrentID={updateCurrentID} evenSpacing={true}/>
     <img id="pfp" src="./assets/pngs/testpfp.png" alt="">
 
     <!-- export -->

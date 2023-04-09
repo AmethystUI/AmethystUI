@@ -10,7 +10,7 @@
 </script>
 
 <script lang="ts">
-    import { createEventDispatcher } from 'svelte';
+    import { createEventDispatcher, onMount } from 'svelte';
     import RegularOption from '../DropdownOptions/RegularOption.svelte';
     import Separator from '../DropdownOptions/Separator.svelte';
     
@@ -32,6 +32,8 @@
 
     let clickStartTime: number;
     let clickEndTime: number;
+
+    let dropdownPanel: HTMLElement;
 
     const openDropdown = ():void => { // toggle the dropdown menu through dispatch
         disp("openDropdown");
@@ -78,6 +80,23 @@
             }
         }, 0);
     }
+
+    let openDirection = "open-right"
+    const updateOpenDirection = ():void => {
+        // iterCt prevents stack overflowing
+        if(!dropdownPanel) return; // keep checking until dropDownElement exists
+        
+        const bbRect = dropdownPanel.getBoundingClientRect()
+        const margin = 10;
+        if(openDirection === "open-right") openDirection = (bbRect.x+bbRect.width+margin > window.innerWidth) ? "open-left" : "open-right";
+        else openDirection = (bbRect.x+bbRect.width*2+margin > window.innerWidth) ? "open-left" : "open-right";
+    }
+
+    onMount(() => {
+        updateOpenDirection(); // update the open direction on init
+    })
+
+    window.addEventListener("resize", updateOpenDirection);
 </script>
 
 <!-- show the highlight and dropdown menu when active -->
@@ -89,7 +108,7 @@
         {/if}
     </section>
 
-    <div on:mousedown={e => e.stopPropagation()} on:mouseup={keepOpenDropdown} class="optionContainer {active && id === currentID ? "" : "hidden"}">
+    <div bind:this={dropdownPanel} on:mousedown={e => e.stopPropagation()} on:mouseup={keepOpenDropdown} class="optionContainer {active && id === currentID ? "" : "hidden"} {openDirection}">
         {#each items as item (item)}
             {#if item.type === "reg"}
                 <RegularOption options={item}/>
@@ -150,7 +169,7 @@
         .optionContainer{
             min-width: 220px; max-width: 500px; width: fit-content; min-height: 14px; max-height: calc(100vh - 120px);
             background-color: hsl(200,5%,12%,85%); backdrop-filter: blur(100px); -webkit-backdrop-filter: blur(100px);
-            position: absolute; top:0; left:0; transform: translateY($btnHeight); margin-top:7px; margin-left:7px;
+            position: absolute; top:0; margin-top:7px; margin-left:7px;
             border: 1px solid $primaryl4; border-radius: 7px;
             box-shadow: 0px 6px 30px -5px hsla(0,0%,0%,60%);
             z-index: 9999999;
@@ -158,6 +177,15 @@
             overflow-x: hidden; overflow-y: auto;
             padding: 5px;
             transition: none;
+
+            
+            &.open-right{
+                left:0;
+                transform: translate3d(3px, $btnHeight, 0px);
+            } &.open-left{
+                right:0;
+                transform: translate3d(-10px, $btnHeight, 0px);
+            }
 
             &.hidden{
                 opacity: 0 !important;

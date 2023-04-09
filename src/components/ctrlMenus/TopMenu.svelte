@@ -3,6 +3,11 @@
     import type { elementStyle } from "../../types/element";
     import { HTMltagInfo, units } from "../../types/general";
 
+    export interface dropdownStatusType{
+        currentID : string,
+        active: boolean
+    }
+
     const commonHeadingStyles: elementStyle = {
         width: {v: 120, u: "fit-content"},
         height: {v: 30, u: "fit-content"},
@@ -361,7 +366,7 @@ E.g. "This app fucking sucks."`,
     };
 
     // dropdown control stuff
-    let dropdownStatus = {
+    let dropdownStatus: dropdownStatusType = {
         currentID : "",
         active : false,
     }
@@ -421,7 +426,9 @@ E.g. "This app fucking sucks."`,
         </section>
     </section>
 
-    <GeneralAppControl on:widthChange={appCtrlContWidthChange} on:toggleDropdown={toggleDropdown}  on:forceOpenDropdown={keepOpenDropdown} on:updateCurrentID={updateCurrentID}/>
+    <GeneralAppControl
+        dropdownStatus={dropdownStatus} openOverlay={openOverlay} closeOverlay={closeOverlay} keepOpenDropdown={keepOpenDropdown}
+        on:widthChange={appCtrlContWidthChange} on:toggleDropdown={toggleDropdown}  on:forceOpenDropdown={keepOpenDropdown} on:updateCurrentID={updateCurrentID}/>
 </main>
 
 <!-- STYLE -->
