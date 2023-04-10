@@ -1,20 +1,21 @@
 <script lang="ts" context="module">
-    import { addComponent } from "../../stores/collection";
-    import type { elementStyle } from "../../types/element";
-    import { HTMltagInfo } from "../../types/general";
-
     // define menus here so we can edit them from outside of this component
     export let accountItems:menuItem[] = [
         { // div
             type : "reg",
-            title : HTMltagInfo["DIV"].name,
-            iconSrc : HTMltagInfo["DIV"].iconURI,
-            desc: "<div>",
-            cta : () => {addComponent("DIV", {})}
+            title : "Account Settings",
+            iconSrc : "./assets/icons/info-outline.svg",
+            desc: "",
+            cta : () => {}
         },
         { // ==========
-            type : "sep",
-            title : "",
+            type : "sep", title : "", cta : () => {}
+        },
+        { // div
+            type : "reg",
+            title : "Log Out",
+            iconSrc : "./assets/icons/arrow-circle-left-outline.svg",
+            desc: "",
             cta : () => {}
         },
     ]
@@ -60,8 +61,9 @@
 <!-- HTML -->
 <main bind:this={mainContainer}>
     <!-- TODO: contact server later to get pfp -->
-    <DropdownControl imageURI="./assets/icons/plus.svg" alt="Add element" id="accountConfig" items={accountItems} {...dropdownStatus} on:openDropdown={openOverlay} on:closeDropdown={() => closeOverlay()} on:keepOpenDropdown={keepOpenDropdown} on:updateCurrentID={updateCurrentID} evenSpacing={true}/>
-    <img id="pfp" src="./assets/pngs/testpfp.png" alt="">
+    <DropdownControl alt="My Account" id="accountConfig" items={accountItems} {...dropdownStatus} on:openDropdown={openOverlay} on:closeDropdown={() => closeOverlay()} on:keepOpenDropdown={keepOpenDropdown} on:updateCurrentID={updateCurrentID} evenSpacing={true} showArrow={false} showHoverEffect={false}>
+        <img id="pfp" src="./assets/pngs/testpfp.png" alt="">
+    </DropdownControl>
 
     <!-- export -->
     <RegularControl imageURI="./assets/icons/share.svg" alt="Export" />
@@ -91,7 +93,7 @@
         height: 100%; min-width: fit-content;
         background: none;
         display: flex; flex-direction: row-reverse; justify-content: center; align-items: center;
-        padding-right: 45px;
+        padding-right: 20px;
     
         img{
             user-select: none; -webkit-user-select: none; -webkit-user-drag: none;
@@ -101,7 +103,6 @@
         #pfp{
             height:32px;
             border-radius: 100px;
-            margin-left: 17px;
         }
     }
 </style>

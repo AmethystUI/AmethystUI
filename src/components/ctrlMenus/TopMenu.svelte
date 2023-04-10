@@ -414,10 +414,16 @@ E.g. "This app fucking sucks."`,
 <main style="position:absolute; width:calc(100vw - {leftMenuWidth}px); position:absolute; left:{leftMenuWidth}px">
     <!-- add elements -->
     <section id="left-ctrl">
-        {#if $currentView === "element"}
-            <DropdownControl imageURI="./assets/icons/plus.svg" alt="Add element" id="addElement" items={addMenuItems} {...dropdownStatus} on:openDropdown={openOverlay} on:closeDropdown={() => closeOverlay()} on:keepOpenDropdown={keepOpenDropdown} on:updateCurrentID={updateCurrentID} evenSpacing={true}/>
-        {:else}
-            <div style="width:15px"></div>
+        <!-- spacer -->
+        <div style="width:15px"></div>
+        
+        {#if $currentView === "element"}        
+            <DropdownControl alt="Add element" id="addElement" items={addMenuItems} {...dropdownStatus} on:openDropdown={openOverlay} on:closeDropdown={() => closeOverlay()} on:keepOpenDropdown={keepOpenDropdown} on:updateCurrentID={updateCurrentID} evenSpacing={true}>
+                <img src="./assets/icons/plus.svg" alt="">            
+            </DropdownControl>
+            
+            <!-- spacer -->
+            <div style="width:7px"></div>
         {/if}
     
         <section>
@@ -444,6 +450,13 @@ E.g. "This app fucking sucks."`,
         display:flex; justify-content: flex-start; align-items: center;
         transform: translate3d(1px,0px,0px);
         
+        img{
+            filter: invert(1); opacity: 0.5;
+            height:24px;
+            transition: filter 200ms ease;
+            user-select: none; -webkit-user-select: none; -webkit-user-drag: none;
+        }
+
         #left-ctrl{
             display: flex; align-items: center; height:100%;
             background-color: $primaryl1;

@@ -16,7 +16,6 @@
     
     const disp = createEventDispatcher()
 
-    export let imageURI : string;
     export let alt : string;
     export let active : boolean;
     export let currentID : string;
@@ -102,7 +101,8 @@
 <!-- show the highlight and dropdown menu when active -->
 <main>
     <section on:mousedown={openDropdown} on:mouseup={closeDropdown} on:mouseenter={updateCurrentID} title={alt} class="{(active && id === currentID) ? "highlight" : ""} {evenSpacing ? "evenly-spaced" : ""}" style={showHoverEffect ? "" : "background:none"}>
-        <img style="transform: translate3d({showArrow ? "3px" : "0px"}, 0px, 0px); {showHoverEffect ? "" : "opacity: 1"}" src={imageURI} alt={alt}>
+        <slot style="transform: translate3d({showArrow ? "3px" : "0px"}, 0px, 0px); {showHoverEffect ? "" : "opacity: 1"}"></slot>
+        
         {#if showArrow}
             <img class="more-options" src="./assets/icons/chevron-down.svg" alt="">
         {/if}
@@ -130,15 +130,11 @@
         section{
             height:$btnHeight; width:60px;
             border-radius: 7px;
-            margin-right: 7px;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer;
             transition: background-color 200ms ease;
             position: relative;
-            
-            &.evenly-spaced{
-                margin: 0px 10px 0px 10px;
-            }
+
             &.highlight {
                 background-color: hsla(0,0%,100%,10%);
                 img{
@@ -181,7 +177,7 @@
             
             &.open-right{
                 left:0;
-                transform: translate3d(3px, $btnHeight, 0px);
+                transform: translate3d(-6px, $btnHeight, 0px);
             } &.open-left{
                 right:0;
                 transform: translate3d(-10px, $btnHeight, 0px);
