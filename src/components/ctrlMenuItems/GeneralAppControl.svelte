@@ -2,6 +2,22 @@
     // define menus here so we can edit them from outside of this component
     export let accountItems:menuItem[] = [
         { // div
+            type : "title",
+            title : "Lemon Foxmere",
+            iconSrc : "", desc: "", cta : () => {}
+        },
+        { // div
+            type : "subtitle",
+            title : "@lemonfoxmere",
+            iconSrc : "", desc: "", cta : () => {}
+        },
+
+        { // spacer
+            type : "spacer", title : "", iconSrc : "", desc: "", cta : () => {}
+        }, { // spacer
+            type : "spacer", title : "", iconSrc : "", desc: "", cta : () => {}
+        },
+        { // div
             type : "reg",
             title : "Account Settings",
             iconSrc : "./assets/icons/info-outline.svg",

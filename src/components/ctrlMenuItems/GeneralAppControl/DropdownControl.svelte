@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-    export type optionTypes = "reg" | "sep";
+    export type optionTypes = "reg" | "sep" | "title" | "subtitle" | "spacer";
     export interface menuItem {
         type : optionTypes,
         title : string,
@@ -114,7 +114,13 @@
                 <RegularOption options={item}/>
             {:else if item.type === "sep"} 
                 <Separator />
-            {/if}                
+            {:else if item.type === "title"}
+                <h1>{item.title}</h1>
+            {:else if item.type === "subtitle"}
+                <h2>{item.title}</h2>
+            {:else if item.type === "spacer"}
+                <div style="height:5px"></div>
+            {/if}
         {/each}
     </div>
 </main>
@@ -187,6 +193,19 @@
                 opacity: 0 !important;
                 pointer-events: none;
                 transition: 200ms opacity ease;
+            }
+
+            & h1{
+                font-size: 18px;
+                font-weight: 600;
+                width: calc(100% - 20px);
+                padding: 5px 10px 0px 10px;
+            } & h2{
+                font-size: 12px;
+                font-weight: 400;
+                width: calc(100% - 20px);
+                color: $secondarys5;
+                padding: 8px 10px 0px 10px;
             }
 
             // hide scrollbar

@@ -2,11 +2,12 @@
     import type { menuItem } from "../GeneralAppControl/DropdownControl.svelte";
 
     export let options : menuItem;
+    export let alignLeft = true;
 
     let hovered = false;
 </script>
 
-<main title={options.title} class="{hovered ? "hovered" : ""}"
+<main title={options.title} class="{hovered ? "hovered" : ""} {alignLeft? "align-left" : "align-right"}"
     on:mouseup={options.cta}
     on:mouseover={() => {hovered = true}} on:focus={undefined}
     on:mouseleave={() => {hovered = false}} on:blur={undefined}>
@@ -39,6 +40,22 @@
         cursor:pointer;
         user-select: none; -webkit-user-select: none;
 
+        &.align-left{
+            flex-direction: row;
+            section{
+                flex-direction: row;
+                img{ margin: 0px 0px 0px 7px }
+                #title{ margin: 0px 7px 0px 11px }
+            }
+        } &.align-right{
+            flex-direction: row-reverse;
+            section{
+                flex-direction: row-reverse;
+                img{ margin: 0px 11px 0px 7px }
+                #title{ margin: 0px }
+            }
+        }
+
         &.hovered{
             background-color: $accent;
 
@@ -66,14 +83,13 @@
             display: flex; align-items: center;
 
             img{
-                filter: invert(1); opacity: 0.7 !important;
-                margin: 0px 0px 0px 7px;
+                filter: invert(1);
+                opacity: 0.7 !important;
             }
 
             #title{
                 color:$secondarys4;
                 font-size: 13px;
-                margin: 0px 7px 0px 11px;
                 white-space: nowrap;
                 font-variation-settings: "wght" 450;
             }
