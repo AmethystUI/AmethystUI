@@ -4,11 +4,11 @@
     import type { units } from "../../../types/general";
 
     import UnitInput from "./Basics/UnitInput.svelte";
-    import { setX, setY, mainOverlayData } from "../../../stores/overlayStat";
-    import { mainColorPickerData, clearColorPickerRef } from "../../../stores/colorPickerStat";
+    import { setX, setY, mainOverlayData } from "../../../stores/dynamicOverlayManager";
+    import { mainColorPickerData, clearColorPickerRef } from "../../../stores/colorPickerManager";
     
-    import { openColorPicker } from "./Advanced/ColorPickerOverlay.svelte";
-    import { keepOpenOverlay } from "./Advanced/Overlay.svelte";
+    import { openColorPicker } from "../../dynamicOverlay/overlays/ColorPickerOverlay.svelte";
+    import { keepOpenOverlay } from "../../dynamicOverlay/OverlayBase.svelte";
     import { activeStyles } from "../../../stores/activeStyles";
 
     let indicatorOffset = 8.5;

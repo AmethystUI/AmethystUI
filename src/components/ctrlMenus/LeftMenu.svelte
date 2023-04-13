@@ -2,9 +2,7 @@
     import CollectionViewer from '../ctrlMenuItems/CollectionViewer.svelte';
     import ViewSwitcher from '../ctrlMenuItems/ViewSwitcher.svelte';
     import { createEventDispatcher } from 'svelte';
-    import { currentView } from '../../stores/viewingMode';
-    import { fade, fly } from 'svelte/transition';
-    import { quartOut } from 'svelte/easing';
+    import { currentView } from '../../stores/viewingManager';
     const disp = createEventDispatcher();
 
     let dragSpace:HTMLDivElement;

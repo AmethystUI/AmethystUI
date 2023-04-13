@@ -2,7 +2,7 @@
     import { fly } from "svelte/transition";
     import { collection, focusedComponent, selectedComponent, selectedOverride, focusedOverride, layerDeleteLock, layerBlurLock } from "../../../stores/collection";
     import { createEventDispatcher } from 'svelte';
-    import { setSelectedElmnt } from "../../../stores/overlayStat";
+    import { setSelectedElmnt } from "../../../stores/dynamicOverlayManager";
     import { bounceOut } from "svelte/easing";
 
     export let height:number;

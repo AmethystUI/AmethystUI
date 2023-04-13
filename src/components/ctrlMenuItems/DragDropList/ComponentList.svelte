@@ -31,7 +31,7 @@ const dragging = writable(undefined);
     import Override from "../CollectionViewer/Override.svelte";
     import { collection, focusedComponent, selectedComponent, selectedOverride, focusedOverride } from "../../../stores/collection";
     import { HTMltagInfo } from '../../../types/general';
-    import { clearColorPickerRef } from "../../../stores/colorPickerStat";
+    import { clearColorPickerRef } from "../../../stores/colorPickerManager";
 
     export let id;
     export let itemCount;

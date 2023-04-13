@@ -2,8 +2,8 @@
 
 <!-- control functions for the overlay -->
 <script lang="ts" context="module">
-    import { setColorPickerRef } from "../../../../stores/colorPickerStat";
-    import { openOverlayFrame } from "./Overlay.svelte";
+    import { setColorPickerRef } from "../../../stores/colorPickerManager";
+    import { openOverlayFrame } from "../OverlayBase.svelte";
     const componentID = crypto.randomUUID();
 
     /**
@@ -127,17 +127,17 @@
 
 <!-- Colorpicker overlay backend -->
 <script lang="ts">
-    import { mainColorPickerData } from "../../../../stores/colorPickerStat"
-    import { collection, selectedComponent, selectedOverride } from "../../../../stores/collection"
-    import type { color } from "../../../../types/general";
-    import { hexToRgba, hslToRgb, rgbaToHex, rgbToHsl } from '../../../../util/colorMaths';
+    import { mainColorPickerData } from "../../../stores/colorPickerManager"
+    import { collection, selectedComponent, selectedOverride } from "../../../stores/collection"
+    import type { color } from "../../../types/general";
+    import { hexToRgba, hslToRgb, rgbaToHex, rgbToHsl } from '../../../util/colorMaths';
     import { tweened } from 'svelte/motion';
 	import { quadOut } from 'svelte/easing';
     
-    import { mainOverlayData } from "../../../../stores/overlayStat";
+    import { mainOverlayData } from "../../../stores/dynamicOverlayManager";
     import ColorPickerOverlay from "./ColorPickerOverlay.svelte"; // This import causes circular dependency warning in the compiler, but it works for now. It might be an issue in the future, so keep an eye out on this line.
 
-    import ValueInput from '../Basics/ValueInput.svelte';
+    import ValueInput from '../../ctrlMenuItems/StyleEditors/Basics/ValueInput.svelte';
     import { get } from "svelte/store";
     
     let colorRef:color;

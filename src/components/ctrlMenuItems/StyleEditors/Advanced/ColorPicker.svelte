@@ -4,10 +4,10 @@
     import ValueStrInput from "../Basics/ValueStrInput.svelte";
     import { hexToRgba, hslToRgb, rgbaToHex, rgbToHsl } from "../../../../util/colorMaths";
     import { collection } from "../../../../stores/collection";
-    import { mainColorPickerData } from "../../../../stores/colorPickerStat";
+    import { mainColorPickerData } from "../../../../stores/colorPickerManager";
 
-    import { openColorPicker } from "./ColorPickerOverlay.svelte";
-    import { keepOpenOverlay } from "./Overlay.svelte";
+    import { openColorPicker } from "../../../dynamicOverlay/overlays/ColorPickerOverlay.svelte";
+    import { keepOpenOverlay } from "../../../dynamicOverlay/OverlayBase.svelte";
 
     export let name:string;
     export let sub = false;

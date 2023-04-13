@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { currentView, viewTypes } from "../../stores/viewingMode";
+    import { currentView, viewTypes } from "../../stores/viewingManager";
     import MultiToggle, { multiToggleSelection } from "./StyleEditors/Basics/MultiToggle.svelte";
 
     const viewToggleElements:multiToggleSelection<viewTypes>[] = [

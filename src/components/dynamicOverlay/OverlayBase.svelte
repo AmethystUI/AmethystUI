@@ -1,9 +1,8 @@
 <!-- This component is the floating window that houses interactive components such as ColorPickerOverlay -->
 <!-- control functions for the overlay -->
 <script lang="ts" context="module">
-    import { selectedComponent, selectedOverride } from "../../../../stores/collection";
     import { get } from "svelte/store";
-    import { setX, setY } from "../../../../stores/overlayStat";
+    import { setX, setY } from "../../stores/dynamicOverlayManager";
 
     // position & sizing tweening setup. These values are constantly being updated, so they have a flat accelerations.
     const xTween = tweened(get(mainOverlayData).x, {easing: linear});
@@ -246,7 +245,7 @@
     import { tweened } from 'svelte/motion';
 	import { linear } from 'svelte/easing';
     
-    import { mainOverlayData } from "../../../../stores/overlayStat";
+    import { mainOverlayData } from "../../stores/dynamicOverlayManager";
 
     $: x = $xTween;
     $: y = $yTween;

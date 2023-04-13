@@ -1,6 +1,6 @@
 import { writable, get } from "svelte/store";
 import type { fontObject } from "../workers/pseudoWorkers/fonts";
-import { mainFontPickerData } from "./fontPickerStat";
+import { mainFontPickerData } from "./fontPickerManager";
 
 /**
  * Represents the font data stored in indexDB and the current page stylesheet

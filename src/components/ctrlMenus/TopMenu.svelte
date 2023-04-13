@@ -357,7 +357,7 @@ E.g. "This app fucking sucks."`,
     import DropdownControl, { menuItem } from "../ctrlMenuItems/GeneralAppControl/DropdownControl.svelte";
     import { defaultMouseDownAction } from "../../App.svelte";
     import { initializeColorFromHSLA } from "../../util/colorMaths";
-    import { currentView } from "../../stores/viewingMode";
+    import { currentView } from "../../stores/viewingManager";
 
     export let leftMenuWidth:number;
     let appControlContWidth = 0;

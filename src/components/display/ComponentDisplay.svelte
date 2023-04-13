@@ -61,14 +61,7 @@
                         color: $primary;
                     }
                 }
-                p{
-                    color: $primaryl7;
-
-                    span{
-                        color: $primary;
-                        border-color: $secondarys6;
-                    }
-                }
+                p{ color: $primaryl7 }
             }
         } &.lightMode{
             background-color: hsla(0deg, 0%, 98%, 100%);
@@ -89,14 +82,7 @@
                         color: $secondary;
                     }
                 }
-                p{
-                    color: $primaryl2;
-
-                    span{
-                        color: hsla(0deg, 0%, 98%, 100%);
-                        background-color: $secondarys4;
-                    }
-                }
+                p{ color: $primaryl2 }
             }
         }
 
@@ -138,14 +124,6 @@
                 text-align: left;
                 font-size: 16px;
                 line-height: 22px;
-
-                span{
-                    transition: all $transitionDuration linear;
-                    padding: 0px 9px 0px 9px;
-                    border-radius: 5px;
-                    font-family: "Fira Code";
-                    font-variation-settings: "wght" 600;
-                }
             }
         }
     }

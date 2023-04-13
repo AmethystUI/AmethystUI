@@ -45,8 +45,8 @@
     import Title from "./Basics/Title.svelte";
     import UnitInput from "./Basics/UnitInput.svelte";
 
-    import { openColorPicker } from "./Advanced/ColorPickerOverlay.svelte";
-    import { openFontPicker } from "./Advanced/FontPickerOverlay.svelte";
+    import { openColorPicker } from "../../dynamicOverlay/overlays/ColorPickerOverlay.svelte";
+    import { openFontPicker } from "../../dynamicOverlay/overlays/FontPickerOverlay.svelte";
     
     export let currentParentWidth = 360;
     
@@ -163,7 +163,7 @@
         textDecoration as textDecorationType
     } from "../../../types/general";
     import { beautifiedFontName, getFontNameValue, standardizedFontName } from "../../../workers/pseudoWorkers/fonts";
-    import { keepOpenOverlay } from "./Advanced/Overlay.svelte";
+    import { keepOpenOverlay } from "../../dynamicOverlay/OverlayBase.svelte";
     import { initializeColorFromHSLA } from "../../../util/colorMaths";
     import { activeStyles } from "../../../stores/activeStyles";
 

@@ -408,8 +408,8 @@
                 box-shadow: 0px 0px 0px 2px $primary;
                 border: 1px solid $secondary;
             } &.lightmode{
-                background-color: hsla(0%, 0%, 98%, 100%);
-                box-shadow: 0px 0px 0px 2px hsla(0%, 0%, 98%, 100%);
+                background-color: hsla(0deg, 0%, 98%, 100%);
+                box-shadow: 0px 0px 0px 2px hsla(0deg, 0%, 98%, 100%);
                 border: 1px solid $primary;
             }
 
@@ -503,12 +503,12 @@
             z-index: 999;
 
             &.darkmode{
-                background-color: hsla(0%, 0%, 100%, 20%);
+                background-color: hsla(0deg, 0%, 100%, 20%);
                 &:hover{
                     background-color: $secondary;
                 }
             } &.lightmode{
-                background-color: hsla(0%, 0%, 0%, 20%);
+                background-color: hsla(0deg, 0%, 0%, 20%);
                 &:hover{
                     background-color: $primary;
                 }

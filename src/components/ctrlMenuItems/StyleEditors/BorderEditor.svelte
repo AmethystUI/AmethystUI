@@ -8,7 +8,7 @@
     import ColorPicker from "./Advanced/ColorPicker.svelte";
     import Dropdown from "./Basics/Dropdown.svelte";
     import Title from "./Basics/Title.svelte";
-    import { clearColorPickerRef, mainColorPickerData } from "../../../stores/colorPickerStat";
+    import { clearColorPickerRef, mainColorPickerData } from "../../../stores/colorPickerManager";
     import { initializeColorFromHSLA } from "../../../util/colorMaths";
     import { activeStyles } from "../../../stores/activeStyles";
     

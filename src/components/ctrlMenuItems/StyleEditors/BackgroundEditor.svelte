@@ -4,7 +4,7 @@
     import { units } from "../../../types/general";
 
     import ColorPicker from "./Advanced/ColorPicker.svelte";
-    import { clearColorPickerRef, mainColorPickerData } from "../../../stores/colorPickerStat";
+    import { clearColorPickerRef, mainColorPickerData } from "../../../stores/colorPickerManager";
     import { initializeColorFromHSLA } from "../../../util/colorMaths";
     import { activeStyles } from "../../../stores/activeStyles";
     

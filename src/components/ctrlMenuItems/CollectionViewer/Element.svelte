@@ -1,10 +1,9 @@
 <script lang="ts">
     import { addOverride, collection, focusedComponent, selectedComponent, selectedOverride, focusedOverride, layerDeleteLock, layerBlurLock } from "../../../stores/collection";
     import { HTMltagInfo } from "../../../types/general";
-    import { setSelectedElmnt } from "../../../stores/overlayStat";
+    import { setSelectedElmnt } from "../../../stores/dynamicOverlayManager";
     import { createEventDispatcher } from 'svelte';
     import { fly } from "svelte/transition";
-    import { activeStyles } from "../../../stores/activeStyles";
     const disp = createEventDispatcher();
 
     export let tagType:string;

@@ -14,7 +14,7 @@
 
 <script lang="ts">
     import { get } from "svelte/store";
-    import Overlay from "./components/ctrlMenuItems/StyleEditors/Advanced/Overlay.svelte";
+    import DynamicOverlay from "./components/dynamicOverlay/OverlayBase.svelte";
     import LeftMenu from "./components/ctrlMenus/LeftMenu.svelte";
     import RightMenu from "./components/ctrlMenus/RightMenu.svelte";
     import TopMenu from "./components/ctrlMenus/TopMenu.svelte";
@@ -23,7 +23,9 @@
     import ElementDisplay from "./components/display/ElementDisplay.svelte";
     import { activeStyles } from "./stores/activeStyles";
     import { collection, focusedComponent, focusedOverride, layerBlurLock, selectedComponent, selectedOverride } from "./stores/collection"
-    import { currentView } from "./stores/viewingMode";
+    import { currentView } from "./stores/viewingManager";
+    import { mainModalData } from "./stores/modalManager";
+    import ModalBase from "./components/modals/Modal.svelte";
 
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
@@ -74,7 +76,11 @@
     {/if}
 
     <!-- color picker overlay -->
-    <Overlay />
+    <DynamicOverlay />
+
+    {#if $mainModalData.opened}
+        <ModalBase />
+    {/if}
 </main>
 
 <style lang="scss">

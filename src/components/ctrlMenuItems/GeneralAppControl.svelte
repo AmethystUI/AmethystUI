@@ -1,7 +1,9 @@
 <script lang="ts" context="module">
     // define menus here so we can edit them from outside of this component
     export let accountItems:menuItem[] = [
-        { // div
+        { // spacer
+            type : "spacer", title : "", iconSrc : "", desc: "", cta : () => {}
+        },{ // div
             type : "title",
             title : "Lemon Foxmere",
             iconSrc : "", desc: "", cta : () => {}
@@ -13,6 +15,8 @@
         },
 
         { // spacer
+            type : "spacer", title : "", iconSrc : "", desc: "", cta : () => {}
+        },{ // spacer
             type : "spacer", title : "", iconSrc : "", desc: "", cta : () => {}
         }, { // spacer
             type : "spacer", title : "", iconSrc : "", desc: "", cta : () => {}
@@ -43,6 +47,7 @@
     import RegularControl from "./GeneralAppControl/RegularControl.svelte";
     import DropdownControl, { menuItem } from "./GeneralAppControl/DropdownControl.svelte";
     import { dropdownStatusType } from "../ctrlMenus/TopMenu.svelte";
+    import { openModal } from "../../stores/modalManager";
 
     export let dropdownStatus: dropdownStatusType = {
         currentID : "",
@@ -82,7 +87,7 @@
     </DropdownControl>
 
     <!-- export -->
-    <RegularControl imageURI="./assets/icons/share.svg" alt="Export" />
+    <RegularControl imageURI="./assets/icons/share.svg" alt="Export" cta={() => openModal("export")} />
 
     <!-- full screen -->
     <!-- <RegularControl imageURI="./assets/icons/expand.svg" alt="Checklist" /> -->

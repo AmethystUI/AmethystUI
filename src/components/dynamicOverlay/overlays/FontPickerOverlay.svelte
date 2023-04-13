@@ -2,10 +2,10 @@
 
 <!-- control functions for the overlay -->
 <script lang="ts" context="module">
-    import { openOverlayFrame } from "./Overlay.svelte";
-    import { mainFontPickerData } from "../../../../stores/fontPickerStat";
-    import { initializeMainFontPickerData, storedFontData } from "../../../../stores/fontStorageStat";
-    import { beautifiedFontName, fontExtensionToFormats, fontObject, getClosestVariation, getFontNameValue, searchFontIndex, variationURL } from "../../../../workers/pseudoWorkers/fonts";
+    import { openOverlayFrame } from "../OverlayBase.svelte";
+    import { mainFontPickerData } from "../../../stores/fontPickerManager";
+    import { initializeMainFontPickerData, storedFontData } from "../../../stores/fontStorageManager";
+    import { beautifiedFontName, fontExtensionToFormats, fontObject, getClosestVariation, getFontNameValue, searchFontIndex, variationURL } from "../../../workers/pseudoWorkers/fonts";
 
     const componentID = crypto.randomUUID();
 
@@ -80,7 +80,7 @@
         textCasing as textCasingType,
         textDecoration as textDecorationType,
         typeCategories
-    } from "../../../../types/general";
+    } from "../../../types/general";
 
     /**
      * This is an object that maps the alignment values to a certain index.
@@ -164,17 +164,17 @@
 	import { cubicOut } from 'svelte/easing';
     import FontPickerOverlay from "./FontPickerOverlay.svelte"; // this import causes circular dependency warning in the compiler, but it works for now. It might be an issue in the future, so keep an eye out on this line.
     
-    import { collection, selectedComponent, selectedOverride } from "../../../../stores/collection";
-    import type { typographyStyle } from "../../../../types/general";
-    import { mainOverlayData } from "../../../../stores/overlayStat";
+    import { collection, selectedComponent, selectedOverride } from "../../../stores/collection";
+    import type { typographyStyle } from "../../../types/general";
+    import { mainOverlayData } from "../../../stores/dynamicOverlayManager";
     import { get } from "svelte/store";
-    import MultiSelect, { textDecoration, typeFilters } from "../Basics/MultiSelect.svelte";
-    import MultiToggle, { textAlignment, textCasing } from "../Basics/MultiToggle.svelte";
-    import UnitInput from "../Basics/UnitInput.svelte";
+    import MultiSelect, { textDecoration, typeFilters } from "../../ctrlMenuItems/StyleEditors/Basics/MultiSelect.svelte";
+    import MultiToggle, { textAlignment, textCasing } from "../../ctrlMenuItems/StyleEditors/Basics/MultiToggle.svelte";
+    import UnitInput from "../../ctrlMenuItems/StyleEditors/Basics/UnitInput.svelte";
 
-    import LoadingSpinner from "../../../ui/LoadingSpinner.svelte";
+    import LoadingSpinner from "../../ui/LoadingSpinner.svelte";
     import { onDestroy, onMount } from "svelte";
-    import { downloadFontFromURLs, fontBinary, fontDBName, TTFObjectStore } from "../../../../workers/fontInstaller.worker";
+    import { downloadFontFromURLs, fontBinary, fontDBName, TTFObjectStore } from "../../../workers/fontInstaller.worker";
     import { IDBPDatabase, IDBPObjectStore, IDBPTransaction, openDB as openDBWithIDB } from "idb";
 
     $: name = $mainFontPickerData.windowName ?? "Fonts";
