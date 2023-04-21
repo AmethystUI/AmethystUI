@@ -1,14 +1,23 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
-    import { closeModal } from "../../stores/modalManager";
+    import { closeModal as rootCloseModal } from "../../stores/modalManager";
     import ModalWindow from "./ModalWindow.svelte";
+    import ExportModal from "./modalWindows/Export/ExportModal.svelte";
 
+    // prevent closing the modal when we drag on something and release outside
+    let pressedOnSpace = false;
+    const setPressedOnSpace = () => pressedOnSpace = true;
+    const closeModal = () => {
+        if(pressedOnSpace) rootCloseModal();
+        pressedOnSpace = false;
+    }
 </script>
 
-<main on:mouseup={closeModal} transition:fade={{duration:150}}>
-    <section on:mouseup={e => e.stopPropagation()}>
+<main on:mousedown={setPressedOnSpace} on:click={closeModal} transition:fade={{duration:150}}>
+    <section on:mousedown={e => e.stopPropagation()} on:click={e => e.stopPropagation()}>
         <ModalWindow>
-            <h1>Hi</h1>
+            <!-- TODO: Add modal detection -->
+            <ExportModal />
         </ModalWindow>
     </section>
 </main>

@@ -10,6 +10,14 @@
         val : T, // the value associated with the selected item
         alt : string // description
     };
+    
+    // define content alignement types
+    export enum alignmentType {
+        left = "flex-start",
+        center = "center",
+        right = "flex-end",
+        stretch = "space-between"
+    }
 
     // default sets
     export const textAlignment:multiToggleSelection<textAlignmentType>[] = [
@@ -54,20 +62,37 @@
     import Title from './Title.svelte';
     const disp = createEventDispatcher();
 
+    // base effects
     export let elements : multiToggleSelection<any>[]; // available selection
     export let selection : number; // self explanatory
     export let name = "" // self explanatory
-    export let sub = false // self explanatory
     export let width = 100; // self explanatory
     export let height = 32; // self explanatory
+    
+    // visual effects
+    export let sub = false // self explanatory
+    export let useIcons = true; // self explanatory
+    export let useText = false; // self explanatory
     export let radius = 8; // self explanatory
     export let iconSize = 20; // self explanatory
+    export let textSize = 10; // self explanatory
+    export let textWeight = 500; // self explanatory
+    
+    // alignment stuff
+    export let contentAlignment: alignmentType = alignmentType.center; // self explanatory
+    export let horizontallyAligned = true; // self explanatory
+
+    export let useHoverEffect: boolean = true;
+
     selection = Math.min(elements.length-1, Math.max(0, selection));
 
     let container:HTMLElement;
     let selector:HTMLElement;
     
-    $: selectorX = (width / elements.length) * selection;
+    $: selectorX = horizontallyAligned ? (width / elements.length) * selection : 0;
+    $: selectorY = horizontallyAligned ? 0 : (height / elements.length) * selection;
+    $: elementWidth = horizontallyAligned ? width / elements.length : width;
+    $: elementHeight = horizontallyAligned ? height : height / elements.length;
 
     const updateValue = (newSelection:number):void => {
         // $store = storeVal;
@@ -91,17 +116,34 @@
 <main>
     <Title name={name} sub={sub}/>
     
-    <section class="container" style="width: {width}px; height: {height}px; border-radius: {radius}px" bind:this={container}>
+    <section
+    class="container {useHoverEffect ? "use-hover" : ""} {horizontallyAligned ? "horizontally-aligned" : "vertically-aligned"}"
+    style="width: {width}px; height: {height}px; border-radius: {radius}px;"
+    bind:this={container}>
+    
         {#each elements as ele, i}
             <!-- use elementID to uniquely identify each choice -->
-            <div class="toggle-element" title={ele.alt} style="width:{width / elements.length}px" on:click={() => updateValue(i)}>
-                <img src={ele.iconDir} alt={ele.alt} class={selection === i ? "selected" : ""}
-                    style="height: {iconSize}px">
+            <div class="toggle-element" title={ele.alt} style="width:{elementWidth-20}px; height:{elementHeight}px;  flex-direction: column; justify-content: {contentAlignment};" on:click={() => updateValue(i)}>
+                {#if useIcons}
+                    <img src={ele.iconDir} alt={ele.alt} class={selection === i ? "selected" : ""}
+                        style="height: {iconSize}px">
+                {/if}
+                {#if useIcons && useText}
+                    <!-- put a divider here if both are shown -->
+                    <div style="width: 10px; height: 5px;"></div>
+                {/if}
+                {#if useText}
+                    <p class={`no-drag icon-text ${selection === i ? "selected" : ""}`} style="font-size: {textSize}px; font-weight: {textWeight}">{ele.alt}</p>
+                {/if}
             </div>
         {/each}
         
         <!-- the selector -->
-        <div bind:this={selector} class="selector no-anim" style="width:{width / elements.length}px; transform: translateX({selectorX}px)"></div>
+        <div
+        bind:this={selector}
+        class="selector no-anim"
+        style=" width:{elementWidth}px; height:{elementHeight}px; transform: translate({selectorX}px, {selectorY}px)"
+        ></div>
     </section>
 </main>
 
@@ -122,14 +164,20 @@
             transition: background-color 300ms ease; transition-delay: 0ms;
             overflow:hidden;
             
-            &:hover{
+            &.horizontallyAligned{
+                flex-direction: row;
+            } &.vertically-aligned{
+                flex-direction: column;
+            }
+
+            &.use-hover:hover{
                 background-color: hsl(0,0%,100%,10%);
             }
             
             .toggle-element{
                 z-index:2;
-                height:100%;
-                display: flex; justify-content: center; align-items: center;
+                display: flex; align-items: center;
+                padding: 0px 10px 0px 10px;
                 cursor:pointer;
     
                 img{
@@ -142,10 +190,20 @@
                         filter: invert(1); opacity: 1 !important;
                     }
                 }
+
+                .icon-text{
+                    color: $secondarys5;
+                    text-align: center;
+                    
+                    transition: color 100ms ease;
+
+                    &.selected {
+                        color: $secondary;
+                    }
+                }
             }
     
             .selector{
-                height:100%;
                 background: $accent;
                 position:absolute;
                 border-radius: inherit;

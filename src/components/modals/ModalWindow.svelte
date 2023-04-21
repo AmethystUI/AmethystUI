@@ -14,10 +14,9 @@
     
     main{
         width: fit-content; height: fit-content;
-        width: 600px; height: 350px;
         background-color: $primaryl1;
         border: 1.5px solid $primaryl3;
-        border-radius: 8pt;
+        border-radius: 10px;
         padding: 10px;
     }
 </style>

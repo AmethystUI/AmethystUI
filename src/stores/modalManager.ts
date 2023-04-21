@@ -6,7 +6,7 @@ export interface modalData {
 }
 
 export const mainModalData = writable<modalData>({
-    opened: false,
+    opened: true,
     modalID: ""
 });
 
