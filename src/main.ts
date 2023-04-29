@@ -1,18 +1,18 @@
 /// <reference lib="dom"/>
 
-import App from './App.svelte';
-import { loadFonts } from "./workers/pseudoWorkers/fonts";
+import App from './App.svelte'
+import { loadFonts } from "$lib/workers/pseudoWorkers/fonts";
 
 const app = new App({
-	target: document.body
-});
+    target: document.body,
+})
 
 window.onload = () => {
 	// Initialize font directory. This does not install the fonts.
 	loadFonts().catch(
 		e => console.error("Error occured during font loading: ", e)
 	);
-
+    
 	// register font install script SW.
 	registerFontInstaller().then((installer: ServiceWorker) => {
 		// download fonts
@@ -34,7 +34,8 @@ const registerFontInstaller = (): Promise<ServiceWorker> => {
 		if ("serviceWorker" in navigator) {
 			try {
 				// Register the service worker located at "./workers/fontInstaller.worker.js"
-				const registration = await navigator.serviceWorker.register("./workers/fontInstaller.worker.js");
+
+                const registration = await navigator.serviceWorker.register(`${import.meta.env.BASE_URL}src/static/workers/fontInstaller.worker.js`);
 
 				// If the service worker is not active, add an event listener to track its installation progress
 				if (!registration.active) {
@@ -81,6 +82,6 @@ const registerFontInstaller = (): Promise<ServiceWorker> => {
 			return rej("Browser doesn't support service workers.");
 		}
 	});
-};  
+};
 
-export default app;
+export default app

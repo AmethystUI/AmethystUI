@@ -14,18 +14,18 @@
 
 <script lang="ts">
     import { get } from "svelte/store";
-    import DynamicOverlay from "./components/dynamicOverlay/OverlayBase.svelte";
-    import LeftMenu from "./components/ctrlMenus/LeftMenu.svelte";
-    import RightMenu from "./components/ctrlMenus/RightMenu.svelte";
-    import TopMenu from "./components/ctrlMenus/TopMenu.svelte";
-    import ComponentDisplay from "./components/display/ComponentDisplay.svelte";
-    import getStyleSetting from "./components/display/displayElements/elementStyleSettings";
-    import ElementDisplay from "./components/display/ElementDisplay.svelte";
-    import { activeStyles } from "./stores/activeStyles";
-    import { collection, focusedComponent, focusedOverride, layerBlurLock, selectedComponent, selectedOverride } from "./stores/collection"
-    import { currentView } from "./stores/viewingManager";
-    import { mainModalData } from "./stores/modalManager";
-    import ModalBase from "./components/modals/Modal.svelte";
+    import DynamicOverlay from "$lib/comp/dynamicOverlay/OverlayBase.svelte";
+    import LeftMenu from "$lib/comp/ctrlMenus/LeftMenu.svelte";
+    import RightMenu from "$lib/comp/ctrlMenus/RightMenu.svelte";
+    import TopMenu from "$lib/comp/ctrlMenus/TopMenu.svelte";
+    import ComponentDisplay from "$lib/comp/display/ComponentDisplay.svelte";
+    import getStyleSetting from "$lib/comp/display/displayElements/elementStyleSettings";
+    import ElementDisplay from "$lib/comp/display/ElementDisplay.svelte";
+    import { activeStyles } from "$lib/stores/activeStyles";
+    import { collection, focusedComponent, focusedOverride, layerBlurLock, selectedComponent, selectedOverride } from "$lib/stores/collection"
+    import { currentView } from "$lib/stores/viewingManager";
+    import { mainModalData } from "$lib/stores/modalManager";
+    import ModalBase from "$lib/comp/modals/Modal.svelte";
 
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
@@ -84,7 +84,7 @@
 </main>
 
 <style lang="scss">
-    @import "public/guideline";
+    @import "/src/static/stylesheets/guideline";
 
     main{
         width:100vw; height:100vh;

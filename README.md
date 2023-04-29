@@ -1,24 +1,26 @@
-<div style="margin-top:1rem; padding: 20px; display:flex; justify-content: center; width: calc(100% - 20px);">
+<div style="margin:1rem; display:flex; justify-content: center; width: 100%;">
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="./public/assets/pngs/markdown_assets/amethyst_banner_dev_darkmode.png">
-        <source media="(prefers-color-scheme: light)" srcset="./public/assets/pngs/markdown_assets/amethyst_banner_dev_lightmode.png">
-        <img alt="AmethystUI" height="70px" src="./public/assets/pngs/markdown_assets/amethyst_banner_dev_lightmode.png">
+        <source media="(prefers-color-scheme: dark)" srcset="./src/assets/pngs/markdown_assets/amethyst_banner_dev_darkmode.png">
+        <source media="(prefers-color-scheme: light)" srcset="./src/assets/pngs/markdown_assets/amethyst_banner_dev_lightmode.png">
+        <img alt="AmethystUI" height="70px" src="./src/assets/pngs/markdown_assets/amethyst_banner_dev_lightmode.png">
     </picture>
 </div>
+
+<br>
 
 # Introduction
 
 AmethystUI is a semantic graphics editor that simplifies the design and testing of UI components, with the goal of making front-end development more efficient. This guide will explain how to install and develop for AmethystUI, and you may use the `☰` button on the top left corner to navigate through different sections.
 
 # Setup
-AmethystUI uses Svelte as its frontend framework and Rollup as its modle bundler. It also includes two live development server that's ready to use; One for the frontend application and one for the service workers.
+AmethystUI uses Svelte as its frontend framework and Vite as its build tool. Originally, the codebase was built with Rollup as the bundler and build tool, but it was migrated to Vite on April 28th, 2023 in favor of more modern web standards. While the migration process was successful, there may be some unforeseen bugs that were not resolved during the migration. If you encounter any issues, please try to resolve them to the best of your abilities. And if the issue persists, create an issue thread in this repository regarding the problem.
 
 ## Prerequisites
 Make sure that you have the following installed on your machine:
 - Git commandline tools
 - `SSH` and `GPG`
 - NodeJS `v19.6.0` or newer
-- `npm` and `yarn` Package Managers
+- `yarn` Package Manager
 - Typescript
 
 ## Security
@@ -31,8 +33,9 @@ To install the codebase and development server, follow these instructions:
 2. Open a terminal and run the command that matches your system.
 - MacOS / Linux SSH: `git clone git@github.com:AmethystUI/AmethystUI.git amethystui/ && cd amethystui/`
 - Windows SSH: `git clone git@github.com:AmethystUI/AmethystUI.git amethystui\ && cd amethystui\`
-3. Run `git pull origin` to update everything from Git
-4. Run `yarn install` to install the necessary packages
+3. Run `git remote -v` to make sure the origin is set correctly
+4. Run `git pull origin` to update everything from Git
+5. Run `yarn install` to install the necessary packages
 
 The `amethystui/` folder will now be your working directory, and we recommend creating a VSCode project with `amethystui/` as the root folder.
 
@@ -43,7 +46,7 @@ The development guide in this repository will mainly cover the development envir
 All of the UI components in AmethystUI are built from scratch and follow a series of design guidelines. Do not use third party UI/UX components unless it meets all criterias of the AmethystUI design guidelines.
 
 ## Application Structure
-AmethystUI's UI layout is as follows:
+AmethystUI's UI layout is as shown (*NOT* a file structure):
 ```
 Main App
 │
@@ -86,11 +89,35 @@ Main App
     6.**Dynamic Overlays**: These are floating, draggable, non-blocking modals that appear on certain contexts (such as picking colors or choosing fonts) on top of the main UI to provide more control over a certain attribute.
 - Service Workers: These are separate threads that handle various background tasks. Currently, we only use it to fetch font files using the Google Fonts API and cache them into IndexedDB.
 
+## Configuring Transpilation
+
+AmethystUI relies on its build tools and bundlers to function. Therefore, we have taken extra care to ensure that there are enough customizable configurations to be flexible enough to accommodate any future changes. In this section, we'll cover two main types of configurations: transpiling for the main application and transpiling for the service worker.
+
+### Main Application Transpilation
+
+These configuration files are crucial in ensuring that the AmethystUI application can be tailored to your specific needs. By modifying these files, you can customize the build process, adjust the behavior of Svelte, fine-tune TypeScript settings, create global path shorthands, and control Vite's behavior. With these powerful configuration options at your disposal, you can create a highly flexible and adaptable application that meets your requirements.
+
+- `package.json`
+    -  Controls the build commands and processes. It contains scripts for running the development and production builds, as well as any other custom scripts needed for the project.
+- `svelte.config.js`
+    - Controls the behavior of Svelte, the frontend framework used in AmethystUI. You most likely would not need to touch this at all.
+- `tsconfig.json`
+    - Controls the global TypeScript behavior. It allows for customization of TypeScript settings such as target version, module resolution, and source map generation.
+- `tsconfig.paths.json`
+    - Controls the global TypeScript path shorthands, such as `$lib` and `$assets`. These paths can be used to import files and folders without needing to specify the entire path each time.
+- `vite.config.ts`
+    - Controls the behavior of Vite. It allows for customization of Vite's settings, such as enabling CSS modules, configuring the server, and setting up build optimization.
+
+### Service Worker Transpilation
+
+AmethystUI heavily utilizes Service Workers to fetch data from remote servers. By default, service worker scripts are seperately bundled as static assets into `/src/static/workers/` so that they can be loaded by the browser. It is ***very*** important to note that this build process is done separately with Rollup, and is only used to bundle static asset scripts such as the service worker scripts. Therefore, `rollup.config.js` is ***specifically*** for static script bundles, and should not be used to configure application behaviors.
+
 ## Development servers
 
-AmethystUI heavily utilize Service Workers to fetch data from remote servers, so it has two separate development servers that should boot up upon running `yarn run dev`.
-
-To make sure both are running, make sure the debug message `Your application is ready~! 🚀` is shown twice. After the server has booted up, you should see a link from the development server that reads `http://localhost:{port-number}`. You may open the link in a web browser, and you should see the AmethystUI app hosted locally.
+To start the development server, follow these steps:
+1. Navigate to your `amethystui/` directory in a command line environment
+2. Run `yarn dev`
+3. The development server should start automatically, and the application should automatically open up in a new tab of your default browser.
 
 ## More stuff
 We're still working on the README, but if you have any questions feel free to ask it on our discord server.

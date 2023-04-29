@@ -1,0 +1,26 @@
+{
+    "extends": "@tsconfig/svelte/tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": "./",
+        "paths": {
+            "$src/*": [
+            "./src/*"
+            ],
+            "$util/*": [
+                "./src/util/*"
+            ],
+            "$lib/*": [
+                "./src/lib/*"
+            ],
+            "$asset/*": [
+                "./src/assets/*"
+            ],
+            "$public/*": [
+                "./public/*"
+            ],
+            "$static/*": [
+                "./src/static/*"
+            ],
+        }
+    },
+}

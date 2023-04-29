@@ -1,37 +1,37 @@
 {
-  "name": "svelte-app",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "build": "rollup -c rollup.config.js",
-    "dev": "rollup -c rollup.config.js -w",
-    "start": "sirv public --no-clear",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
-  },
-  "devDependencies": {
-    "@rollup/plugin-commonjs": "^17.0.0",
-    "@rollup/plugin-node-resolve": "^11.0.0",
-    "@rollup/plugin-typescript": "^8.0.0",
-    "@tsconfig/svelte": "^2.0.0",
-    "rollup": "^2.3.4",
-    "rollup-plugin-css-only": "^3.1.0",
-    "rollup-plugin-livereload": "^2.0.0",
-    "rollup-plugin-svelte": "^7.0.0",
-    "rollup-plugin-terser": "^7.0.0",
-    "sass": "^1.56.1",
-    "svelte": "^3.0.0",
-    "svelte-check": "^2.0.0",
-    "svelte-preprocess": "^4.0.0",
-    "tslib": "^2.0.0",
-    "typescript": "^4.0.0"
-  },
-  "dependencies": {
-    "global": "^4.4.0",
-    "idb": "^7.1.1",
-    "node-sass": "^8.0.0",
-    "rollup-plugin-copy": "^3.4.0",
-    "sirv-cli": "^2.0.0",
-    "svelte-dnd-list": "^0.1.3",
-    "yarn": "^1.22.19"
-  }
+    "name": "amethyst-vite",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "run-p --print-label dev:*",
+        "dev:vite": "vite",
+        "dev:swrk": "rollup -c rollup.config.js -w",
+        "build": "tsc && vite build && rollup -c rollup.config.js",
+        "serve": "vite preview",
+        "check": "svelte-check --tsconfig ./tsconfig.json"
+    },
+    "devDependencies": {
+        "@rollup/plugin-commonjs": "^24.1.0",
+        "@rollup/plugin-node-resolve": "^15.0.2",
+        "@rollup/plugin-typescript": "^11.1.0",
+        "@sveltejs/vite-plugin-svelte": "^2.0.3",
+        "@tsconfig/svelte": "^4.0.1",
+        "npm-run-all": "^4.1.5",
+        "path": "^0.12.7",
+        "rollup": "^3.21.0",
+        "rollup-plugin-livereload": "^2.0.5",
+        "rollup-plugin-terser": "^7.0.2",
+        "sass": "^1.62.0",
+        "svelte": "^3.57.0",
+        "svelte-check": "^3.2.0",
+        "tslib": "^2.5.0",
+        "typescript": "^5.0.2",
+        "vite": "^4.3.0"
+    },
+    "dependencies": {
+        "idb": "^7.1.1",
+        "svelte-dnd-list": "^0.1.8",
+        "yarn": "^1.22.19"
+    }
 }

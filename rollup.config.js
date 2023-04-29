@@ -1,102 +1,33 @@
-import glob from 'glob';
-import svelte from 'rollup-plugin-svelte';
-import commonjs from '@rollup/plugin-commonjs';
-import resolve from '@rollup/plugin-node-resolve';
-import livereload from 'rollup-plugin-livereload';
-import { terser } from 'rollup-plugin-terser';
-import sveltePreprocess from 'svelte-preprocess';
-import typescript from '@rollup/plugin-typescript';
-import css from 'rollup-plugin-css-only';
+/**
+ * @WARNING: THIS IS NOT RESPONSIBLE FOR THE MAIN APPLICATION CODE!
+ * This rollup config is used ONLY for generating the service worker JS files. The main application code is managed by Vite.
+ * 
+ * If you are trying to configure compilation settings for the main application code, this is not the place to do it!
+ */
+
+import typescript from "@rollup/plugin-typescript";
+import glob from "glob";
+import commonjs from "@rollup/plugin-commonjs";
+import resolve from "@rollup/plugin-node-resolve";
+import livereload from "rollup-plugin-livereload";
+import { terser } from "rollup-plugin-terser";
 
 const production = !process.env.ROLLUP_WATCH;
 
-function serve() {
-	let server;
-
-	function toExit() {
-		if (server) server.kill(0);
-	}
-
-	return {
-		writeBundle() {
-			if (server) return;
-			server = require('child_process').spawn('npm', ['run', 'start', '--', '--dev'], {
-				stdio: ['ignore', 'inherit', 'inherit'],
-				shell: true
-			});
-
-			process.on('SIGTERM', toExit);
-			process.on('exit', toExit);
-		}
-	};
-}
-
-const workerFiles = glob.sync('src/workers/**/*.worker.ts'); // worker files
-
-const appConfig = { // Main Svelte App
-	input: 'src/main.ts',
-	output: {
-		sourcemap: true,
-		format: 'iife',
-		name: 'app',
-		file: 'public/build/bundle.js'
-	},
-	plugins: [
-		svelte({
-			preprocess: sveltePreprocess({ sourceMap: !production }),
-			compilerOptions: {
-				// enable run-time checks when not in production
-				dev: !production
-			}
-		}),
-		// we'll extract any component CSS out into
-		// a separate file - better for performance
-		css({ output: 'bundle.css' }),
-
-		// If you have external dependencies installed from
-		// npm, you'll most likely need these plugins. In
-		// some cases you'll need additional configuration -
-		// consult the documentation for details:
-		// https://github.com/rollup/plugins/tree/master/packages/commonjs
-		resolve({
-			browser: true,
-			dedupe: ['svelte']
-		}),
-		commonjs(),
-		typescript({
-			sourceMap: !production,
-			inlineSources: !production
-		}),
-
-		// In dev mode, call `npm run start` once
-		// the bundle has been generated
-		!production && serve(),
-
-		// Watch the `public` directory and refresh the
-		// browser on changes when not in production
-		!production && livereload('public'),
-
-		// If we're building for production (npm run build
-		// instead of npm run dev), minify
-		production && terser()
-	],
-	watch: {
-		clearScreen: false
-	}
-}
+const workerFiles = glob.sync("./src/lib/workers/**/*.worker.ts"); // worker files
 
 const workerConfigs = workerFiles.map((workerFile) => ({ // Worker scripts
 	input: workerFile,
 	output: {
 		sourcemap: true,
-		format: 'iife',
-		name: workerFile.replace(/src\/workers\//, '').replace(/\.ts$/, ''),
-		file: workerFile.replace(/src\/workers\//, 'public/workers/').replace(/\.ts$/, '.js')
+		format: "iife",
+		name: workerFile.replace(/src\/workers\//, "").replace(/\.ts$/, ""),
+		file: `${process.cwd()}/src/static/workers/${workerFile.replace(/^\.\/src\/lib\/workers\//, "").replace(/\.ts$/, ".js")}`
 	},
 	plugins: [
 		resolve({
 			browser: true,
-			dedupe: ['svelte']
+			dedupe: ["svelte"]
 		}),
 		commonjs(),
 		typescript({
@@ -104,23 +35,17 @@ const workerConfigs = workerFiles.map((workerFile) => ({ // Worker scripts
 			inlineSources: !production
 		}),
 
-		// In dev mode, call `npm run start` once
-		// the bundle has been generated
-		!production && serve(),
-
 		// Watch the `public` directory and refresh the
 		// browser on changes when not in production
-		!production && livereload('public'),
+		!production && livereload("public"),
 
-		// If we're building for production (npm run build
-		// instead of npm run dev), minify
+		// If we"re building for production (yarn build
+		// instead of yarn dev), minify
 		production && terser()
 	],
 	watch: {
-		clearScreen: false
+		clearScreen: true,
 	}
 }))
 
-const globalConfig = [...workerConfigs, appConfig]
-
-export default globalConfig;
+export default [...workerConfigs];
