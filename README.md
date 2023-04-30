@@ -1,4 +1,6 @@
-<div style="margin:1rem; display:flex; justify-content: center; width: 100%;">
+<br>
+
+<div style="width: 100%;" align="center">
     <picture>
         <source media="(prefers-color-scheme: dark)" srcset="./src/assets/pngs/markdown_assets/amethyst_banner_dev_darkmode.png">
         <source media="(prefers-color-scheme: light)" srcset="./src/assets/pngs/markdown_assets/amethyst_banner_dev_lightmode.png">
