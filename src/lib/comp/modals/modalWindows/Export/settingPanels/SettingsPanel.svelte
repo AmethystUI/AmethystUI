@@ -23,7 +23,7 @@
 
     main{
         section{
-            padding: 10px
+            padding: 0px 10px 10px 10px;
         }
 
         .header{

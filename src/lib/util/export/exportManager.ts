@@ -3,6 +3,7 @@
  * It also defines certain types and objects such as the available export formats, as well as the available settings for each file type.
  */
 
+import type exportConfigInterface from "$src/lib/types/exportConfigs";
 import { writable } from "svelte/store"
 
 /**
@@ -53,13 +54,13 @@ type Configs<T extends Record<string, Record<any, any>>> = {
  * const config = { ...defaultConfigs, scss: { nestStyles: false } };
  * ```
  */
-const defaultConfigs = {
+const defaultConfigs: exportConfigInterface = {
     "stylesheets" : {
-        "colorFmt" : "HSLA" as "HSLA" | "HEX" | "RGBA",
+        "colorFmt" : "hsl",
         "colorUnitInference" : false,
         "fontIntegration" : true,
         "fontLocalization" : false,
-        "compressionAmt" : "Aggressive" as "None" | "Standard" | "Aggressive",
+        "compressionAmt" : 1,
     },
     "scss" : {
         "nestStyles" : true,
@@ -76,4 +77,4 @@ const defaultConfigs = {
  * @param stylesheets - Access configuration settings that are universal to all stylesheets. This does NOT include types like JSON.
  * @param common - Access configuration settings that are universal to all file types, including types like JSON.
  */
-export const exportConfigs = writable<typeof defaultConfigs>(defaultConfigs); // type inference works properly
+export const exportConfigs = writable<exportConfigInterface>(defaultConfigs); // type inference works properly

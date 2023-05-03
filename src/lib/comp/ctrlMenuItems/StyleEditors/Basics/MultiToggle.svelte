@@ -77,6 +77,7 @@
     export let iconSize = 20; // self explanatory
     export let textSize = 10; // self explanatory
     export let textWeight = 500; // self explanatory
+    export let textClrOverride = "";
     
     // alignment stuff
     export let contentAlignment: alignmentType = alignmentType.center; // self explanatory
@@ -114,7 +115,7 @@
 
 <!--HTML -->
 <main>
-    <Title name={name} sub={sub}/>
+    <Title name={name} sub={sub} textClrOverride={textClrOverride}/>
     
     <section
     class="container {useHoverEffect ? "use-hover" : ""} {horizontallyAligned ? "horizontally-aligned" : "vertically-aligned"}"
