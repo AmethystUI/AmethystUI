@@ -1,36 +1,19 @@
 <script lang="ts" context="module">
     import { closeModal } from "$lib/stores/modalManager";
-    import type { fileTypes } from "$lib/util/exportEngine/exportManager";
     import { alignmentType, type multiToggleSelection } from "$lib/comp/ctrlMenuItems/StyleEditors/Basics/MultiToggle.svelte";
 
-    const verticalAlignments: multiToggleSelection<fileTypes>[] = [
-        {
-            iconDir : "",
-            val : "css",
-            alt : ".CSS"
-        },{
-            iconDir : "",
-            val : "scss",
-            alt : ".SCSS"
-        }, {
-            iconDir : "",
-            val : "json",
-            alt : ".JSON"
-        },
-    ]
-
-    const test:multiToggleSelection<any>[] = [
+    const configFilters:multiToggleSelection<fileTypes>[] = [
         {
             iconDir : "/src/assets/icons/css.svg",
-            val : "flex-start",
+            val : "css",
             alt : "CSS"
         }, {
             iconDir : "/src/assets/icons/scss.svg",
-            val : "center",
+            val : "scss",
             alt : "SCSS"
         }, {
             iconDir : "/src/assets/icons/json.svg",
-            val : "flex-end",
+            val : "json",
             alt : "JSON"
         },
     ]
@@ -38,7 +21,15 @@
 
 <script lang="ts">
     import MultiToggle from "$lib/comp/ctrlMenuItems/StyleEditors/Basics/MultiToggle.svelte";
-    import SettingsPanel from "./settingPanels/SettingsPanel.svelte";
+    import { type fileTypes, nonStylesheetTypes } from "$src/lib/util/export/exportManager";
+    import ColorSettings from "./settingPanels/ColorSettings.svelte";
+
+    let currentConfigFilter: fileTypes = "css";
+    $: currentFilterIndex = configFilters.map(item => item.val).indexOf(currentConfigFilter);
+
+    const updateConfigFilter = (e: CustomEvent) => currentConfigFilter = e.detail.value;
+
+
 </script>
 
 <main>
@@ -48,16 +39,18 @@
     <section id="setting-container">
         <!-- Setting filter -->
         <section id="setting-filters-container">
-            <MultiToggle elements={test} selection={0} useText={true}
+            <MultiToggle elements={configFilters} selection={currentFilterIndex} useText={true}
             contentAlignment={alignmentType.center} horizontallyAligned={false} useHoverEffect={false}
-            name={""} sub={true} width={70} height={test.length * 50} radius={6} iconSize={16} textSize={10} textWeight={400}/>
+            name={""} sub={true} width={70} height={configFilters.length * 50} radius={6} iconSize={16} textSize={10} textWeight={400}
+            on:valueChange={updateConfigFilter}/>
         </section>
         <div id="separator"></div>
         
         <section id="setting-panels-container">
-            <SettingsPanel>
-                
-            </SettingsPanel>
+            <!-- Common Stylesheet Configs -->
+            {#if !nonStylesheetTypes.includes(currentConfigFilter)}
+                <ColorSettings />
+            {/if}
         </section>
     </section>
 

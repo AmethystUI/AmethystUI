@@ -1,9 +1,6 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-
     export let panelName = "";
 
-    let showContent = true;
     let panel: HTMLElement;
 </script>
 
@@ -34,9 +31,9 @@
 
             p{
                 width: 100%;
-                font-size: 14px;
-                font-weight: 500;
-                letter-spacing: 0px;
+                font-size: 20px;
+                font-weight: 600;
+                letter-spacing: -0.24px;
                 padding: 8px 10px 8px 10px;
                 background-color: hsla(200, 5%, 8%, 100%);
                 backdrop-filter: blur(50px); -webkit-backdrop-filter: blur(50px);

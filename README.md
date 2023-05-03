@@ -118,8 +118,9 @@ AmethystUI heavily utilizes Service Workers to fetch data from remote servers. B
 
 To start the development server, follow these steps:
 1. Navigate to your `amethystui/` directory in a command line environment
-2. Run `yarn dev`
-3. The development server should start automatically, and the application should automatically open up in a new tab of your default browser.
+2. Make sure that all dependencies are installed with `yarn install`
+3. Run `yarn dev`
+4. The development server should start automatically, and the application should automatically open up in a new tab of your default browser.
 
 ## More stuff
 We're still working on the README, but if you have any questions feel free to ask it on our discord server.
