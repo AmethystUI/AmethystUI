@@ -14,7 +14,9 @@
 </script>
 
 <main on:mousedown={setPressedOnSpace} on:click={closeModal} transition:fade={{duration:150}}>
-    <section on:mousedown={e => e.stopPropagation()} on:click={e => e.stopPropagation()}>
+    <!-- I forgot why I needed this line, but if shit breaks and you need it, it's here. -->
+    <!-- on:mousedown={e => e.stopPropagation()} -->
+    <section on:click={e => e.stopPropagation()}>
         <ModalWindow>
             <!-- TODO: Add modal detection -->
             <ExportModal />

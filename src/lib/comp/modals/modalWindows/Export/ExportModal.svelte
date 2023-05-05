@@ -17,19 +17,46 @@
             alt : "JSON"
         },
     ]
+
+    const fullPanelWidth = 490;
+    const configSpacing = "13px";
+    const configPanelStyling = {
+        fullPanelWidth,
+        configSpacing,
+        multiToggleStyling : {
+            "useText" : true,
+            "useIcons" : false,
+            "contentAlignment" : alignmentType.center,
+            "name" : "",
+            width : fullPanelWidth,
+            height : 32,
+            radius : 6,
+            textSize: 10,
+            textWeight: 500
+        },
+        checkboxStyling : {
+            "textSize" : 12,
+            "textWeight" : 400,
+            "textColor" :  "hsl(0, 0%, 90%)",
+            "letterSpacing" : 0.15,
+            "checkBoxMargin" : `${configSpacing} 0px 0px 0px`
+        }
+    }
+
 </script>
 
 <script lang="ts">
     import MultiToggle from "$lib/comp/ctrlMenuItems/StyleEditors/Basics/MultiToggle.svelte";
     import { type fileTypes, nonStylesheetTypes } from "$src/lib/util/export/exportManager";
     import ColorSettings from "./settingPanels/ColorSettings.svelte";
+    import FontSettings from "./settingPanels/FontSettings.svelte";
+    import CompressionSettings from "./settingPanels/CompressionSettings.svelte";
+    import ScssSpecificSettings from "./settingPanels/ScssSpecificSettings.svelte";
 
     let currentConfigFilter: fileTypes = "css";
     $: currentFilterIndex = configFilters.map(item => item.val).indexOf(currentConfigFilter);
 
     const updateConfigFilter = (e: CustomEvent) => currentConfigFilter = e.detail.value;
-
-
 </script>
 
 <main>
@@ -49,8 +76,19 @@
         <section id="setting-panels-container">
             <!-- Common Stylesheet Configs -->
             {#if !nonStylesheetTypes.includes(currentConfigFilter)}
-                <ColorSettings />
+                <ColorSettings {...configPanelStyling}/>
+                <FontSettings {...configPanelStyling}/>
             {/if}
+
+            <!-- SCSS only configs -->
+            {#if currentConfigFilter === "scss"}
+                <ScssSpecificSettings {...configPanelStyling}/>
+            {/if}
+
+            <!-- Common settings -->
+            <CompressionSettings {...configPanelStyling}/>
+
+            <div style="height: 30%"></div>
         </section>
     </section>
 

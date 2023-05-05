@@ -22,28 +22,6 @@ export const nonStylesheetTypes:fileTypes[] = ["json"];
 export const targetFileType = writable<fileTypes>("css");
 
 /**
- * Creates a new type by mapping a subset of properties of the given type to
- * be optional.
- *
- * @template K - A union of keys of the input type that should be made optional.
- * @template T - The type of the properties in the input type.
- */
-type PartialRecord<K extends keyof any, T> = Partial<Record<K, T>>;
-
-/**
- * A type representing a configuration value that consists of a display name
- * and a typed value.
- *
- * @template T - The type of the value being configured.
- */
-
-type Configs<T extends Record<string, Record<any, any>>> = {
-    [K in keyof T]: {
-        [C in keyof T[K]]: T[K][C];
-    };
-};
-
-/**
  * The default configuration object for the application.
  *
  * @devnote I tried to give this config object explicit typing but ended up losing my fucking mind.
@@ -55,18 +33,18 @@ type Configs<T extends Record<string, Record<any, any>>> = {
  * ```
  */
 const defaultConfigs: exportConfigInterface = {
-    "stylesheets" : {
-        "colorFmt" : "hsl",
-        "colorUnitInference" : false,
-        "fontIntegration" : true,
-        "fontLocalization" : false,
-        "compressionAmt" : 1,
+    "common": {
+        "compressionAmt": 1,
     },
-    "scss" : {
-        "nestStyles" : true,
+    "stylesheets": {
+        "colorFmt": "hsl",
+        "colorUnitInference": false,
+        "fontIntegration": true,
+        "loadFullTypeface": false,
+        "fontLocalization": false,
     },
-    "json" : {
-        "compress" : false,
+    "scss": {
+        "nestStyles": true,
     },
 }
 
