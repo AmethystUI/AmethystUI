@@ -89,7 +89,7 @@
         border-left: 1px solid $primaryl4;
         top:65px; right:0;
         display:flex; flex-direction: column;
-        z-index: 9997;
+        z-index: 17;
         overflow-y:scroll;
         // hide scrollbar
         // &::-webkit-scrollbar { width: 0 !important }

@@ -5,20 +5,20 @@
      * Every component might have a different indicies object. These are exclusive to this component.
      */
 
-    const alignmentIndices: { [K in textAlignmentType]: number } = {
+    const alignmentIndices: { [K in textAlignment]: number } = {
         "left": 0,
         "center": 1,
         "right": 2,
         "justify": 3,
     };
     
-    const casingIndices: { [K in textCasingType]: number } = {
+    const casingIndices: { [K in textCasing]: number } = {
         "lowercase": 0,
         "none": 1,
         "uppercase": 2,
     };
 
-    const decorationIndices: { [K in textDecorationType]: number } = {
+    const decorationIndices: { [K in textDecoration]: number } = {
         "italicize": 0,
         "underline": 1,
         "strike": 2,
@@ -31,10 +31,6 @@
         selectedComponent,
         selectedOverride
     } from "$lib/stores/collection";
-    import type {
-        color,
-        typographyStyle
-    } from "$lib/types/general"
 
     import TypefaceFinder from "./Advanced/TypefaceFinder.svelte";
     import Dropdown from "./Basics/Dropdown.svelte";
@@ -157,11 +153,6 @@
 
     // ====================== UPDATE FUNCTIONS ======================
 
-    import type {
-        textAlignment as textAlignmentType,
-        textCasing as textCasingType,
-        textDecoration as textDecorationType
-    } from "$lib/types/general";
     import { beautifiedFontName, getFontNameValue, standardizedFontName } from "$lib/workers/pseudoWorkers/fonts";
     import { keepOpenOverlay } from "../../dynamicOverlay/OverlayBase.svelte";
     import { initializeColorFromHSLA } from "$lib/util/colorMaths";

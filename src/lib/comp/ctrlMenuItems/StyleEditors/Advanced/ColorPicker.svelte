@@ -1,5 +1,4 @@
 <script lang="ts">
-    import type { color } from "$lib/types/general";
     import ValueInput from "../Basics/ValueInput.svelte";
     import ValueStrInput from "../Basics/ValueStrInput.svelte";
     import { hexToRgba, hslToRgb, rgbaToHex, rgbToHsl } from "$lib/util/colorMaths";

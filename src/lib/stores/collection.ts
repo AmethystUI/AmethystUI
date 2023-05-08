@@ -1,6 +1,4 @@
 import { writable, get } from 'svelte/store';
-import type { elementStyle } from '../types/element';
-import type { HTMLtags, element } from "$lib/types/general";
 
 export let collection = writable<element[]>([]); // the project file data
 

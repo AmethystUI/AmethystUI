@@ -1,4 +1,4 @@
-import type { color, overflow, boxShadow, unitedAttr, borderOutlineStyle, typographyStyle, displayTypes, flexAlignment, flexDirection } from "./general";
+// import type { color, overflow, boxShadow, unitedAttr, borderOutlineStyle, typographyStyle, displayTypes, flexAlignment, flexDirection } from "./general";
 
 /**
  * An object representing the style properties of an HTML element.
@@ -7,7 +7,7 @@ import type { color, overflow, boxShadow, unitedAttr, borderOutlineStyle, typogr
  * @property First Letter Cap - Properties used in the backend as an aid to style elements. Does not directly affect the stylesheet.
  * @property Normal Camel Case - Properties that will directly affect the styling of the element.
  */
-export interface elementStyle{
+interface elementStyle{
     USEBACKGROUND? : boolean; // done
     backgroundColor? : color, // done
     opacity? : number, // done
@@ -75,4 +75,9 @@ export interface elementStyle{
 };
 
 // All the styles possible
-export type elementStyleType = keyof elementStyle;
+type elementStyleKeys = keyof elementStyle;
+
+// globalScope
+
+declare let elementStyle: elementStyle;
+declare let elementStyleKeys: elementStyleKeys;

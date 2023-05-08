@@ -1,9 +1,4 @@
 <script context="module" lang="ts">
-    import type {
-        textCasing as textCasingType,
-        textAlignment as textAlignmentType
-    } from '../../../../types/general';
-    
     // define selection data
     export interface multiToggleSelection<T> {
         iconDir : string, // where the app gets the icon image
@@ -20,7 +15,7 @@
     }
 
     // default sets
-    export const textAlignment:multiToggleSelection<textAlignmentType>[] = [
+    export const textAlignment:multiToggleSelection<textAlignment>[] = [
         {
             iconDir : "/src/assets/icons/align-left.svg",
             val : "left",
@@ -40,7 +35,7 @@
         }
     ]
 
-    export const textCasing:multiToggleSelection<textCasingType>[] = [
+    export const textCasing:multiToggleSelection<textCasing>[] = [
         {
             iconDir : "/src/assets/icons/lower-case.svg",
             val : "lowercase",
@@ -106,11 +101,9 @@
     };
 
     // remove selector animation blocker once it's loaded
-    $: if(!!selector){
-        setTimeout(() => { // push removal to the next execution cycle so that the animation doesnt play
-            selector.classList.remove("no-anim");
-        }, 0);
-    }
+    $: setTimeout(() => { // push removal to the next execution cycle so that the animation doesnt play
+        if(!!selector) selector.classList.remove("no-anim");
+    }, 0);
 </script>
 
 <!--HTML -->

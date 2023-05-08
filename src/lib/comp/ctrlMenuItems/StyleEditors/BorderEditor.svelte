@@ -1,7 +1,5 @@
 <script lang="ts">
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
-    import type { color } from "$lib/types/general";
-    import type { units, borderOutlineStyle } from "$lib/types/general";
 
     import Slider from "./Basics/Slider.svelte";
     import UnitInput from "./Basics/UnitInput.svelte";

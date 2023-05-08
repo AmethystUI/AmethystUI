@@ -2,7 +2,6 @@
     import { get } from "svelte/store";
     import { activeStyles } from "$lib/stores/activeStyles";
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
-    import type { units } from "$lib/types/general";
 
     import Slider from "./Basics/Slider.svelte";
     import UnitInput from "./Basics/UnitInput.svelte";

@@ -1,6 +1,5 @@
 /// <reference lib="dom" />
 
-import type { typeCategories } from "$lib/types/general";
 import { fontLimit, fontSorting } from "../configs/fontLoading.config";
 
 /**

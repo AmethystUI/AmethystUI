@@ -151,7 +151,7 @@
             backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
             overflow:hidden;
             display:flex; flex-direction: column;
-            z-index: 1000;
+            z-index: 100;
 
             cursor:pointer;
 
@@ -198,7 +198,7 @@
 
         .sel-opened{
             &#main-box{
-                z-index:1001 !important;
+                z-index:101 !important;
 
                 background-color: $primaryl5;
 

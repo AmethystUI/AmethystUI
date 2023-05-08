@@ -1,4 +1,4 @@
-export type colorFmt = "hsl" | "hex" | "rgb"
+type colorFmt = "hsl" | "hex" | "rgb"
 
 type PartialRecord<K extends keyof any, T> = Partial<Record<K, T>>;
 
@@ -6,7 +6,7 @@ type PartialRecord<K extends keyof any, T> = Partial<Record<K, T>>;
  * Represents the default configurations for a project, with options for stylesheets,
  * SCSS, and JSON files.
  */
-export default interface exportConfigInterface extends PartialRecord<colorFmt, Record<string, any>> {
+interface exportConfigInterface extends PartialRecord<colorFmt, Record<string, any>> {
     common: {
         compressionAmt: number; // 0 is none, 1 is standard, 2 is aggressive
     }
@@ -21,3 +21,12 @@ export default interface exportConfigInterface extends PartialRecord<colorFmt, R
         nestStyles: boolean;
     };
 }
+
+type exportableFileTypes = "css" | "scss" | "less" | "styl" | "svelte" | "json";
+
+// globalScope
+
+declare let colorFmt : colorFmt;
+declare let PartialRecord : PartialRecord;
+declare let exportConfigInterface : exportConfigInterface;
+declare let exportableFileTypes : exportableFileTypes;

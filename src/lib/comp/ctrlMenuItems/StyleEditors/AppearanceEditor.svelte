@@ -59,7 +59,6 @@
 
 <script lang="ts">
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
-    import type { overflow, flexAlignment } from "$lib/types/general";
 
     import Slider from "./Basics/Slider.svelte";
     import Dropdown from "./Basics/Dropdown.svelte";

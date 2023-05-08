@@ -2,7 +2,7 @@
     import { closeModal } from "$lib/stores/modalManager";
     import { alignmentType, type multiToggleSelection } from "$lib/comp/ctrlMenuItems/StyleEditors/Basics/MultiToggle.svelte";
 
-    const configFilters:multiToggleSelection<fileTypes>[] = [
+    const configFilters:multiToggleSelection<exportableFileTypes>[] = [
         {
             iconDir : "/src/assets/icons/css.svg",
             val : "css",
@@ -47,13 +47,14 @@
 
 <script lang="ts">
     import MultiToggle from "$lib/comp/ctrlMenuItems/StyleEditors/Basics/MultiToggle.svelte";
-    import { type fileTypes, nonStylesheetTypes } from "$src/lib/util/export/exportManager";
+    import { nonStylesheetTypes } from "$src/lib/util/export/exportManager";
     import ColorSettings from "./settingPanels/ColorSettings.svelte";
     import FontSettings from "./settingPanels/FontSettings.svelte";
     import CompressionSettings from "./settingPanels/CompressionSettings.svelte";
     import ScssSpecificSettings from "./settingPanels/ScssSpecificSettings.svelte";
+    import { startExport } from "$lib/util/export/exportManager";
 
-    let currentConfigFilter: fileTypes = "css";
+    let currentConfigFilter: exportableFileTypes = "css";
     $: currentFilterIndex = configFilters.map(item => item.val).indexOf(currentConfigFilter);
 
     const updateConfigFilter = (e: CustomEvent) => currentConfigFilter = e.detail.value;
@@ -87,8 +88,6 @@
 
             <!-- Common settings -->
             <CompressionSettings {...configPanelStyling}/>
-
-            <div style="height: 30%"></div>
         </section>
     </section>
 
@@ -99,7 +98,7 @@
         <!-- cancel export -->
         <button class="secondary-btn" style="margin: 0px 10px 0px 10px" on:click={closeModal}>Cancel</button>
         <!-- export -->
-        <button>Export</button>
+        <button on:click={startExport}>Export</button>
     </section>
 </main>
 

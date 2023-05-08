@@ -1,7 +1,4 @@
-
 <script lang="ts">
-    import type { elementStyle } from "$lib/types/element";
-
     export let currentStyle: elementStyle;
 </script>
 

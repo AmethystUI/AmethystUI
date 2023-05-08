@@ -1,5 +1,4 @@
 <script lang="ts">
-    import type { units } from '../../../../types/general';
     import { createEventDispatcher, onMount } from 'svelte';
     import Title from './Title.svelte';
     const disp = createEventDispatcher();
@@ -262,10 +261,10 @@
 
         .sel-opened{
             input{
-                z-index:1000;
+                z-index:100;
             }
             #unit-display{
-                z-index: 1001;
+                z-index: 101;
             }
 
             &.open-bottom{
@@ -296,7 +295,7 @@
                 backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
                 overflow:hidden;
                 display:flex; flex-direction: column;
-                z-index: 10000;
+                z-index: 100;
                 cursor:pointer;
 
                 &.open-bottom{

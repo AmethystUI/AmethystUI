@@ -375,7 +375,7 @@
         display:flex; flex-direction: column; justify-content: center; align-items: center;
         padding: 0px;
         pointer-events: none;
-        z-index: 1000;
+        z-index: 15;
 
         &:active{
             .corner-drag{
@@ -399,7 +399,7 @@
             width: 10px; height: 10px;
             border-radius: 100%;            
             position: absolute;
-            z-index: 2000;
+            z-index: 100;
             opacity: 0;
             transition: opacity ease 100ms;
 
@@ -420,7 +420,7 @@
             }
 
             &:active{
-                z-index: 4000;
+                z-index: 101;
                 &.darkmode{ background-color: $secondary }
                 &.lightmode{ background-color: $primary }
 
@@ -500,7 +500,7 @@
 
             position:absolute;
             pointer-events: all;
-            z-index: 999;
+            z-index: 99;
 
             &.darkmode{
                 background-color: hsla(0deg, 0%, 100%, 20%);
@@ -518,7 +518,7 @@
                 opacity: 1 !important;
             }
             &:active{
-                z-index: 4000;
+                z-index: 101;
 
                 &::before{
                     width: 100vw; height: 100vh;

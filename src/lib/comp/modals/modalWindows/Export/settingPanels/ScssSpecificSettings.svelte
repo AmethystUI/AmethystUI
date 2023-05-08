@@ -2,7 +2,6 @@
     import SettingsPanel from "./SettingsPanel.svelte";
     import { exportConfigs } from "$lib/util/export/exportManager";
     import Checkbox from "$src/lib/comp/ctrlMenuItems/StyleEditors/Basics/Checkbox.svelte";
-    import InfoTag from "$src/lib/comp/ctrlMenuItems/StyleEditors/Basics/InfoTag.svelte";
 
     export let fullPanelWidth;
     export let configSpacing:string;
@@ -23,7 +22,4 @@
 </SettingsPanel>
 
 <style lang="scss">
-    section{
-        display: flex; align-items: flex-end;
-    }
 </style>

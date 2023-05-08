@@ -3,8 +3,9 @@
  * It also defines certain types and objects such as the available export formats, as well as the available settings for each file type.
  */
 
-import type exportConfigInterface from "$src/lib/types/exportConfigs";
 import { writable } from "svelte/store"
+import { openProgressModal } from "$src/lib/stores/modalManager"
+import { progressOverlayController as POC } from "../UI/progressOverlayController";
 
 /**
  * A union type that represents supported file types.
@@ -13,13 +14,12 @@ import { writable } from "svelte/store"
  * For example, if you have a function that accepts a file type as an argument, you can use this type to ensure
  * that the argument is one of the supported file types.
  */
-export type fileTypes = "css" | "scss" | "less" | "styl" | "svelte" | "json"
-export const nonStylesheetTypes:fileTypes[] = ["json"];
+export const nonStylesheetTypes:exportableFileTypes[] = ["json"];
 
 /**
  * The global target file type. This can be used to access export configurations
  */
-export const targetFileType = writable<fileTypes>("css");
+export const targetFileType = writable<exportableFileTypes>("css");
 
 /**
  * The default configuration object for the application.
@@ -56,3 +56,10 @@ const defaultConfigs: exportConfigInterface = {
  * @param common - Access configuration settings that are universal to all file types, including types like JSON.
  */
 export const exportConfigs = writable<exportConfigInterface>(defaultConfigs); // type inference works properly
+
+export const startExport = async () => {
+    // bring up progress modal first
+    await openProgressModal("Exporting", 20);
+
+    
+}

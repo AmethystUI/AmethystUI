@@ -30,7 +30,7 @@ const dragging = writable(undefined);
     import Element from "../CollectionViewer/Element.svelte";
     import Override from "../CollectionViewer/Override.svelte";
     import { collection, focusedComponent, selectedComponent, selectedOverride, focusedOverride } from "$lib/stores/collection";
-    import { HTMltagInfo } from '../../../types/general';
+    import { HTMltagInfo } from '../../../@const/general.const';
     import { clearColorPickerRef } from "$lib/stores/colorPickerManager";
 
     export let id;
@@ -177,7 +177,7 @@ const dragging = writable(undefined);
                     el.style.cssText = `position: fixed;
                             top: 0;
                             left: 0;
-                            z-index:1000;
+                            z-index:1;
                             pointer-events:none;
                             cursor:grabbing;
                             transition:height 300ms cubic-bezier(0.215, 0.610, 0.355, 1.000), width 300ms cubic-bezier(0.215, 0.610, 0.355, 1.000); position:fixed; transform:translate(${tx}px,${ty}px)`;
@@ -218,7 +218,7 @@ const dragging = writable(undefined);
                             };
                             $dragging = active;
                         }
-                        el.style.cssText = `position: fixed; top: 0; left: 0; z-index:1000; pointer-events: none; cursor:grabbing; position:fixed; transition: height 300ms cubic-bezier(0.215, 0.610, 0.355, 1.000); transform:translate(${tx}px,${ty}px); transition:height 300ms cubic-bezier(0.215, 0.610, 0.355, 1.000), width 300ms cubic-bezier(0.215, 0.610, 0.355, 1.000);`;
+                        el.style.cssText = `position: fixed; top: 0; left: 0; z-index:100; pointer-events: none; cursor:grabbing; position:fixed; transition: height 300ms cubic-bezier(0.215, 0.610, 0.355, 1.000); transform:translate(${tx}px,${ty}px); transition:height 300ms cubic-bezier(0.215, 0.610, 0.355, 1.000), width 300ms cubic-bezier(0.215, 0.610, 0.355, 1.000);`;
                     }
                     else {
                         // style the dragging element - it keeps its source dimensions as its not inside a drop zone
@@ -231,7 +231,7 @@ const dragging = writable(undefined);
                             };
                             $dragging = active;
                         }
-                        el.style.cssText = `position: fixed; top: 0; left: 0; z-index:1000; pointer-events:none; cursor:grabbing; position:fixed; transform:translate(${tx}px,${ty}px); transition:height 300ms cubic-bezier(0.215, 0.610, 0.355, 1.000), width 300ms cubic-bezier(0.215, 0.610, 0.355, 1.000);`;
+                        el.style.cssText = `position: fixed; top: 0; left: 0; z-index:100; pointer-events:none; cursor:grabbing; position:fixed; transform:translate(${tx}px,${ty}px); transition:height 300ms cubic-bezier(0.215, 0.610, 0.355, 1.000), width 300ms cubic-bezier(0.215, 0.610, 0.355, 1.000);`;
                     }
                 }
             });
@@ -296,7 +296,7 @@ const dragging = writable(undefined);
             width = sourceZone.itemWidth();
             sourceZone.styleSourceMove(sourceIndex, sourceIndex, true);
         }
-        el.style.cssText = `position: fixed; top: 0; left: 0; z-index:1000; position:fixed; transform:translate(${tx}px,${ty}px); transition:transform 300ms cubic-bezier(0.2,0,0,1), height 300ms cubic-bezier(0.215, 0.610, 0.355, 1.000), width 300ms cubic-bezier(0.215, 0.610, 0.355, 1.000);`;
+        el.style.cssText = `position: fixed; top: 0; left: 0; z-index:100; position:fixed; transform:translate(${tx}px,${ty}px); transition:transform 300ms cubic-bezier(0.2,0,0,1), height 300ms cubic-bezier(0.215, 0.610, 0.355, 1.000), width 300ms cubic-bezier(0.215, 0.610, 0.355, 1.000);`;
         // if a force was detected as needed, fire it off here
         if (forceFinal) {
             finalizeDrag();
@@ -354,7 +354,7 @@ const dragging = writable(undefined);
                 const ty = dropzone.dragYOffset(srcIndex);
                 const height = dropzone.itemHeight();
                 const width = dropzone.itemWidth();
-                el.style.cssText = `z-index:1000; height:${height}px; width:${width}px; position:fixed; transform:translate(${tx}px,${ty}px)`;
+                el.style.cssText = `z-index:100; height:${height}px; width:${width}px; position:fixed; transform:translate(${tx}px,${ty}px)`;
             }
             // style the containers
             dropzone.styleSourceMove(srcIndex, srcIndex, false);
@@ -392,7 +392,7 @@ const dragging = writable(undefined);
                 const width = destZone.itemWidth();
                 el.addEventListener('transitionend', finalizeDrag);
                 el.style.cssText = `
-                    z-index: 1000; 
+                    z-index: 100; 
                     position: fixed; 
                     top:0; left: 0;
                     height: ${height}px; 

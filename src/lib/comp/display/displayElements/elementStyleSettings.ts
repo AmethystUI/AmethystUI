@@ -1,5 +1,4 @@
 import type { activeStylesType } from "$lib/stores/activeStyles";
-import type { HTMLtags } from "$lib/types/general";
 
 const margin: activeStylesType = { marginTop: true, marginBottom: true, marginLeft: true, marginRight: true }
 const padding: activeStylesType = { paddingTop: true, paddingBottom: true, paddingLeft: true, paddingRight: true }

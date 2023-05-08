@@ -1,7 +1,5 @@
 <script lang="ts">
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
-    import type { color } from "$lib/types/general";
-    import type { units } from "$lib/types/general";
 
     import ColorPicker from "./Advanced/ColorPicker.svelte";
     import { clearColorPickerRef, mainColorPickerData } from "$lib/stores/colorPickerManager";

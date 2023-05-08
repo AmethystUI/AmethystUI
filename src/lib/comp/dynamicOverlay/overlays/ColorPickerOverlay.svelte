@@ -129,7 +129,6 @@
 <script lang="ts">
     import { mainColorPickerData } from "$lib/stores/colorPickerManager"
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection"
-    import type { color } from "$lib/types/general";
     import { hexToRgba, hslToRgb, rgbaToHex, rgbToHsl } from '../../../util/colorMaths';
     import { tweened } from 'svelte/motion';
 	import { quadOut } from 'svelte/easing';

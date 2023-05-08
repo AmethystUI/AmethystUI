@@ -1,9 +1,4 @@
 <script context="module" lang="ts">
-    import type {
-        textDecoration as textDecorationType,
-        typeCategories as typeCategoriesType
-    } from '../../../../types/general';
-    
     // define selection data
     export interface multiSelectSelection<T> {
         iconDir : string, // where the app gets the icon image
@@ -11,7 +6,7 @@
         alt : string // description
     };
 
-    export const textDecoration:multiSelectSelection<textDecorationType>[] = [
+    export const textDecoration: multiSelectSelection<textDecoration>[] = [
         {
             iconDir : "/src/assets/icons/italicize.svg",
             val : "italicize",
@@ -27,7 +22,7 @@
         }
     ]
 
-    export const typeFilters:multiSelectSelection<typeCategoriesType>[] = [
+    export const typeFilters:multiSelectSelection<typeCategories>[] = [
         {
             iconDir : "/src/assets/icons/sans-serif.svg",
             val : "sans-serif",

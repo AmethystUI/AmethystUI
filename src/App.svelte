@@ -24,8 +24,9 @@
     import { activeStyles } from "$lib/stores/activeStyles";
     import { collection, focusedComponent, focusedOverride, layerBlurLock, selectedComponent, selectedOverride } from "$lib/stores/collection"
     import { currentView } from "$lib/stores/viewingManager";
-    import { mainModalData } from "$lib/stores/modalManager";
+    import { mainModalData, progressModalData } from "$lib/stores/modalManager";
     import ModalBase from "$lib/comp/modals/Modal.svelte";
+    import ProgressOverlay from "./lib/comp/modals/ProgressOverlay.svelte";
 
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
@@ -80,6 +81,10 @@
 
     {#if $mainModalData.opened}
         <ModalBase />
+    {/if}
+
+    {#if $progressModalData.opened}
+        <ProgressOverlay />
     {/if}
 </main>
 

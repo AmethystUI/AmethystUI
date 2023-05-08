@@ -11,7 +11,6 @@
 
     import { createEventDispatcher, onMount } from 'svelte';
     import flipAnimate from '../../../../util/flipAnimate';
-    import type { typographyStyle } from '../../../../types/general';
     import { mainFontPickerData } from '../../../../stores/fontPickerManager';
     import Title from '../Basics/Title.svelte';
     import { keepOpenOverlay } from '../../../dynamicOverlay/OverlayBase.svelte';

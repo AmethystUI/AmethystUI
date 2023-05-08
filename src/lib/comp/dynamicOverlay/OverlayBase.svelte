@@ -454,7 +454,7 @@
     }
 
     #overlayContainer{
-        position: fixed; z-index: 999999; top:0;left:0;
+        position: fixed; z-index: 200; top:0;left:0;
         transition: 150ms opacity ease-in-out;
         &.hidden{
             opacity:0;
@@ -582,7 +582,7 @@
                 display: flex;
                 
                 transition: transform $normal-ease-out;
-                z-index: 1000;
+                z-index: 200;
 
                 div{
                     width:6px; height:6px;

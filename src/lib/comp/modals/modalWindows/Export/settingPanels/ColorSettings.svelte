@@ -3,7 +3,6 @@
     import { exportConfigs } from "$lib/util/export/exportManager";
     import MultiToggle, { alignmentType, type multiToggleSelection } from "$src/lib/comp/ctrlMenuItems/StyleEditors/Basics/MultiToggle.svelte";
     import Checkbox from "$src/lib/comp/ctrlMenuItems/StyleEditors/Basics/Checkbox.svelte";
-    import type { colorFmt } from "$src/lib/types/exportConfigs";
 
     export let fullPanelWidth;
     export let configSpacing:string;

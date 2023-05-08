@@ -1,5 +1,4 @@
 <script lang="ts">
-    import type { color } from '../../../../types/general';
     import { createEventDispatcher } from 'svelte';
     import Title from './Title.svelte';
     const disp = createEventDispatcher();

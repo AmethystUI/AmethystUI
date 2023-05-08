@@ -174,7 +174,7 @@
             position: absolute; top:0; margin-top:7px; margin-left:7px;
             border: 1px solid $primaryl4; border-radius: 7px;
             box-shadow: 0px 6px 30px -5px hsla(0,0%,0%,60%);
-            z-index: 9999999;
+            z-index: 100;
             cursor:default;
             overflow-x: hidden; overflow-y: auto;
             padding: 5px;

@@ -74,32 +74,23 @@
 		easing: cubicOut
     }); // controls how much the content is moved down. Update with height changes
 
-    // UI COMPONENT CONSTANTS
-
-    import type {
-        textAlignment as textAlignmentType,
-        textCasing as textCasingType,
-        textDecoration as textDecorationType,
-        typeCategories
-    } from "$lib/types/general";
-
     /**
      * This is an object that maps the alignment values to a certain index.
      * It helps in easily identifying the position of the element on the component UI.
      * Every component might have a different alignmentIndicies object. This one is exclusive to this component.
      */
-    const alignmentIndices: { [K in textAlignmentType]: number } = {
+    const alignmentIndices: { [K in textAlignment]: number } = {
         "left": 0,
         "center": 1,
         "right": 2,
         "justify": 3,
     };
-    const casingIndices: { [K in textCasingType]: number } = {
+    const casingIndices: { [K in textCasing]: number } = {
         "lowercase": 0,
         "none": 1,
         "uppercase": 2,
     };
-    const decorationIndices: { [K in textDecorationType]: number } = {
+    const decorationIndices: { [K in textDecoration]: number } = {
         "italicize": 0,
         "underline": 1,
         "strike": 2,
@@ -166,7 +157,6 @@
     import FontPickerOverlay from "./FontPickerOverlay.svelte"; // this import causes circular dependency warning in the compiler, but it works for now. It might be an issue in the future, so keep an eye out on this line.
     
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
-    import type { typographyStyle } from "$lib/types/general";
     import { mainOverlayData } from "$lib/stores/dynamicOverlayManager";
     import { get } from "svelte/store";
     import MultiSelect, { textDecoration, typeFilters } from "$lib/comp/ctrlMenuItems/StyleEditors/Basics/MultiSelect.svelte";

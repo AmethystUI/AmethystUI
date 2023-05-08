@@ -31,7 +31,7 @@
         top: 0; left: 0;
         width: 100vw; height: 100vh;
         background: none; -webkit-backdrop-filter: blur(2px) brightness(0.7); backdrop-filter: blur(2px) brightness(0.7);
-        z-index: 10000;
+        z-index: 300;
         display: flex; justify-content: center; align-items: center;
     }
 </style>

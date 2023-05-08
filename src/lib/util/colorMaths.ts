@@ -1,7 +1,3 @@
-import type { color } from "$lib/types/general";
-
-export type colorType = "HEX" | "RGB" | "HSL";
-
 /**
  * Converts an RGB color value to HSL. Conversion formula
  * adapted from http://en.wikipedia.org/wiki/HSL_color_space.

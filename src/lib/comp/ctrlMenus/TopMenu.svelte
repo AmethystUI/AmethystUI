@@ -1,7 +1,6 @@
 <script lang="ts" context="module">
     import { addComponent } from "$lib/stores/collection";
-    import type { elementStyle } from "$lib/types/element";
-    import { HTMltagInfo } from "$lib/types/general";
+    import { HTMltagInfo } from "$src/lib/@const/general.const";
 
     export interface dropdownStatusType{
         currentID : string,
@@ -446,7 +445,7 @@ E.g. "This app fucking sucks."`,
         top:0;
         background-color: $primaryl1;
         border-bottom: 1px solid $primaryl4;
-        z-index: 9998;
+        z-index: 18;
         display:flex; justify-content: flex-start; align-items: center;
         transform: translate3d(1px,0px,0px);
         

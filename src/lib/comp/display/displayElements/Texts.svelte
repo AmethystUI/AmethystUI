@@ -1,7 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
-    import type { boxShadow } from "$lib/types/general";
     import TextContent from "$lib/comp/display/displayElements/util/TextContent.svelte";
 
     export let headingType: string;

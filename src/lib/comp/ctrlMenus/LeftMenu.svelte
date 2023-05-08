@@ -61,7 +61,7 @@
         -webkit-backdrop-filter: blur(100px);
         backdrop-filter: blur(100px);
         
-        z-index: 9999;
+        z-index: 19;
         user-select: none; -webkit-user-select: none; -webkit-user-drag: none;
 
         &::before{
