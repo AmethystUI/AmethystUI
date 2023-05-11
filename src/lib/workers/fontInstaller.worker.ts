@@ -203,8 +203,7 @@ sw.addEventListener("install", event => {
     }))
 });
 
-sw.addEventListener("activate", () => {
-})
+sw.addEventListener("activate", () => {})
 
 sw.addEventListener("message", (e: MessageEvent<{command: string, payload: any}>) => {
     // if the event wants us to start downloading the font
@@ -228,5 +227,5 @@ sw.addEventListener("message", (e: MessageEvent<{command: string, payload: any}>
 });
 
 sw.onerror = (error) => {
-    console.error(error);
+    console.error(`Error from Font Installer: ${error}`);
 };

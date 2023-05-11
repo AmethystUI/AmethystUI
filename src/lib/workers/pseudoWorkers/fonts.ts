@@ -121,7 +121,7 @@ export const loadFonts = async (web = true): Promise<{fontsLoaded: number}> => {
         if(!web){
             storeFontDataToLocalStorage(typefaceData, "fonts");
 
-            res({
+            return res({
                 fontsLoaded: typefaceData.length
             }); // response end
         }

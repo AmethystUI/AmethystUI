@@ -7,6 +7,8 @@ const app = new App({
     target: document.body,
 })
 
+const rootURL = import.meta.env.BASE_URL;
+
 window.onload = () => {
 	// Initialize font directory. This does not install the fonts.
 	loadFonts().catch(
@@ -14,9 +16,9 @@ window.onload = () => {
 	);
     
 	// register font install script SW.
-	registerFontInstaller().then((installer: ServiceWorker) => {
+	registerServiceWorker(`${rootURL}src/static/workers/fontInstaller.worker.js`, "Font Installer").then((installer: ServiceWorker) => {
 		// download fonts
-		console.debug("Font installer loaded and activated successfully.");
+		console.debug("[SW] Font installer loaded and activated successfully.");
 		installer.postMessage({ command: "downloadRequiredFonts" });		
 	}).catch(err => {
 		// cannot download web fonts
@@ -25,28 +27,25 @@ window.onload = () => {
 }
 
 /**
- * Function to register a font installer service worker.
+ * Function to register a service worker at the given URL.
  * @returns Promise that resolves with the ServiceWorker instance when it's installed and activated.
  */
-const registerFontInstaller = (): Promise<ServiceWorker> => {
+const registerServiceWorker = (workerURL: string, workerName: string): Promise<ServiceWorker> => {
 	return new Promise<ServiceWorker>(async (res, rej) => {
 		// Check if the browser supports service workers
 		if ("serviceWorker" in navigator) {
 			try {
-				// Register the service worker located at "./workers/fontInstaller.worker.js"
-
-                const registration = await navigator.serviceWorker.register(`${import.meta.env.BASE_URL}src/static/workers/fontInstaller.worker.js`);
+				// Attempt to register worker
+                const registration = await navigator.serviceWorker.register(workerURL);
 
 				// If the service worker is not active, add an event listener to track its installation progress
 				if (!registration.active) {
 					registration.addEventListener("updatefound", () => {
 						// Add a new temporary promise to allow timeouts
 						const workerPromise = new Promise<ServiceWorker>((resolve, reject) => {
-							let timedOut = false;
 							const timeoutId = setTimeout(() => {
-								timedOut = true;
-								return reject(new Error("Font installer activation timeout"));
-							}, 5000); // set a timeout of 5 seconds
+								return reject(new Error(`${workerName} activation timeout`));
+							}, 5000); // set an activation timeout of 5 seconds
 
 							const attemptToResolveWorker = (): void => {
 								if (!!registration.active && registration.active.state === "activated") { // return the service worker
@@ -75,7 +74,7 @@ const registerFontInstaller = (): Promise<ServiceWorker> => {
 				}
 			} catch (error) {
 				// If there is an error while registering the service worker, reject the promise with the error message
-				return rej("Font installer service worker failed to register. Reason: " + error);
+				return rej(`${workerName} failed to register. Reason: ` + error);
 			}
 		} else {
 			// If the browser doesn't support service workers, reject the promise with an error message

@@ -6,6 +6,7 @@
 import { writable } from "svelte/store"
 import { openProgressModal } from "$src/lib/stores/modalManager"
 import { progressOverlayController as POC } from "../UI/progressOverlayController";
+import { exportCSS } from "./langs/css";
 
 /**
  * A union type that represents supported file types.
@@ -61,5 +62,7 @@ export const startExport = async () => {
     // bring up progress modal first
     await openProgressModal("Exporting", 20);
 
-    
+    exportCSS();
+
+    POC.set(12);
 }

@@ -465,7 +465,7 @@
     // openDB and stuff
     let db:IDBPDatabase;
 
-    let openDB = async () => {
+    const openDB = async () => {
         // check if the DB is already open by seeing if it holds a value
         if(!!db) return;
 

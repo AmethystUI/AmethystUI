@@ -434,8 +434,9 @@ const dragging = writable(undefined);
 			style={itemStyle}
 			bind:this={dropzone.items[i]}
 			on:mousedown={(e) => onMouseDown(e, i)}
-			on:touchstart={(e) => onTouchDown(e, i)}
 		>
+        <!-- on:touchstart={(e) => onTouchDown(e, i)} For the shit above, if this should work on a touch screen -->
+
             <Element tagType={_.type} elmntIndex={i} height={layerHeight} width={containerWidth-20} iconURI={HTMltagInfo[_.type].iconURI} on:updateElList={updateElList}/>
             
             {#if !!$collection[i].styleOverrides && $collection[i].showing}

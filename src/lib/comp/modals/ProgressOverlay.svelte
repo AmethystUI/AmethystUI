@@ -12,7 +12,7 @@
     $: realProgress = $progressModalData.currentStep / $progressModalData.totalSteps * 100;
     $: progressTween.set(realProgress); // update the tween dynamically
     const progressTween = tweened(0, {
-		duration: 500,
+		duration: 2350,
 		easing: linear
 	});
 </script>
