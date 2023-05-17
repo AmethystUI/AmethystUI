@@ -3,10 +3,6 @@
     import { exportConfigs } from "$lib/util/export/exportManager";
     import Checkbox from "$src/lib/comp/ctrlMenuItems/StyleEditors/Basics/Checkbox.svelte";
 
-    export let fullPanelWidth;
-    export let configSpacing:string;
-
-    export let multiToggleStyling;
     export let checkboxStyling;
 
     let nestStyles: boolean;

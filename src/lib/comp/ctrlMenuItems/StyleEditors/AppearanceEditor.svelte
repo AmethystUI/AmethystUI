@@ -1,5 +1,34 @@
 <script lang="ts" context="module">
+    // GLOBAL DEFAULT VALUES
+    export const defaultOpacity = 100;
+    export const defaultOverflow: overflow = "auto";
+    export const defaultFlexAlign: flexAlignment = "none";
+</script>
+
+<script lang="ts">
+    import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
+
+    import Slider from "./Basics/Slider.svelte";
+    import Dropdown from "./Basics/Dropdown.svelte";
+    import ValueInput from "./Basics/ValueInput.svelte";
+    import Title from "./Basics/Title.svelte";
+    import MultiToggle from "./Basics/MultiToggle.svelte";
+    import { activeStyles } from "$lib/stores/activeStyles";
     import type { multiToggleSelection } from "./Basics/MultiToggle.svelte";
+    
+    export let currentParentWidth = 360;
+    
+    // reactive
+        $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
+
+    const possibleOverflowStyles:overflow[] = ["auto", "hidden", "scroll", "visible"];
+
+    let opacity:number;
+    let overflowX:overflow;
+    let overflowY:overflow;
+    let alignX:flexAlignment;
+    let alignY:flexAlignment;
+    let syncOverflow = false;
 
     const horizontalAlignments:multiToggleSelection<flexAlignment>[] = [
         {
@@ -20,7 +49,6 @@
             alt : "Align Right"
         },
     ]
-
     const verticalAlignments:multiToggleSelection<flexAlignment>[] = [
         {
             iconDir : "/src/assets/icons/none.svg",
@@ -40,7 +68,6 @@
             alt : "Align Bottom"
         },
     ]
-
     /*
      * These are objects that maps the alignment values to a certain index.
      * It helps in easily identifying the position of the element on the component UI.
@@ -55,31 +82,6 @@
         "space-between": -1,
         "space-evenly": -1,
     };
-</script>
-
-<script lang="ts">
-    import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
-
-    import Slider from "./Basics/Slider.svelte";
-    import Dropdown from "./Basics/Dropdown.svelte";
-    import ValueInput from "./Basics/ValueInput.svelte";
-    import Title from "./Basics/Title.svelte";
-    import MultiToggle from "./Basics/MultiToggle.svelte";
-    import { activeStyles } from "$lib/stores/activeStyles";
-    
-    export let currentParentWidth = 360;
-    
-    // reactive
-        $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
-
-    const possibleOverflowStyles:overflow[] = ["auto", "hidden", "scroll", "visible"];
-
-    let opacity:number = 100;
-    let overflowX:overflow = "auto";
-    let overflowY:overflow = "auto";
-    let alignX:flexAlignment = "none";
-    let alignY:flexAlignment = "none";
-    let syncOverflow = false;
 
     // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
     $: useOpacity = $activeStyles.opacity;
@@ -88,29 +90,28 @@
     $: useAlignX = $activeStyles.justifyContent; // might need to change in the future
     $: useAlignY = $activeStyles.alignItems; // might need to change in the future
 
-    $: if(!!currentStyle){ // these variables just make the code look nicer
-        
+    $: if(!!currentStyle){ // VARIABLE UPDATING AND INITIALIZING
         // opacity
         if(useOpacity){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
-            if(currentStyle.opacity === undefined) currentStyle.opacity = 100;
+            if(currentStyle.opacity === undefined) currentStyle.opacity = defaultOpacity;
             opacity = currentStyle.opacity;
         }
         
         // overflows
         if(useOverflowX){
-            if(!currentStyle.overflowX) currentStyle.overflowX = "auto";
+            if(!currentStyle.overflowX) currentStyle.overflowX = defaultOverflow;
             overflowX = currentStyle.overflowX;
         } if(useOverflowY){
-            if(!currentStyle.overflowY) currentStyle.overflowY = "auto";
+            if(!currentStyle.overflowY) currentStyle.overflowY = defaultOverflow;
             overflowY = currentStyle.overflowY;
         }
 
         // alignments
         if(useAlignX){
-            if(!currentStyle.justifyContent) currentStyle.justifyContent = "none";
+            if(!currentStyle.justifyContent) currentStyle.justifyContent = defaultFlexAlign;
             alignX = currentStyle.justifyContent;
         } if (useAlignY) {
-            if(!currentStyle.alignItems) currentStyle.alignItems = "none";
+            if(!currentStyle.alignItems) currentStyle.alignItems = defaultFlexAlign;
             alignY = currentStyle.alignItems;
         }
     }

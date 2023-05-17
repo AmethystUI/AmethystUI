@@ -1,3 +1,10 @@
+<script lang="ts" context="module">
+    const defaultBorderWidth: unitedAttr<number> = { v: 2, u: "px" };
+    const defaultBorderRadius: unitedAttr<number> = { v: 18, u: "pt" };
+    const defaultBorderColor: color = initializeColorFromHSLA(0, 0, 100, 100);
+    const defaultBorderStyle: borderOutlineStyle = "solid";
+</script>
+
 <script lang="ts">
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
 
@@ -13,30 +20,29 @@
     export let currentParentWidth = 360;
     
     // reactive
-        $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
+    $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
-    let cBWT = 0; let cBWTu:units = "px"; // cBW = current border width
-    let cBWR = 0; let cBWRu:units = "px"; // cBW = current border width
-    let cBWB = 0; let cBWBu:units = "px"; // cBW = current border width
-    let cBWL = 0; let cBWLu:units = "px"; // cBW = current border width
-    let cBWAvg = 0;
+    let cBWT:number; let cBWTu:units; // cBW = current border width
+    let cBWR:number; let cBWRu:units; // cBW = current border width
+    let cBWB:number; let cBWBu:units; // cBW = current border width
+    let cBWL:number; let cBWLu:units; // cBW = current border width
+    let cBWAvg:number;
 
-    let cBRT = 0; let cBRTu:units = "px"; // cBR = current border radius
-    let cBRR = 0; let cBRRu:units = "px"; // cBR = current border radius
-    let cBRB = 0; let cBRBu:units = "px"; // cBR = current border radius
-    let cBRL = 0; let cBRLu:units = "px"; // cBR = current border radius
-    let cBRAvg = 0;
+    let cBRT:number; let cBRTu:units; // cBR = current border radius
+    let cBRR:number; let cBRRu:units; // cBR = current border radius
+    let cBRB:number; let cBRBu:units; // cBR = current border radius
+    let cBRL:number; let cBRLu:units; // cBR = current border radius
+    let cBRAvg:number;
 
-    const initialColor:color = initializeColorFromHSLA(0, 0, 100, 100);
-    let clr:color = {...initialColor};
+    let clr:color;
 
     // this has to be a subset of the borderOutlineStyle type set in $collection
     const possibleStyles:borderOutlineStyle[] = ["dotted", "dashed", "solid", "double", "groove", "ridge", "inset", "hidden"];
 
-    let styleTop:borderOutlineStyle = "solid";
-    let styleRight:borderOutlineStyle = "solid";
-    let styleBottom:borderOutlineStyle = "solid";
-    let styleLeft:borderOutlineStyle = "solid";
+    let styleTop:borderOutlineStyle;
+    let styleRight:borderOutlineStyle;
+    let styleBottom:borderOutlineStyle;
+    let styleLeft:borderOutlineStyle;
     let syncStyle = true;
 
     // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
@@ -57,16 +63,16 @@
 
         // border width
         if(useWidth){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
-            if(!currentStyle["borderWidthTop"]) currentStyle["borderWidthTop"] = {v:2,u:"px"};
+            if(!currentStyle["borderWidthTop"]) currentStyle["borderWidthTop"] = {...defaultBorderWidth};
             cBWT = currentStyle["borderWidthTop"].v;
             cBWTu = currentStyle["borderWidthTop"].u;
-            if(!currentStyle["borderWidthRight"]) currentStyle["borderWidthRight"] = {v:2,u:"px"};
+            if(!currentStyle["borderWidthRight"]) currentStyle["borderWidthRight"] = {...defaultBorderWidth};
             cBWR = currentStyle["borderWidthRight"].v;
             cBWRu = currentStyle["borderWidthRight"].u;
-            if(!currentStyle["borderWidthBottom"]) currentStyle["borderWidthBottom"] = {v:2,u:"px"};
+            if(!currentStyle["borderWidthBottom"]) currentStyle["borderWidthBottom"] = {...defaultBorderWidth};
             cBWB = currentStyle["borderWidthBottom"].v;
             cBWBu = currentStyle["borderWidthBottom"].u;
-            if(!currentStyle["borderWidthLeft"]) currentStyle["borderWidthLeft"] = {v:2,u:"px"};
+            if(!currentStyle["borderWidthLeft"]) currentStyle["borderWidthLeft"] = {...defaultBorderWidth};
             cBWL = currentStyle["borderWidthLeft"].v;
             cBWLu = currentStyle["borderWidthLeft"].u;
             cBWAvg = (cBWT + cBWR + cBWB + cBWL) / 4;
@@ -74,16 +80,16 @@
 
         // border radius
         if(useRadius){
-            if(!currentStyle["borderRadiusTop"]) currentStyle["borderRadiusTop"] = {v:18,u:"pt"};
+            if(!currentStyle["borderRadiusTop"]) currentStyle["borderRadiusTop"] = {...defaultBorderRadius};
             cBRT = currentStyle["borderRadiusTop"].v;
             cBRTu = currentStyle["borderRadiusTop"].u;
-            if(!currentStyle["borderRadiusRight"]) currentStyle["borderRadiusRight"] = {v:18,u:"pt"};
+            if(!currentStyle["borderRadiusRight"]) currentStyle["borderRadiusRight"] = {...defaultBorderRadius};
             cBRR = currentStyle["borderRadiusRight"].v;
             cBRRu = currentStyle["borderRadiusRight"].u;
-            if(!currentStyle["borderRadiusBottom"]) currentStyle["borderRadiusBottom"] = {v:18,u:"pt"};
+            if(!currentStyle["borderRadiusBottom"]) currentStyle["borderRadiusBottom"] = {...defaultBorderRadius};
             cBRB = currentStyle["borderRadiusBottom"].v;
             cBRBu = currentStyle["borderRadiusBottom"].u;
-            if(!currentStyle["borderRadiusLeft"]) currentStyle["borderRadiusLeft"] = {v:18,u:"pt"};
+            if(!currentStyle["borderRadiusLeft"]) currentStyle["borderRadiusLeft"] = {...defaultBorderRadius};
             cBRL = currentStyle["borderRadiusLeft"].v;
             cBRLu = currentStyle["borderRadiusLeft"].u;
             cBRAvg = (cBRT + cBRR + cBRB + cBRL) / 4;
@@ -91,22 +97,22 @@
 
         // border color
         if(useColor){
-            if(!currentStyle["borderColor"]) currentStyle["borderColor"] = {...initialColor};
+            if(!currentStyle["borderColor"]) currentStyle["borderColor"] = {...defaultBorderColor};
             clr = currentStyle["borderColor"];
         }
 
         // border style
         if(useStyleTop){
-            if(!currentStyle["borderStyleTop"]) currentStyle["borderStyleTop"] = "solid";
+            if(!currentStyle["borderStyleTop"]) currentStyle["borderStyleTop"] = defaultBorderStyle;
             styleTop = currentStyle["borderStyleTop"];
         } if(useStyleRight){
-            if(!currentStyle["borderStyleRight"]) currentStyle["borderStyleRight"] = "solid";
+            if(!currentStyle["borderStyleRight"]) currentStyle["borderStyleRight"] = defaultBorderStyle;
             styleRight = currentStyle["borderStyleRight"];
         } if(useStyleBottom){
-            if(!currentStyle["borderStyleBottom"]) currentStyle["borderStyleBottom"] = "solid";
+            if(!currentStyle["borderStyleBottom"]) currentStyle["borderStyleBottom"] = defaultBorderStyle;
             styleBottom = currentStyle["borderStyleBottom"];
         } if(useStyleLeft){
-            if(!currentStyle["borderStyleLeft"]) currentStyle["borderStyleLeft"] = "solid";
+            if(!currentStyle["borderStyleLeft"]) currentStyle["borderStyleLeft"] = defaultBorderStyle;
             styleLeft = currentStyle["borderStyleLeft"];
         }
     }

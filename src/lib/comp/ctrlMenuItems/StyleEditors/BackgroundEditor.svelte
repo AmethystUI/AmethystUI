@@ -1,3 +1,7 @@
+<script lang="ts" context="module">
+    export const defaultBgClr = initializeColorFromHSLA(0, 0, 100, 100);
+</script>
+
 <script lang="ts">
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
 
@@ -9,20 +13,19 @@
     // reactive
         $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
-    const initialClr:color = initializeColorFromHSLA(0, 0, 100, 100);
-    let clr:color = {...initialClr};
+    let clr:color;
 
     // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
     $: useBackground = $activeStyles.USEBACKGROUND;
     $: useBackgroundColor = $activeStyles.backgroundColor;
 
-    $: if(!!currentStyle && useBackground){ // these variables just make the code look nicer        
+    $: if(!!currentStyle && useBackground){ // VARIABLE UPDATING AND INITIALIZING
         // use background
         currentStyle["USEBACKGROUND"] = !!currentStyle["USEBACKGROUND"]; // boolean initialization weirdness
 
         // background color
         if(useBackgroundColor){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
-            if(!currentStyle["backgroundColor"]) currentStyle["backgroundColor"] = {...initialClr};
+            if(!currentStyle["backgroundColor"]) currentStyle["backgroundColor"] = {...defaultBgClr};
             clr = currentStyle["backgroundColor"];
         }
     }

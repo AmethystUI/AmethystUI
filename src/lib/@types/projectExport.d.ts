@@ -22,6 +22,26 @@ interface exportConfigInterface extends PartialRecord<colorFmt, Record<string, a
     };
 }
 
+/**
+ * @summary An object structure that can be used in buffering to store an element / override's generated style strings temporarily.
+ * 
+ * @example let divBuffer: styleBufferObject = {style: ..., overrideStyles: [{override1: ..., override2: ...}]}
+ */
+type styleBufferObject = {
+    style: string,
+    overrideStyles: Record<string, string>
+}
+
+interface simpleExportBuffer extends PartialRecord<HTMLtags, styleBufferObject> {
+    [] : {
+        style: string,
+        overrideStyles: {
+            name: string;
+            style: string;
+        }
+    }
+}
+
 type exportableFileTypes = "css" | "scss" | "less" | "styl" | "svelte" | "json";
 
 // globalScope
@@ -30,3 +50,4 @@ declare let colorFmt : colorFmt;
 declare let PartialRecord : PartialRecord;
 declare let exportConfigInterface : exportConfigInterface;
 declare let exportableFileTypes : exportableFileTypes;
+declare let simpleExportBuffer : simpleExportBuffer;

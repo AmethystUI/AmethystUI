@@ -22,11 +22,13 @@
     import getStyleSetting from "$lib/comp/display/displayElements/elementStyleSettings";
     import ElementDisplay from "$lib/comp/display/ElementDisplay.svelte";
     import { activeStyles } from "$lib/stores/activeStyles";
-    import { collection, focusedComponent, focusedOverride, layerBlurLock, selectedComponent, selectedOverride } from "$lib/stores/collection"
+    import { addComponent, collection, focusedComponent, focusedOverride, layerBlurLock, selectedComponent, selectedOverride } from "$lib/stores/collection"
     import { currentView } from "$lib/stores/viewingManager";
     import { mainModalData, progressModalData } from "$lib/stores/modalManager";
     import ModalBase from "$lib/comp/modals/Modal.svelte";
-    import ProgressOverlay from "./lib/comp/modals/ProgressOverlay.svelte";
+    import ProgressOverlay from "$lib/comp/modals/ProgressOverlay.svelte";
+    import setImmediate from "$lib/util/setImmediate";
+    import { onMount } from "svelte";
 
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
@@ -43,17 +45,18 @@
     document.onmousedown = defaultMouseDownAction;
 
     // DEBUG: 
-    setTimeout(() => {
-        // addComponent("DIV", {
-        //     USEBACKGROUND: true,
-        // })
-        // // simulate clicking on it
-        // $selectedComponent = 0;
-        // $focusedComponent = 0;
-        // $selectedOverride = -1;
-        // $focusedOverride = -1;
-        // $collection = $collection;
-    }, 50);
+    onMount(() => {
+        addComponent("DIV", {
+            USEBACKGROUND: true,
+        })
+
+        setImmediate(() => {
+            // simulate clicking on it
+            $selectedComponent = 0;
+            $focusedComponent = 0;
+            $collection = $collection;
+        });
+    });
 
     $: if(!!currentStyle){
         const currentElement = $collection[get(selectedComponent)];

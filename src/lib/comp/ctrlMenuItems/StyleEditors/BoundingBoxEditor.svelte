@@ -1,7 +1,15 @@
+<script lang="ts" context="module">
+    // GLOBAL DEFAULT VALUES
+    export const defaultWidth: unitedAttr<number> = { v: 100, u: "px" };
+    export const defaultHeight: unitedAttr<number> = { v: 100, u: "px" };
+    export const defaultMargin: unitedAttr<number> = { v: 0, u: "px" };
+    export const defaultPadding: unitedAttr<number> = { v: 0, u: "px" };
+</script>
+
 <script lang="ts">
-    import { get } from "svelte/store";
+    import setImmediate from "$lib/util/setImmediate";
     import { activeStyles } from "$lib/stores/activeStyles";
-    import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
+    import { collection, focusedComponent, selectedComponent, selectedOverride } from "$lib/stores/collection";
 
     import Slider from "./Basics/Slider.svelte";
     import UnitInput from "./Basics/UnitInput.svelte";
@@ -11,70 +19,83 @@
     // reactive
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
-    let cW = 100; let cWu:units = "px"; 
-    let cH = 100; let cHu:units = "px"; 
-    let cSAvg = 100;
+    let cW:number; let cWu:units;
+    let cH:number; let cHu:units;
+    let cSAvg:number;
 
-    let cMT = 0; let cMTu:units = "px"; 
-    let cMR = 0; let cMRu:units = "px"; 
-    let cMB = 0; let cMBu:units = "px"; 
-    let cML = 0; let cMLu:units = "px"; 
-    let cMAvg = 0;
+    let cMT:number; let cMTu:units;
+    let cMR:number; let cMRu:units;
+    let cMB:number; let cMBu:units;
+    let cML:number; let cMLu:units;
+    let cMAvg:number;
 
-    let cPT = 0; let cPTu:units = "px"; 
-    let cPR = 0; let cPRu:units = "px"; 
-    let cPB = 0; let cPBu:units = "px"; 
-    let cPL = 0; let cPLu:units = "px"; 
-    let cPAvg = 0;
+    let cPT:number; let cPTu:units;
+    let cPR:number; let cPRu:units;
+    let cPB:number; let cPBu:units;
+    let cPL:number; let cPLu:units;
+    let cPAvg:number;
 
     // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
     $: useWidthAndHeight = $activeStyles.width || $activeStyles.height;
     $: useMargin = $activeStyles.marginTop || $activeStyles.marginBottom || $activeStyles.marginLeft || $activeStyles.marginRight;
     $: usePadding = $activeStyles.paddingTop || $activeStyles.paddingBottom || $activeStyles.paddingLeft || $activeStyles.paddingRight;
 
-    $: if(!!currentStyle){ // these variables just make the code look nicer
-        // size
+    $: if(!!currentStyle){ // VARIABLE UPDATING AND INITIALIZING
+        // update size
         if(useWidthAndHeight){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
-            if(!currentStyle.width) currentStyle.width = {v:100,u:"px"};
+            if(!currentStyle.width) currentStyle.width = {...defaultWidth};
+            if(!currentStyle.height) currentStyle.height = {...defaultHeight};
+            
             cW = currentStyle.width.v;
             cWu = currentStyle.width.u;
-            if(!currentStyle.height) currentStyle.height = {v:100,u:"px"};
+            
             cH = currentStyle.height.v;
             cHu = currentStyle.height.u;
+            
             cSAvg = (cW + cH) / 2;
         }
     
-        // margin
+        // update margin
         if(useMargin){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
-            if(!currentStyle["marginTop"]) currentStyle["marginTop"] = {v:0,u:"px"};
+            if(!currentStyle["marginTop"]) currentStyle["marginTop"] = {...defaultMargin};
+            if(!currentStyle["marginRight"]) currentStyle["marginRight"] = {...defaultMargin};
+            if(!currentStyle["marginBottom"]) currentStyle["marginBottom"] = {...defaultMargin};
+            if(!currentStyle["marginLeft"]) currentStyle["marginLeft"] = {...defaultMargin};
+            
             cMT = currentStyle["marginTop"].v;
             cMTu = currentStyle["marginTop"].u;
-            if(!currentStyle["marginRight"]) currentStyle["marginRight"] = {v:0,u:"px"};
+    
             cMR = currentStyle["marginRight"].v;
             cMRu = currentStyle["marginRight"].u;
-            if(!currentStyle["marginBottom"]) currentStyle["marginBottom"] = {v:0,u:"px"};
+            
             cMB = currentStyle["marginBottom"].v;
             cMBu = currentStyle["marginBottom"].u;
-            if(!currentStyle["marginLeft"]) currentStyle["marginLeft"] = {v:0,u:"px"};
+            
             cML = currentStyle["marginLeft"].v;
             cMLu = currentStyle["marginLeft"].u;
+            
             cMAvg = (cMT + cMR + cMB + cML) / 4;
         }
-
-        // padding
+    
+        // update padding
         if(usePadding){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
-            if(!currentStyle["paddingTop"]) currentStyle["paddingTop"] = {v:0,u:"px"};
+            if(!currentStyle["paddingTop"]) currentStyle["paddingTop"] = {...defaultPadding};
+            if(!currentStyle["paddingRight"]) currentStyle["paddingRight"] = {...defaultPadding};
+            if(!currentStyle["paddingBottom"]) currentStyle["paddingBottom"] = {...defaultPadding};
+            if(!currentStyle["paddingLeft"]) currentStyle["paddingLeft"] = {...defaultPadding};
+    
             cPT = currentStyle["paddingTop"].v
             cPTu = currentStyle["paddingTop"].u;
-            if(!currentStyle["paddingRight"]) currentStyle["paddingRight"] = {v:0,u:"px"};
+            
             cPR = currentStyle["paddingRight"].v
             cPRu = currentStyle["paddingRight"].u;
-            if(!currentStyle["paddingBottom"]) currentStyle["paddingBottom"] = {v:0,u:"px"};
+            
             cPB = currentStyle["paddingBottom"].v
             cPBu = currentStyle["paddingBottom"].u;
-            if(!currentStyle["paddingLeft"]) currentStyle["paddingLeft"] = {v:0,u:"px"};
+            
             cPL = currentStyle["paddingLeft"].v
             cPLu = currentStyle["paddingLeft"].u;
+            
             cPAvg = (cPT + cPR + cPB + cPL) / 4;
         }
     }
