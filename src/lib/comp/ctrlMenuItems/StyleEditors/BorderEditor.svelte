@@ -1,8 +1,8 @@
 <script lang="ts" context="module">
-    const defaultBorderWidth: unitedAttr<number> = { v: 2, u: "px" };
-    const defaultBorderRadius: unitedAttr<number> = { v: 18, u: "pt" };
-    const defaultBorderColor: color = initializeColorFromHSLA(0, 0, 100, 100);
-    const defaultBorderStyle: borderOutlineStyle = "solid";
+    export const defaultBorderWidth: unitedAttr<number> = { v: 2, u: "px" };
+    export const defaultBorderRadius: unitedAttr<number> = { v: 18, u: "pt" };
+    export const defaultBorderColor: color = initializeColorFromHSLA(0, 0, 100, 100);
+    export const defaultBorderStyle: borderOutlineStyle = "solid";
 </script>
 
 <script lang="ts">

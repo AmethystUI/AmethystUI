@@ -1,8 +1,24 @@
+<script lang="ts" context="module">
+    export const defaultShadows: boxShadow[] = [];
+    export const defaultNewShadow: boxShadow = {
+        x: {v:2, u:"px"},
+        y: {v:2, u:"px"},
+        radius: {v:5, u:"px"},
+        color : {
+            type : "hsl",
+            r : 0, g : 0, b : 0,
+            h : 0, s : 0, l : 0,
+            a : 50, hex : "00000080"
+        },
+        grow : {v:0, u:"px"}
+    };
+</script>
+
 <script lang="ts">
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
 
     import UnitInput from "./Basics/UnitInput.svelte";
-    import { setX, setY, mainOverlayData } from "$lib/stores/dynamicOverlayManager";
+    import { mainOverlayData } from "$lib/stores/dynamicOverlayManager";
     import { mainColorPickerData, clearColorPickerRef } from "$lib/stores/colorPickerManager";
     
     import { openColorPicker } from "../../dynamicOverlay/overlays/ColorPickerOverlay.svelte";
@@ -14,7 +30,7 @@
     // reactive
         $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
-    let shadows:boxShadow[] = [];
+    let shadows:boxShadow[];
     // we don't have a color defined here because we're using MuxBoxShadClr as a multiplexer
 
     // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
@@ -26,7 +42,7 @@
         // currentStyle["USESHADOW"] = true; // debugging force open
 
         // update shadows
-        if(!currentStyle["boxShadows"]) currentStyle["boxShadows"] = [];
+        if(!currentStyle["boxShadows"]) currentStyle["boxShadows"] = defaultShadows;
         shadows = currentStyle["boxShadows"];
     }
 
@@ -42,18 +58,7 @@
         console.log("ADD EVENT");
 
         // add the new shadow to shadowList
-        currentStyle["boxShadows"] = [{
-            x: {v:2, u:"px"},
-            y: {v:2, u:"px"},
-            radius: {v:5, u:"px"},
-            color : {
-                type : "hsl",
-                r : 0, g : 0, b : 0,
-                h : 0, s : 0, l : 0,
-                a : 50, hex : "00000080"
-            },
-            grow : {v:0, u:"px"}
-        }, ...currentStyle["boxShadows"]];
+        currentStyle["boxShadows"] = [{...defaultNewShadow}, ...currentStyle["boxShadows"]];
 
         $collection = $collection;
     }

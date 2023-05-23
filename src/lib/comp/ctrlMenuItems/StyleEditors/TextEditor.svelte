@@ -1,28 +1,30 @@
 <script lang="ts" context="module">
-    /*
-     * These are objects that maps the alignment values to a certain index.
-     * It helps in easily identifying the position of the element on the component UI.
-     * Every component might have a different indicies object. These are exclusive to this component.
-     */
-
-    const alignmentIndices: { [K in textAlignment]: number } = {
-        "left": 0,
-        "center": 1,
-        "right": 2,
-        "justify": 3,
-    };
-    
-    const casingIndices: { [K in textCasing]: number } = {
-        "lowercase": 0,
-        "none": 1,
-        "uppercase": 2,
-    };
-
-    const decorationIndices: { [K in textDecoration]: number } = {
-        "italicize": 0,
-        "underline": 1,
-        "strike": 2,
-    };
+    export const defaultFontObj: typographyStyle = {
+        fontObj: {
+            family: "system-ui",
+            appearedName: "System UI",
+            category: "sans-serif",
+            variations: [400, 700],
+            webSafe: true,
+        },
+        variation: 400,
+        textDecorations: [],
+        casing: "none",
+        alignment: "left",
+        size: {
+            v: 14, u: "px"
+        },
+        lineHeight: {
+            v: 100, u: "%"
+        },
+        tracking: {
+            v: 0, u: "px"
+        }
+    }
+    export const defaultTextColor: color = initializeColorFromHSLA(0, 0, 100, 100);
+    export const defaultLeadingContent: string = ""; 
+    export const defaultTrailingContent: string = "";
+    export const defaultPlaceholder: string = "";
 </script>
 
 <script lang="ts">
@@ -53,35 +55,36 @@
     let colorPreviewSquare:HTMLDivElement;
 
     // these variables just make the code look nicer
-    let clr:color = initializeColorFromHSLA(0, 0, 100, 100); // default text color
+    let clr:color;
 
-    const initialFontRef: typographyStyle = {
-        fontObj: {
-            family: "system-ui",
-            appearedName: "System UI",
-            category: "sans-serif",
-            variations: [400, 700],
-            webSafe: true,
-        },
-        variation: 400,
-        textDecorations: [],
-        casing: "none",
-        alignment: "left",
-        size: {
-            v: 14, u: "px"
-        },
-        lineHeight: {
-            v: 100, u: "%"
-        },
-        tracking: {
-            v: 0, u: "px"
-        }
-    }
-    let fontRef = {...initialFontRef};
+    /*
+     * These are objects that maps the alignment values to a certain index.
+     * It helps in easily identifying the position of the element on the component UI.
+     * Every component might have a different indicies object. These are exclusive to this component.
+     */
+    const alignmentIndices: { [K in textAlignment]: number } = {
+        "left": 0,
+        "center": 1,
+        "right": 2,
+        "justify": 3,
+    };
+    
+    const casingIndices: { [K in textCasing]: number } = {
+        "lowercase": 0,
+        "none": 1,
+        "uppercase": 2,
+    };
 
-    let leadingContent: string = "";
-    let trailingContent: string = "";
-    let placeholder: string = "";
+    const decorationIndices: { [K in textDecoration]: number } = {
+        "italicize": 0,
+        "underline": 1,
+        "strike": 2,
+    };
+    let fontRef: typographyStyle;
+
+    let leadingContent: string;
+    let trailingContent: string;
+    let placeholder: string;
 
     // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
     $: useText = $activeStyles.USETEXT;
@@ -96,15 +99,15 @@
 
         // text color
         if(useTypefaceSettings){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
-            if(!currentStyle.color) currentStyle.color = initializeColorFromHSLA(0, 0, 100, 100);
+            if(!currentStyle.color) currentStyle.color = {...defaultTextColor};
             clr = currentStyle.color;
 
             // typeface setup. We have to do some special initialization 
             if(!currentStyle.typeStyle){ // if there's no type style, then we need to set it to the default
-                currentStyle.typeStyle = {...initialFontRef}; // set current style's type style to the default type style
+                currentStyle.typeStyle = {...defaultFontObj}; // set current style's type style to the default type style
                 fontRef = {...currentStyle.typeStyle}; // reflow fontRef
             } else if (Object.keys(currentStyle.typeStyle).length !== Object.keys(fontRef).length) { // if the type style has a different number of properties than the fontRef, we know that we're initializing from an incomplete object. In this case, we need to transfer what we have to the default type style and use that to initialize.
-                fontRef = {...initialFontRef}; // initialize fontRef with a default type style
+                fontRef = {...defaultFontObj}; // initialize fontRef with a default type style
 
                 // update fontRef as needed
                 for(let i = 0; i < Object.keys(currentStyle?.typeStyle ?? {}).length; i++){
@@ -121,16 +124,16 @@
 
         // initial text
         if(useLeadingContent){
-            if(currentStyle.leadingContent === undefined) currentStyle.leadingContent = "";
+            if(currentStyle.leadingContent === undefined) currentStyle.leadingContent = defaultLeadingContent;
             leadingContent = currentStyle.leadingContent;
         } if(useTrailingContent){
-            if(currentStyle.trailingContent === undefined) currentStyle.trailingContent = "";
+            if(currentStyle.trailingContent === undefined) currentStyle.trailingContent = defaultTrailingContent;
             trailingContent = currentStyle.trailingContent;
         }
 
         // initial place holder
         if(usePlaceholder){
-            if(currentStyle.placeholder === undefined) currentStyle.placeholder = "";
+            if(currentStyle.placeholder === undefined) currentStyle.placeholder = defaultPlaceholder;
             placeholder = currentStyle.placeholder;
         }
     }

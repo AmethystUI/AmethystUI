@@ -1,3 +1,9 @@
+<script lang="ts" context="module">
+    export const defaultOutlineWidth: unitedAttr<number> = { v: 2.5, u: "px" };
+    export const defaultOutlineColor: color = initializeColorFromHSLA(226, 88, 59, 100);
+    export const defaultOutlineStyle: borderOutlineStyle = "solid";
+</script>
+
 <script lang="ts">
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
 
@@ -8,28 +14,28 @@
     import { clearColorPickerRef, mainColorPickerData } from "$lib/stores/colorPickerManager";
     import { initializeColorFromHSLA } from "$lib/util/colorMaths";
     import { activeStyles } from "$lib/stores/activeStyles";
+    import { defaultBorderRadius } from "./BorderEditor.svelte";
     
     export let currentParentWidth = 360;
     
     // reactive
         $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
-    let cOW = 0; let cOWu:units = "px"; // cBW = current outline width
-    let cOFF = 0; let cOFFu:units = "px"; // cBW = current outline width
+    let cOW:number; let cOWu:units = "px"; // cBW = current outline width
+    let cOFF:number; let cOFFu:units = "px"; // cBW = current outline offset
 
-    let cBRT = 0; let cBRTu:units = "px"; // cBR = current outline radius
-    let cBRR = 0; let cBRRu:units = "px"; // cBR = current outline radius
-    let cBRB = 0; let cBRBu:units = "px"; // cBR = current outline radius
-    let cBRL = 0; let cBRLu:units = "px"; // cBR = current outline radius
+    let cBRT:number; let cBRTu:units = "px"; // cBR = current border radius
+    let cBRR:number; let cBRRu:units = "px"; // cBR = current border radius
+    let cBRB:number; let cBRBu:units = "px"; // cBR = current border radius
+    let cBRL:number; let cBRLu:units = "px"; // cBR = current border radius
     let cBRAvg = 0;
     
-    const initialColor = initializeColorFromHSLA(226, 88, 59, 100);;
-    let clr:color = {...initialColor};
+    let clr:color;
 
     // this has to be a subset of the borderOutlineStyle type set in $collection
     const possibleStyles:borderOutlineStyle[] = ["dotted", "dashed", "solid", "double", "groove", "ridge", "inset", "hidden"];
 
-    let style:borderOutlineStyle = "solid";
+    let style:borderOutlineStyle;
 
     // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization
     $: useOutline = $activeStyles.USEOUTLINE;
@@ -47,23 +53,23 @@
 
         // outline width
         if(useWidth){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
-            if(!currentStyle["outlineWidth"]) currentStyle["outlineWidth"] = {v:2.5,u:"px"};
+            if(!currentStyle["outlineWidth"]) currentStyle["outlineWidth"] = {...defaultOutlineWidth};
             cOW = currentStyle["outlineWidth"].v;
             cOWu = currentStyle["outlineWidth"].u;
         }
 
         // border radius (yes border radius also control the outline radius for some reason)
         if(useRadius){
-            if(!currentStyle["borderRadiusTop"]) currentStyle["borderRadiusTop"] = {v:18,u:"pt"};
+            if(!currentStyle["borderRadiusTop"]) currentStyle["borderRadiusTop"] = {...defaultBorderRadius};
             cBRT = currentStyle["borderRadiusTop"].v;
             cBRTu = currentStyle["borderRadiusTop"].u;
-            if(!currentStyle["borderRadiusRight"]) currentStyle["borderRadiusRight"] = {v:18,u:"pt"};
+            if(!currentStyle["borderRadiusRight"]) currentStyle["borderRadiusRight"] = {...defaultBorderRadius};
             cBRR = currentStyle["borderRadiusRight"].v;
             cBRRu = currentStyle["borderRadiusRight"].u;
-            if(!currentStyle["borderRadiusBottom"]) currentStyle["borderRadiusBottom"] = {v:18,u:"pt"};
+            if(!currentStyle["borderRadiusBottom"]) currentStyle["borderRadiusBottom"] = {...defaultBorderRadius};
             cBRB = currentStyle["borderRadiusBottom"].v;
             cBRBu = currentStyle["borderRadiusBottom"].u;
-            if(!currentStyle["borderRadiusLeft"]) currentStyle["borderRadiusLeft"] = {v:18,u:"pt"};
+            if(!currentStyle["borderRadiusLeft"]) currentStyle["borderRadiusLeft"] = {...defaultBorderRadius};
             cBRL = currentStyle["borderRadiusLeft"].v;
             cBRLu = currentStyle["borderRadiusLeft"].u;
             cBRAvg = (cBRT + cBRR + cBRB + cBRL) / 4;
@@ -78,13 +84,13 @@
 
         // outline color
         if(useColor){
-            if(!currentStyle["outlineColor"]) currentStyle["outlineColor"] = {...initialColor};
+            if(!currentStyle["outlineColor"]) currentStyle["outlineColor"] = {...defaultOutlineColor};
             clr = currentStyle["outlineColor"];
         }
 
         // outline style
         if(useStyle){
-            if(!currentStyle["outlineStyle"]) currentStyle["outlineStyle"] = "solid"
+            if(!currentStyle["outlineStyle"]) currentStyle["outlineStyle"] = defaultOutlineStyle
             style = currentStyle["outlineStyle"];
         }
     }
