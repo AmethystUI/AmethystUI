@@ -18,7 +18,7 @@
         },
     ]
 
-    const fullPanelWidth = 490;
+    const fullPanelWidth = 540;
     const configSpacing = "13px";
     const configPanelStyling = {
         fullPanelWidth,
@@ -106,7 +106,7 @@
     @import "/src/static/stylesheets/guideline";
     
     main{
-        width: 600px; height: fit-content;
+        width: 650px; height: fit-content;
 
         #setting-container{
             $setting-filter-width: 80px;

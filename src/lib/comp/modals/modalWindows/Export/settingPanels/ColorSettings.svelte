@@ -28,15 +28,16 @@
         {
             iconDir : "",
             val : "hsl",
-            alt : `HSL(270°, ${useUnitInference ? "1" : "100%"}, ${useUnitInference ? "0.55" : "55%"})`
+            alt: `${useUnitInference ? "HSLA(270°, 1, 0.55, 0.95)" : "HSLA(270°, 100%, 55%, 95%)"}`
+            // alt : `HSLA(270°, ${useUnitInference ? "1" : "100%"}, ${useUnitInference ? "0.55" : "55%"})`
         }, {
             iconDir : "",
             val : "hex",
-            alt : "HEX #8C1AFF"
+            alt : "HEX #8C1AFFF2"
         }, {
             iconDir : "",
             val : "rgb",
-            alt : "RGB(140, 26, 255)"
+            alt : `${useUnitInference ? "RGBA(140, 26, 255, 0.95)" : "RGBA(140, 26, 255, 95%)"}`
         },
     ]
 
@@ -45,10 +46,10 @@
 <SettingsPanel panelName="Colors">
     <!-- Color formatting -->
     <h2 class="configTitle">Preferred Format</h2>
-    <MultiToggle {...multiToggleStyling}
+    <MultiToggle {...multiToggleStyling} textSize=10
         elements={colorFormats} selection={clrFmtSelection} on:valueChange={updateClrFmt} />
 
-    {#if $exportConfigs.stylesheets.colorFmt === "hsl"}
+    {#if ["hsl", "rgb"].includes($exportConfigs.stylesheets.colorFmt)}
         <Checkbox name="Use Decimals Instead of %" {...checkboxStyling}
             checked={useUnitInference} on:updateValue={updateUnitInf}/>
     {/if}
