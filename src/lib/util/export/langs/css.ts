@@ -7,6 +7,7 @@ import { exportConfigs } from "../exportManager";
 import _ from "../../common";
 import { defaultFlexAlign, defaultOpacity, defaultOverflow } from "$src/lib/comp/ctrlMenuItems/StyleEditors/AppearanceEditor.svelte";
 import { defaultBgClr } from "$src/lib/comp/ctrlMenuItems/StyleEditors/BackgroundEditor.svelte";
+import getStringFor from "../../toString";
 
 const exportCSS = async () => {
     // Get current collection
@@ -24,7 +25,7 @@ const exportCSS = async () => {
         // fetch root style
         let rootStyleString = await generateStyleString(elementStyle);
 
-        console.log(rootStyleString);
+        // console.log(rootStyleString);
     }
 
     // run through aggressive compression if enabled
@@ -33,17 +34,51 @@ const exportCSS = async () => {
 
 const generateStyleString = async (style: elementStyle) => {
     const configs = get(exportConfigs);
-    const attributeSeperator = configs.common.compressionAmt == 0 ? "\n\n" : "\n";
+    const sectionSeperator = configs.common.compressionAmt == 0 ? "\n\n" : "\n";
+    const groupingSeperator = configs.common.compressionAmt == 0 ? "\n" : " ";
 
-    const boundingBox = getBoundingBoxStyles(style, configs);
-    const appearance = getAppearanceStyles(style, configs);
+    const sizing: string = [
+        `width: ${getStringFor.unitedAttr(style.width)};`,
+        `height: ${getStringFor.unitedAttr(style.height)}`
+    ].join(groupingSeperator).trim();
+
+    const margin = getQuadAttributeStyles("margin", configs,
+        style.marginTop ?? defaultMargin,
+        style.marginRight ?? defaultMargin,
+        style.marginBottom ?? defaultMargin,
+        style.marginLeft ?? defaultMargin,
+    )
+
+    const padding = getQuadAttributeStyles("padding", configs,
+        style.paddingTop ?? defaultPadding,
+        style.paddingRight ?? defaultPadding,
+        style.paddingBottom ?? defaultPadding,
+        style.paddingLeft ?? defaultPadding,
+    )
+
+    const opacity = `opacity: ${style.opacity ?? defaultOpacity};`
+    let overflow: string
+    if(style.overflowX === style.overflowY && style.overflowX !== "auto"){
+        overflow = `overflow: ${style.overflowX ?? defaultOverflow};`
+    } else {
+        overflow = [
+            style.overflowX !== "auto" ? `overflow-x: ${style.overflowX ?? defaultOverflow};` : "",
+            style.overflowY !== "auto" ? `overflow-y: ${style.overflowY ?? defaultOverflow};` : ""
+        ].join(groupingSeperator).trim();
+    }
     
-    let backgroundClr = "";
-    if(style.USEBACKGROUND) backgroundClr = getColorStyle("background-color", style.backgroundColor ?? defaultBgClr, configs);
+    console.log(overflow);
 
+    // const boundingBox = getBoundingBoxStyles(style, configs);
+    // const appearance = getAppearanceStyles(style, configs);
     
+    // let backgroundClr = "";
+    // if(style.USEBACKGROUND) backgroundClr = getColorStyle("background-color", style.backgroundColor ?? defaultBgClr, configs);
 
-    return backgroundClr;
+    // let borderStr = "";
+
+
+    return "";
     // return `${boundingBox}${attributeSeperator}${appearance}`;
 }
 
@@ -57,7 +92,7 @@ const generateStyleString = async (style: elementStyle) => {
  * @param {unitedAttr<number>} valLeft - The left value of the bounding box attribute.
  * @returns {string} The condensed representation of the bounding box attribute.
  */
-export const condenseBoundingBoxAttribute = (
+export const condenseQuadAttributes = (
     attrName: string,
     valTop: unitedAttr<number>,
     valRight: unitedAttr<number>,
@@ -82,61 +117,33 @@ export const condenseBoundingBoxAttribute = (
 }
 
 // Some of these utility functions are exported because we can use them for supersets of CSS, like SCSS.
-export const getBoundingBoxStyles = (style: elementStyle, exportConfig: exportConfigInterface): string => {
+export const getQuadAttributeStyles = (
+    attrName: string,
+    exportConfig: exportConfigInterface,
+    valTop: unitedAttr<number>,
+    valRight: unitedAttr<number>,
+    valBottom: unitedAttr<number>,
+    valLeft: unitedAttr<number>
+): string => {
     const compress = exportConfig.common.compressionAmt;  // 0 is none, 1 is standard, 2 is aggressive
 
-    // define constants
-    const width: unitedAttr<number> = style.width ?? defaultWidth;
-    const height: unitedAttr<number> = style.height ?? defaultHeight;
-    
-    const marginTop: unitedAttr<number> = style.marginTop ?? defaultMargin;
-    const marginRight: unitedAttr<number> = style.marginRight ?? defaultMargin;
-    const marginBottom: unitedAttr<number> = style.marginBottom ?? defaultMargin;
-    const marginLeft: unitedAttr<number> = style.marginLeft ?? defaultMargin;
-
-    const paddingTop: unitedAttr<number> = style.paddingTop ?? defaultPadding;
-    const paddingRight: unitedAttr<number> = style.paddingRight ?? defaultPadding;
-    const paddingBottom: unitedAttr<number> = style.paddingBottom ?? defaultPadding;
-    const paddingLeft: unitedAttr<number> = style.paddingLeft ?? defaultPadding;
-
-    // Width and Height
-    let widthStr = `width: ${width.v}${width.u};`;
-    let heightStr = `height: ${height.v}${height.u};`;
-
-    // adjust for fit-content
-    if(width.u === "fit-content") widthStr = `width: fit-content;`;
-    if(height.u === "fit-content") heightStr = `height: fit-content;`;
-
     // Margins
-    let marginStr;
+    let str;
     if( compress !== 0 ){ // if any compression is used
-        marginStr = condenseBoundingBoxAttribute("margin", marginTop, marginRight, marginBottom, marginLeft);
+        str = condenseQuadAttributes(attrName, valTop, valRight, valBottom, valLeft);
     } else {
-        marginStr = [
-            `margin-top: ${marginTop.v}${marginTop.u};`,
-            `margin-right: ${marginRight.v}${marginRight.u};`,
-            `margin-bottom: ${marginBottom.v}${marginBottom.u};`,
-            `margin-left: ${marginLeft.v}${marginLeft.u};`
-        ].join("\n");
-    }
-
-    // Paddings
-    let paddingStr;
-    if( compress !== 0 ){ // if any compression is used
-        paddingStr = condenseBoundingBoxAttribute("padding", marginTop, marginRight, marginBottom, marginLeft);
-    } else {
-        paddingStr = [
-            `padding-top: ${paddingTop.v}${paddingTop.u};`,
-            `padding-right: ${paddingRight.v}${paddingRight.u};`,
-            `padding-bottom: ${paddingBottom.v}${paddingBottom.u};`,
-            `padding-left: ${paddingLeft.v}${paddingLeft.u};`
+        str = [
+            `${attrName}-top: ${valTop.v}${valTop.u};`,
+            `${attrName}-right: ${valRight.v}${valRight.u};`,
+            `${attrName}-bottom: ${valBottom.v}${valBottom.u};`,
+            `${attrName}-left: ${valLeft.v}${valLeft.u};`
         ].join("\n");
     }
 
     // final formatting
-    if(compress === 0) return `${widthStr}\n${heightStr}\n\n${marginStr}\n\n${paddingStr}`;
-    return `${widthStr} ${heightStr}\n${marginStr} ${paddingStr}`
+    return str;
 }
+
 
 export const getAppearanceStyles = (style: elementStyle, exportConfig: exportConfigInterface): string => {
     const compress = exportConfig.common.compressionAmt;  // 0 is none, 1 is standard, 2 is aggressive
@@ -178,40 +185,6 @@ export const getAppearanceStyles = (style: elementStyle, exportConfig: exportCon
     // final formatting
     if(compress === 0) return `${opacityStr}\n\n${overflowStr}\n\n${alignStr}`;
     return `${opacityStr}\n${overflowStr}\n${alignStr}`;
-}
-
-export const getColorStyle = (name: string, value: color, exportConfig: exportConfigInterface): string => {
-    const compress = exportConfig.common.compressionAmt;  // 0 is none, 1 is standard, 2 is aggressive
-    const colorFmt: colorFmt = exportConfig.stylesheets.colorFmt;
-
-    let colorStr = "";
-    if(colorFmt === "hex"){ // hex format
-        colorStr = `#${value.hex}`;
-    } else if(colorFmt === "hsl"){ // hsl / hsla format
-        const useAlpha = value.a !== 100;
-        const inferUnits = exportConfig.stylesheets.colorUnitInference || compress === 2;
-
-        const alpha = `${value.a / (inferUnits ? 100 : 1)}${inferUnits ? "" : "%"}`;
-        const sat = `${value.s / (inferUnits ? 100 : 1)}${inferUnits ? "" : "%"}`;
-        const lum = `${value.l / (inferUnits ? 100 : 1)}${inferUnits ? "" : "%"}`;
-        const hue = `${value.h}deg`;
-
-        // if we're not using an alpha value or we're on the aggressive compression mode, we want to infer the units as much as we can
-        colorStr = `${useAlpha ? "hsla" : "hsl"}(${hue}, ${sat}, ${lum}`; // the base string
-        if(useAlpha) colorStr += `, ${alpha}`; // add alpha value if needed
-        colorStr += `)`; // closing parenthesis
-    } else if(colorFmt === "rgb"){ // rgb format
-        const useAlpha = value.a !== 100;
-        const inferUnits = exportConfig.stylesheets.colorUnitInference || compress === 2;
-
-        const alpha = `${value.a / (inferUnits ? 100 : 1)}${inferUnits ? "" : "%"}`;
-        
-        colorStr = `${useAlpha ? "rgba" : "rgb"}(${value.r}, ${value.g}, ${value.b}`; // the base string
-        if(useAlpha) colorStr += `, ${alpha}`; // add alpha value if needed
-        colorStr += `)`; // closing parenthesis
-    } else throw new Error(`Unknown color format: ${colorFmt}`);
-
-    return `${name}: ${colorStr};`;
 }
 
 export default exportCSS;
