@@ -5,7 +5,7 @@ const getStringFor = {
         return `${val.v}${val.u}`;
     },
 
-    color : (value: color, compression = 1 as 0 | 1 | 2, colorFmt = "hsl" as colorFmt, preferInference = false): string => { 
+    color : (value: color, compression=1, colorFmt = "hsl" as colorFmt, preferInference = false): string => { 
         const inferUnits = preferInference || compression === 2;
         let colorStr = "";
 

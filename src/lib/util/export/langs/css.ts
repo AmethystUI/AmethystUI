@@ -37,37 +37,115 @@ const generateStyleString = async (style: elementStyle) => {
     const sectionSeperator = configs.common.compressionAmt == 0 ? "\n\n" : "\n";
     const groupingSeperator = configs.common.compressionAmt == 0 ? "\n" : " ";
 
-    const sizing: string = [
-        `width: ${getStringFor.unitedAttr(style.width)};`,
-        `height: ${getStringFor.unitedAttr(style.height)}`
-    ].join(groupingSeperator).trim();
+    /* 
+     * Create a new styleBuffer array, which is just a simple 3d array of strings that correspond to the grouping structure:
+     *
+     * Level 1 (highest) - Sections, where we control how attributes that control similar properties, such as bounding box attributes are grouped together.
+     * Level 2 - Groups, where we control how attributes that control one property, such as overflow are grouped together.
+     * Level 3 (lowest) - Attributes, which are the individual attributes that live in groups.
+     * 
+     * This buffer structure is optimized for CSS and CSS derivative languages, so it may be different from other formats.
+     */
+    let TOTAL_BUFFER: string[][][] = [];
 
-    const margin = getQuadAttributeStyles("margin", configs,
+    // bounding box attributes
+    let BOUNDING_BOX_BUFFER: string[][] = [];
+
+    // sizing
+    BOUNDING_BOX_BUFFER.push([
+        `width: ${getStringFor.unitedAttr(style.width)}`,
+        `height: ${getStringFor.unitedAttr(style.height)}`
+    ]);
+
+    const marginStyle = getQuadAttributeStyles("margin", configs,
         style.marginTop ?? defaultMargin,
         style.marginRight ?? defaultMargin,
         style.marginBottom ?? defaultMargin,
         style.marginLeft ?? defaultMargin,
-    )
-
-    const padding = getQuadAttributeStyles("padding", configs,
+    );
+    const paddingStyle = getQuadAttributeStyles("padding", configs,
         style.paddingTop ?? defaultPadding,
         style.paddingRight ?? defaultPadding,
         style.paddingBottom ?? defaultPadding,
         style.paddingLeft ?? defaultPadding,
-    )
+    );
 
-    const opacity = `opacity: ${style.opacity ?? defaultOpacity};`
-    let overflow: string
-    if(style.overflowX === style.overflowY && style.overflowX !== "auto"){
-        overflow = `overflow: ${style.overflowX ?? defaultOverflow};`
+    // if there was no compression, we should be adding the margin and padding as seperate sections entirely.
+    if(configs.common.compressionAmt === 0){
+        // margin
+        BOUNDING_BOX_BUFFER.push([marginStyle]);
+        // padding
+        BOUNDING_BOX_BUFFER.push([paddingStyle]);
+        // final push
+        TOTAL_BUFFER.push(BOUNDING_BOX_BUFFER);
     } else {
-        overflow = [
-            style.overflowX !== "auto" ? `overflow-x: ${style.overflowX ?? defaultOverflow};` : "",
-            style.overflowY !== "auto" ? `overflow-y: ${style.overflowY ?? defaultOverflow};` : ""
-        ].join(groupingSeperator).trim();
+        // size
+        TOTAL_BUFFER.push(BOUNDING_BOX_BUFFER);
+        // margin
+        TOTAL_BUFFER.push([[marginStyle]]);
+        // padding
+        TOTAL_BUFFER.push([[paddingStyle]]);
+    }
+        
+        // appearance buffer
+    let APPEARANCE_BUFFER: string[][] = [];
+
+    // Opacity. Only add opacity if it is at the default, assumed 100%
+    if(style.opacity !== 100){
+        APPEARANCE_BUFFER.push([`opacity: ${style.opacity ?? defaultOpacity}`]);
     }
     
-    console.log(overflow);
+    // Overflow. Do not add is both x and y are set to auto, as that's the default value
+    if(style.overflowX !== "auto" || style.overflowY !== "auto"){
+        if(style.overflowX === style.overflowY){
+            APPEARANCE_BUFFER.push[`overflow: ${style.overflowX ?? defaultOverflow}`];
+        } else {
+            APPEARANCE_BUFFER.push([
+                style.overflowX !== "auto" ? `overflow-x: ${style.overflowX ?? defaultOverflow}` : "",
+                style.overflowY !== "auto" ? `overflow-y: ${style.overflowY ?? defaultOverflow}` : ""
+            ]);
+        }
+    }
+
+    TOTAL_BUFFER.push(APPEARANCE_BUFFER);
+    
+    // background buffer
+    let BACKGROUND_BUFFER: string[][] = [];
+
+    if(style.USEBACKGROUND){
+        BACKGROUND_BUFFER.push([`background-color: ${getStringFor.color(
+            style.backgroundColor,
+            configs.common.compressionAmt,
+            configs.stylesheets.colorFmt,
+            configs.stylesheets.colorUnitInference,
+        )}`]);
+    }
+
+    TOTAL_BUFFER.push(BACKGROUND_BUFFER);
+
+    // border buffer
+    let BORDER_BUFFER: string[][] = [];
+    
+    // border radius
+    const borderRadiusStr = getQuadAttributeStyles("padding", configs,
+        style.paddingTop ?? defaultPadding,
+        style.paddingRight ?? defaultPadding,
+        style.paddingBottom ?? defaultPadding,
+        style.paddingLeft ?? defaultPadding,
+    );
+    
+    if(configs.common.compressionAmt > 0) BORDER_BUFFER.push([borderRadiusStr]);
+    else TOTAL_BUFFER.push([[borderRadiusStr]]);
+
+    // end with color since it will apply to everything
+    BORDER_BUFFER.push([`border-color: ${getStringFor.color(
+        style.borderColor,
+        configs.common.compressionAmt,
+        configs.stylesheets.colorFmt,
+        configs.stylesheets.colorUnitInference,
+    )}`]);
+
+    console.log(JSON.stringify(TOTAL_BUFFER, null, 2))
 
     // const boundingBox = getBoundingBoxStyles(style, configs);
     // const appearance = getAppearanceStyles(style, configs);
@@ -102,16 +180,16 @@ export const condenseQuadAttributes = (
     let str = "";
     if (_.isEqual(valTop, valRight, valBottom, valLeft)) {
         // in the case that all margins are equal
-        str = `${attrName}: ${valTop.v}${valTop.u};`;
+        str = `${attrName}: ${valTop.v}${valTop.u}`;
     } else if (_.isEqual(valTop, valBottom) && _.isEqual(valLeft, valRight)) {
         // in the case that the top and bottom match, and left and right match, but not all
-        str = `${attrName}: ${valTop.v}${valTop.u} ${valLeft.v}${valLeft.u};`;
+        str = `${attrName}: ${valTop.v}${valTop.u} ${valLeft.v}${valLeft.u}`;
     } else if (_.isEqual(valLeft, valRight)) {
         // in the case that the left and right match, but not the top and bottom
-        str = `${attrName}: ${valTop.v}${valTop.u} ${valLeft.v}${valLeft.u} ${valBottom.v}${valBottom.u};`;
+        str = `${attrName}: ${valTop.v}${valTop.u} ${valLeft.v}${valLeft.u} ${valBottom.v}${valBottom.u}`;
     } else {
         // default to using standard marginal shorthand notation
-        str = `${attrName}: ${valTop.v}${valTop.u} ${valRight.v}${valRight.u} ${valBottom.v}${valBottom.u} ${valLeft.v}${valLeft.u};`;
+        str = `${attrName}: ${valTop.v}${valTop.u} ${valRight.v}${valRight.u} ${valBottom.v}${valBottom.u} ${valLeft.v}${valLeft.u}`;
     }
     return str;
 }
@@ -129,7 +207,7 @@ export const getQuadAttributeStyles = (
 
     // Margins
     let str;
-    if( compress !== 0 ){ // if any compression is used
+    if( compress !== 0 || _.isEqual(valTop, valRight, valBottom, valLeft) ){ // if any compression is used
         str = condenseQuadAttributes(attrName, valTop, valRight, valBottom, valLeft);
     } else {
         str = [
