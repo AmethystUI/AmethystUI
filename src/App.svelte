@@ -29,6 +29,7 @@
     import ProgressOverlay from "$lib/comp/modals/ProgressOverlay.svelte";
     import setImmediate from "$lib/util/setImmediate";
     import { onMount } from "svelte";
+    import { initializeColorFromHSLA } from "./lib/util/colorMaths";
 
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
@@ -47,7 +48,20 @@
     // DEBUG: 
     onMount(() => {
         addComponent("DIV", {
-            USEBACKGROUND: true,
+            USEBORDER: true,
+            borderWidthTop: {v:69, u:"px"},
+            borderWidthRight: {v:19, u:"pt"},
+            borderWidthBottom: {v:0, u:"px"},
+            borderWidthLeft: {v:84, u:"px"},
+            borderRadiusTop: {v:18, u:"px"},
+            borderRadiusRight: {v:38, u:"pt"},
+            borderRadiusBottom: {v:48, u:"px"},
+            borderRadiusLeft: {v:38, u:"px"},
+            borderStyleTop: "solid",
+            borderStyleRight: "dashed",
+            borderStyleBottom: "solid",
+            borderStyleLeft: "hidden",
+            borderColor: initializeColorFromHSLA(0, 84, 52, 100),
         })
 
         setImmediate(() => {

@@ -8,6 +8,7 @@ import _ from "../../common";
 import { defaultFlexAlign, defaultOpacity, defaultOverflow } from "$src/lib/comp/ctrlMenuItems/StyleEditors/AppearanceEditor.svelte";
 import { defaultBgClr } from "$src/lib/comp/ctrlMenuItems/StyleEditors/BackgroundEditor.svelte";
 import getStringFor from "../../toString";
+import { defaultBorderRadius } from "$src/lib/comp/ctrlMenuItems/StyleEditors/BorderEditor.svelte";
 
 const exportCSS = async () => {
     // Get current collection
@@ -107,11 +108,11 @@ const generateStyleString = async (style: elementStyle) => {
         }
     }
 
-    TOTAL_BUFFER.push(APPEARANCE_BUFFER);
+    if(APPEARANCE_BUFFER.length > 0) TOTAL_BUFFER.push(APPEARANCE_BUFFER);
     
     // background buffer
     let BACKGROUND_BUFFER: string[][] = [];
-
+    
     if(style.USEBACKGROUND){
         BACKGROUND_BUFFER.push([`background-color: ${getStringFor.color(
             style.backgroundColor,
@@ -121,29 +122,78 @@ const generateStyleString = async (style: elementStyle) => {
         )}`]);
     }
 
-    TOTAL_BUFFER.push(BACKGROUND_BUFFER);
+    if(BACKGROUND_BUFFER.length > 0) TOTAL_BUFFER.push(BACKGROUND_BUFFER);
 
     // border buffer
-    let BORDER_BUFFER: string[][] = [];
+    if(style.USEBORDER){
+        let BORDER_BUFFER: string[][] = [];
+        
+        // border width and style
+        const equalBorderStyles = (new Set([style.borderStyleTop, style.borderStyleRight, style.borderStyleBottom, style.borderStyleLeft])).size === 1;
+        const equalBorderWidths = _.isEqual(style.borderWidthTop, style.borderWidthRight, style.borderWidthBottom, style.borderWidthLeft);
     
-    // border radius
-    const borderRadiusStr = getQuadAttributeStyles("padding", configs,
-        style.paddingTop ?? defaultPadding,
-        style.paddingRight ?? defaultPadding,
-        style.paddingBottom ?? defaultPadding,
-        style.paddingLeft ?? defaultPadding,
-    );
+        if((equalBorderStyles && style.borderStyleTop === "hidden") || (equalBorderWidths && style.borderWidthTop.v === 0)){ 
+            // edge case where we hide all borders
+            BORDER_BUFFER.push(["border: none"])
+        } else {
+            if(equalBorderStyles && equalBorderWidths){ // if both style and width are equal
+                BORDER_BUFFER.push([`border: ${style.borderWidthTop.v}${style.borderWidthTop.u} ${style.borderStyleTop}`]);
+            } else {
+                // We don't wanna over engineer the output formatting here, so we'll keep it consistent as using border mixins are both short and readable, and suitable for all compression amounts.
     
-    if(configs.common.compressionAmt > 0) BORDER_BUFFER.push([borderRadiusStr]);
-    else TOTAL_BUFFER.push([[borderRadiusStr]]);
+                const borderWidths: Record<string, unitedAttr<number>> = {
+                    "border-top": style.borderWidthTop,
+                    "border-right": style.borderWidthRight,
+                    "border-bottom": style.borderWidthBottom,
+                    "border-left": style.borderWidthLeft
+                }; const borderStyles: Record<keyof typeof borderWidths, borderOutlineStyle> = {
+                    "border-top" : style.borderStyleTop,
+                    "border-right" : style.borderStyleRight,
+                    "border-bottom" : style.borderStyleBottom,
+                    "border-left" : style.borderStyleLeft
+                }
+                const borderWidthKeys = Object.keys(borderWidths);
+                let borderWidthStyleBuffer: string[] = [];
+                
+                for(let i = 0; i < borderWidthKeys.length; i++){
+                    const k = borderWidthKeys[i];
+    
+                    if(borderWidths[k].v === 0 || borderStyles[k] === "hidden") continue;
+    
+                    if(configs.common.compressionAmt > 0){ // with compression
+                        borderWidthStyleBuffer.push(`${k}: ${borderWidths[k].v}${borderWidths[k].u} ${borderStyles[k]}`);
+                        continue;
+                    } else { // no compression
+                        BORDER_BUFFER.push([`${k}: ${borderWidths[k].v}${borderWidths[k].u} ${borderStyles[k]}`]);
+                    }
+                }
+    
+                // final push if we're using compression
+                if(configs.common.compressionAmt > 0) BORDER_BUFFER.push(borderWidthStyleBuffer);
+            }
 
-    // end with color since it will apply to everything
-    BORDER_BUFFER.push([`border-color: ${getStringFor.color(
-        style.borderColor,
-        configs.common.compressionAmt,
-        configs.stylesheets.colorFmt,
-        configs.stylesheets.colorUnitInference,
-    )}`]);
+            // border radius
+            const borderRadiusStr = getQuadAttributeStyles("border-radius", configs,
+                style.borderRadiusTop ?? defaultBorderRadius,
+                style.borderRadiusRight ?? defaultBorderRadius,
+                style.borderRadiusBottom ?? defaultBorderRadius,
+                style.borderRadiusLeft ?? defaultBorderRadius,
+            );
+            if(configs.common.compressionAmt > 0) BORDER_BUFFER.push([borderRadiusStr]);
+            else TOTAL_BUFFER.push([[borderRadiusStr]]);
+        
+            // end with color since it will apply to everything
+            BORDER_BUFFER.push([`border-color: ${getStringFor.color(
+                style.borderColor,
+                configs.common.compressionAmt,
+                configs.stylesheets.colorFmt,
+                configs.stylesheets.colorUnitInference,
+            )}`]);
+        }
+
+        // push to total buffer
+        TOTAL_BUFFER.push(BORDER_BUFFER);
+    }
 
     console.log(JSON.stringify(TOTAL_BUFFER, null, 2))
 
