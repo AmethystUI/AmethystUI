@@ -117,8 +117,7 @@ const generateStyleString = async (style: elementStyle) => {
     }
 
     if(BACKGROUND_BUFFER.length > 0) TOTAL_BUFFER.push(BACKGROUND_BUFFER);
-
-    // border buffer
+    
     // border width and style
     const equalBorderStyles = (new Set([style.borderStyleTop, style.borderStyleRight, style.borderStyleBottom, style.borderStyleLeft])).size === 1;
     const equalBorderWidths = _.isEqual(style.borderWidthTop, style.borderWidthRight, style.borderWidthBottom, style.borderWidthLeft);

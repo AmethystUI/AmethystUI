@@ -6,7 +6,7 @@
 import { writable } from "svelte/store"
 import { openProgressModal } from "$src/lib/stores/modalManager"
 import { progressOverlayController as POC } from "../UI/progressOverlayController";
-import exportCSS from "./langs/css";
+import exportCSS from "./transpilers/css";
 
 /**
  * A union type that represents supported file types.

@@ -1,5 +1,8 @@
-// import type { elementStyle } from "./element";
-// import type { fontObject } from "$lib/workers/pseudoWorkers/fonts";
+type Enumerate<N extends number, Acc extends number[] = []> = Acc["length"] extends N
+    ? Acc[number]
+    : Enumerate<N, [...Acc, Acc["length"]]>
+
+type IntRange<F extends number, T extends number> = Exclude<Enumerate<T>, Enumerate<F>>
 
 type HTMLtags = "A" | "BODY" | "BUTTON" | "CANVAS" | "DIV" | "H1" | "H2" | "H3" | "H4" | "H5" | "H6" | "HR" | "INPUT" | "LABEL" | "OL" | "UL" | "PROGRESS" | "P" | "SECTION" | "SPAN" | "TEXTAREA";
 type units = "px" | "pt" | "pc" | "em" | "rem" | "vw" | "vh" | "%" | "fit-content";
@@ -77,6 +80,8 @@ interface color {
 // Tester key:          AIzaSyDW3JQmec-yJykfP-FcRYpIujOc6jYa4RQ
 
 // globalScope
+
+declare let IntRange: IntRange;
 
 declare let HTMLtags: HTMLtags;
 declare let units : units;

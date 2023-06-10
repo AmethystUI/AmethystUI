@@ -331,10 +331,10 @@
                     
                     height:15px; width:15px;
                     border-radius: 3px;
-        
+
                     margin: 2px 0px 0px 15px;
                     border: 1.5px solid $primaryl5;
-        
+
                     &:checked{
                         background: $accent;
                         border:none;
