@@ -6,7 +6,7 @@ type PartialRecord<K extends keyof any, T> = Partial<Record<K, T>>;
  * Represents the default configurations for a project, with options for stylesheets,
  * SCSS, and JSON files.
  */
-interface exportConfigInterface extends PartialRecord<colorFmt, Record<string, any>> {
+interface exportConfig extends PartialRecord<colorFmt, Record<string, any>> {
     common: {
         compressionAmt: number; // 0 is none, 1 is standard, 2 is aggressive
     }
@@ -48,6 +48,6 @@ type exportableFileTypes = "css" | "scss" | "less" | "styl" | "svelte" | "json";
 
 declare let colorFmt : colorFmt;
 declare let PartialRecord : PartialRecord;
-declare let exportConfigInterface : exportConfigInterface;
+declare let exportConfigInterface : exportConfig;
 declare let exportableFileTypes : exportableFileTypes;
 declare let simpleExportBuffer : simpleExportBuffer;

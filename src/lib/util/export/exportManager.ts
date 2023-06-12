@@ -33,7 +33,7 @@ export const targetFileType = writable<exportableFileTypes>("css");
  * const config = { ...defaultConfigs, scss: { nestStyles: false } };
  * ```
  */
-const defaultConfigs: exportConfigInterface = {
+const defaultConfigs: exportConfig = {
     "common": {
         "compressionAmt": 1,
     },
@@ -56,7 +56,7 @@ const defaultConfigs: exportConfigInterface = {
  * @param stylesheets - Access configuration settings that are universal to all stylesheets. This does NOT include types like JSON.
  * @param common - Access configuration settings that are universal to all file types, including types like JSON.
  */
-export const exportConfigs = writable<exportConfigInterface>(defaultConfigs); // type inference works properly
+export const exportConfigs = writable<exportConfig>(defaultConfigs); // type inference works properly
 
 export const exportTextFile = async (fileName: string, fileType: exportableFileTypes, content: string) => {
     // Create element with <a> tag
