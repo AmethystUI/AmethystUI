@@ -21,6 +21,27 @@ CSSTemplate.set("000001x000", (style: elementStyle): string => { // height
         return `height: ${getStringFor.unitedAttr(style.height)};`;
     } return null;
 });
+CSSTemplate.set("000100x000", (style: elementStyle): string => { // height
+    if(style.height !== undefined){
+        return `HI MOM;`;
+    } return null;
+});
+
+CSSTemplate.set("010000x000", (style: elementStyle): string => { // height
+    if(style.height !== undefined){
+        return `This is a new section,`;
+    } return null;
+});
+CSSTemplate.set("010001x000", (style: elementStyle): string => { // height
+    if(style.height !== undefined){
+        return `a new sentence.`;
+    } return null;
+});
+CSSTemplate.set("010100x000", (style: elementStyle): string => { // height
+    if(style.height !== undefined){
+        return `How cool is that?`;
+    } return null;
+});
 
 // =========================== UTILITY FUNCTIONS ===========================
 
