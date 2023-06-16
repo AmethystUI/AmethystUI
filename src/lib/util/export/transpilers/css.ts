@@ -3,7 +3,7 @@ import { get } from "svelte/store";
 
 import _ from "../../common";
 
-import { decodeAddr, encodeAddr, toHex8, type hex4, type hex8, type weightedPosition, toHex } from "./utils/css.util";
+import { encodeAddr, toHex8, type hex4, type hex8, type weightedPosition, toHex } from "./utils/css.util";
 import { CSSTemplate, generateCSSTemplate } from "./templates/css.template";
 import { exportConfigs } from "../exportManager";
 
@@ -67,8 +67,8 @@ const getStyleString = (
         // after generating the current line, we can move on to the next line
         if(newResult !== null){
             const fin = result + " " + getStyleString(style, verbose, currentChunk, currentLine, {p: (currentColumn.p + 1) as hex8, w: 0}, 2, false);
-            if(verbose) console.log(`<<< [EXIT] Lvl: ${level}; Res: ${fin}`);
-            return fin;
+            if(verbose) console.log(`<<< [EXIT] Lvl: ${level}; Res: ${fin.trim()}`);
+            return fin.trim();
         }
         
         if(verbose) console.log(`<<< [EXIT] Lvl: ${level}; Res: ""`);
@@ -84,7 +84,7 @@ const getStyleString = (
             // attempt to generate the current line
             const tRes = getStyleString(style, verbose, currentChunk, {p: currentLine.p, w: highestWeight as hex4}, currentColumn, 2, false);
             // assuming everything else works properly, check if tRes is null
-            if(tRes !== null && tRes !== "") { // if tRes is not null, we have a result, and we can break out of the loop
+            if(tRes !== null && tRes.trim() !== "") { // if tRes is not null, we have a result, and we can break out of the loop
                 result += tRes;
                 if(verbose) console.log(`[CHANGED] Lvl: ${level}; Val: ${tRes}`);
                 break;
@@ -94,8 +94,8 @@ const getStyleString = (
         if(lineWeights !== null){
             // after generating the current line, we can move on to the next line
             const fin = result + "\n" + getStyleString(style, verbose, currentChunk, {p: (currentLine.p + 1) as hex8, w: 0}, currentColumn, 1, false);
-            if(verbose) console.log(`<<< [EXIT] Lvl: ${level}; Res: ${fin}`);
-            return fin;
+            if(verbose) console.log(`<<< [EXIT] Lvl: ${level}; Res: ${fin.trim()}`);
+            return fin.trim();
         }
 
         if(verbose) console.log(`<<< [EXIT] Lvl: ${level}; Res: ${result}`);
@@ -110,7 +110,7 @@ const getStyleString = (
         // attempt to generate a result from this chunk priority
         const tRes = getStyleString(style, verbose, {p: currentChunk.p, w: highestWeight as hex4}, currentLine, currentColumn, 1, false);
         // assuming everything else works properly, check if tRes is null
-        if(tRes !== null && tRes !== "") { // if tRes is not null, we have a result, and we can break out of the loop
+        if(tRes !== null && tRes.trim() !== "") { // if tRes is not null, we have a result, and we can break out of the loop
             result += tRes;
             if(verbose) console.log(`[CHANGED] Lvl: ${level};`);
             break;
@@ -122,7 +122,7 @@ const getStyleString = (
         let fin = result + "\n\n" + getStyleString(style, verbose, {p: (currentChunk.p + 1) as hex8, w: 0}, currentLine, currentColumn, 0, false);
         
         if(init) return fin.trim(); // get rid of stray new lines
-        return fin;
+        return fin.trim();
     }
     return "";
 }

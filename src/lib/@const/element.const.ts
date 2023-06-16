@@ -8,7 +8,33 @@
  *
  * @type {Record<HTMLtags, elementStyle>}
  */
-export const defaultCSSStyles: Record<HTMLtags, elementStyle> = {
+export const defaultCSSStyles: Record<HTMLtags | "COM", elementStyle> = {
+    COM: {
+        opacity: 100,
+        marginTop: { v: 0, u: "px" },
+        marginRight: { v: 0, u: "px" },
+        marginBottom: { v: 0, u: "px" },
+        marginLeft: { v: 0, u: "px" },
+        paddingTop: { v: 0, u: "px" },
+        paddingRight: { v: 0, u: "px" },
+        paddingBottom: { v: 0, u: "px" },
+        paddingLeft: { v: 0, u: "px" },
+        overflowX: "auto",
+        overflowY: "auto",
+
+        borderStyleTop: "solid",
+        borderStyleRight: "solid",
+        borderStyleBottom: "solid",
+        borderStyleLeft: "solid",
+
+        borderWidthTop: { v: 0, u: "px" },
+        borderWidthRight: { v: 0, u: "px" },
+        borderWidthBottom: { v: 0, u: "px" },
+        borderWidthLeft: { v: 0, u: "px" }
+    },
+
+    // ==========
+    
     A: {
         typeStyle: {
             textDecorations: ["underline"]
@@ -24,14 +50,6 @@ export const defaultCSSStyles: Record<HTMLtags, elementStyle> = {
     CANVAS: {},
     DIV: {
         display: "block",
-        marginTop: { v: 0, u: "px" },
-        marginRight: { v: 0, u: "px" },
-        marginBottom: { v: 0, u: "px" },
-        marginLeft: { v: 0, u: "px" },
-        paddingTop: { v: 0, u: "px" },
-        paddingRight: { v: 0, u: "px" },
-        paddingBottom: { v: 0, u: "px" },
-        paddingLeft: { v: 0, u: "px" },
     },
     H1: {
         display: "block",
@@ -143,5 +161,5 @@ export const defaultCSSStyles: Record<HTMLtags, elementStyle> = {
         paddingLeft: { v: 40, u: "px" }
     },
     PROGRESS: {},
-    TEXTAREA: {}
+    TEXTAREA: {},
 }
