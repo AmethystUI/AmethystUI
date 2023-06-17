@@ -35,6 +35,17 @@ const _ = {
             return true;
         }
     },
+    isUnitedValueZero: function (...items: unitedAttr<number>[]){
+        // check if the values are all equal to 0
+        return items.every(item => item.v === 0);
+    },
+    isUnitedValueEqual: function (...items: unitedAttr<number>[]){
+        // check if the values are all equal to 0 first
+        if(this.isUnitedValueZero(...items)) return true;
+
+        // if not everything is equal to 0, return the result of deep object comparison
+        return this.isEqual(...items);
+    },
     isDefault: function (htmlTag: HTMLtags, style: elementStyle, attribute: elementStyleKeys): boolean {
         // Check COM for backup
         const defaultVal = defaultCSSStyles[htmlTag][attribute] ?? defaultCSSStyles.COM[attribute];
