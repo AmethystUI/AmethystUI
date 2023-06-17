@@ -56,7 +56,7 @@ const _ = {
         }
 
         if(Object.keys(defaultVal).length === 0) return defaultVal === style[attribute]; // non-object comparison
-        return this.isEqual(defaultVal, style[attribute]);
+        return this.isUnitedValueEqual(defaultVal, style[attribute]);
     },
     repeatString: function (str: string, numTimes: number): string {
         let result = "";

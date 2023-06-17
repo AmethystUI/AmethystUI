@@ -30,7 +30,14 @@ export const defaultCSSStyles: Record<HTMLtags | "COM", elementStyle> = {
         borderWidthTop: { v: 0, u: "px" },
         borderWidthRight: { v: 0, u: "px" },
         borderWidthBottom: { v: 0, u: "px" },
-        borderWidthLeft: { v: 0, u: "px" }
+        borderWidthLeft: { v: 0, u: "px" },
+
+        borderRadiusTop: { v: 0, u: "px" },
+        borderRadiusRight: { v: 0, u: "px" },
+        borderRadiusBottom: { v: 0, u: "px" },
+        borderRadiusLeft: { v: 0, u: "px" },
+
+        outlineOffset: { v: 0, u: "px" },
     },
 
     // ==========

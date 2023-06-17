@@ -61,6 +61,9 @@
             borderStyleRight: "dashed",
             borderStyleBottom: "solid",
             borderStyleLeft: "hidden",
+
+            USEOUTLINE: true,
+
             borderColor: initializeColorFromHSLA(0, 84, 52, 100),
         })
 

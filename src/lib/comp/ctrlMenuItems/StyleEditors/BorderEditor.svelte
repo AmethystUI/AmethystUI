@@ -246,10 +246,10 @@
             {#if useRadius}
                 <section>
                     <Slider name="Radius" min={0} max={200} v={cBRAvg} hasMargin={true} on:updateValue={updateBorderRadiusAll} currentParentWidth={currentParentWidth} colorRef={clr}/>
-                    <UnitInput name="Top" v={cBRT} u={cBRTu} on:updateValue={evt => updateBorderRadius(evt, "Top")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
-                    <UnitInput name="Right" v={cBRR} u={cBRRu} on:updateValue={evt => updateBorderRadius(evt, "Right")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
-                    <UnitInput name="Bottom" v={cBRB} u={cBRBu} on:updateValue={evt => updateBorderRadius(evt, "Bottom")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
-                    <UnitInput name="Left" v={cBRL} u={cBRLu} on:updateValue={evt => updateBorderRadius(evt, "Left")} hasMargin={false} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
+                    <UnitInput name="Top L" v={cBRT} u={cBRTu} on:updateValue={evt => updateBorderRadius(evt, "Top")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
+                    <UnitInput name="Top R" v={cBRR} u={cBRRu} on:updateValue={evt => updateBorderRadius(evt, "Right")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
+                    <UnitInput name="Bottom R" v={cBRB} u={cBRBu} on:updateValue={evt => updateBorderRadius(evt, "Bottom")} hasMargin={true} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
+                    <UnitInput name="Bottom L" v={cBRL} u={cBRLu} on:updateValue={evt => updateBorderRadius(evt, "Left")} hasMargin={false} maxWidth={"70px"} useFC={false} usePercent={true} sub={true}/>
                 </section>
             {/if}
 

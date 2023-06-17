@@ -21,9 +21,9 @@ const exportCSS = async () => {
         const elementType: HTMLtags = currentElement.type;
         
         // generate template tree for current tag
-        generateCSSTemplate(get(exportConfigs), elementType);
+        generateCSSTemplate(get(exportConfigs), elementType, elementStyle);
         // fetch root style
-        let rootStyleString = getStyleString(elementStyle);
+        let rootStyleString = getStyleString();
 
         console.log(rootStyleString);
     }
@@ -34,7 +34,6 @@ const exportCSS = async () => {
  * It uses the DFS algorithm to generate the stylesheet code.
  */
 const getStyleString = (
-    style: elementStyle,
     verbose: boolean = false,
     currentChunk: weightedPosition = {p: 0, w: 0},
     currentLine: weightedPosition = {p: 0, w: 0},
@@ -54,7 +53,7 @@ const getStyleString = (
 
             const callback = CSSTemplate.get(currentAddress);
             if(callback !== undefined){
-                newResult = callback(style);
+                newResult = callback();
                 if(newResult !== null){
                     if(verbose) console.log(`[OK] ${currentAddress}`)
                     result += newResult;
@@ -66,7 +65,7 @@ const getStyleString = (
         
         // after generating the current line, we can move on to the next line
         if(newResult !== null){
-            const fin = result + " " + getStyleString(style, verbose, currentChunk, currentLine, {p: (currentColumn.p + 1) as hex8, w: 0}, 2, false);
+            const fin = result + " " + getStyleString(verbose, currentChunk, currentLine, {p: (currentColumn.p + 1) as hex8, w: 0}, 2, false);
             if(verbose) console.log(`<<< [EXIT] Lvl: ${level}; Res: ${fin.trim()}`);
             return fin.trim();
         }
@@ -82,7 +81,7 @@ const getStyleString = (
             // get the highest line weight
             let highestWeight: number = lineWeights.pop();
             // attempt to generate the current line
-            const tRes = getStyleString(style, verbose, currentChunk, {p: currentLine.p, w: highestWeight as hex4}, currentColumn, 2, false);
+            const tRes = getStyleString(verbose, currentChunk, {p: currentLine.p, w: highestWeight as hex4}, currentColumn, 2, false);
             // assuming everything else works properly, check if tRes is null
             if(tRes !== null && tRes.trim() !== "") { // if tRes is not null, we have a result, and we can break out of the loop
                 result += tRes;
@@ -93,7 +92,7 @@ const getStyleString = (
         
         if(lineWeights !== null){
             // after generating the current line, we can move on to the next line
-            const fin = result + "\n" + getStyleString(style, verbose, currentChunk, {p: (currentLine.p + 1) as hex8, w: 0}, currentColumn, 1, false);
+            const fin = result + "\n" + getStyleString(verbose, currentChunk, {p: (currentLine.p + 1) as hex8, w: 0}, currentColumn, 1, false);
             if(verbose) console.log(`<<< [EXIT] Lvl: ${level}; Res: ${fin.trim()}`);
             return fin.trim();
         }
@@ -108,7 +107,7 @@ const getStyleString = (
         // get the highest chunk weight
         const highestWeight: number = chunkWeights.pop();
         // attempt to generate a result from this chunk priority
-        const tRes = getStyleString(style, verbose, {p: currentChunk.p, w: highestWeight as hex4}, currentLine, currentColumn, 1, false);
+        const tRes = getStyleString(verbose, {p: currentChunk.p, w: highestWeight as hex4}, currentLine, currentColumn, 1, false);
         // assuming everything else works properly, check if tRes is null
         if(tRes !== null && tRes.trim() !== "") { // if tRes is not null, we have a result, and we can break out of the loop
             result += tRes;
@@ -119,7 +118,7 @@ const getStyleString = (
 
     if(chunkWeights !== null){
         // after generating this chunk, we can move on to the next chunk.
-        let fin = result + "\n\n" + getStyleString(style, verbose, {p: (currentChunk.p + 1) as hex8, w: 0}, currentLine, currentColumn, 0, false);
+        let fin = result + "\n\n" + getStyleString(verbose, {p: (currentChunk.p + 1) as hex8, w: 0}, currentLine, currentColumn, 0, false);
         
         if(init) return fin.trim(); // get rid of stray new lines
         return fin.trim();
