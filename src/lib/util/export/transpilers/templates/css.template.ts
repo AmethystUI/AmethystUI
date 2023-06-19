@@ -1,5 +1,6 @@
 import getStringFor from "$src/lib/util/toString";
 import _ from "$src/lib/util/common";
+import { getClosestVariation, type fontObject } from "$src/lib/workers/pseudoWorkers/fonts";
 
 type exportFunction = () => string | null;
 
@@ -114,7 +115,21 @@ const genMap = (tag: HTMLtags, style: elementStyle): Map<string, exportFunction>
         if(_.isDefault(tag, style, "overflowY")) return ""; // check default values
         return `overflowY: ${style.overflowY};`;
     });
-    // TODO: Add display flex and alignment here
+    hmap.set("010200x000", (): string => { // display
+        // this might change in the future, but we'll keep it how it is for now
+        if(style.justifyContent !== "none" || style.alignItems !== "none"){
+            return `display: flex;`;
+        }
+        return null;
+    })
+    hmap.set("010201x000", (): string => { // justify content
+        if(style.justifyContent === "none") return "";
+        return `justify-content: ${style.justifyContent};`;
+    })
+    hmap.set("010202x000", (): string => { // align items
+        if(style.alignItems === "none") return "";
+        return `align-items: ${style.alignItems};`;
+    })
 
     hmap.set("020000x000", (): string => { // border all
         if(!style.USEBACKGROUND) return null; // do not generate if we"re not using a border
@@ -312,13 +327,57 @@ const genMap = (tag: HTMLtags, style: elementStyle): Map<string, exportFunction>
         return usableAttr.join("\n").trim();
     });
 
-    hmap.set("040100x000", (): string => { return ""; }) // will be radius, if applicable
+    hmap.set("040100x000", (): string => { return "" }) // will be radius, if applicable
     
     hmap.set("040200x000", (): string => { // outline offset
         if(!USEOUTLINE) return null; // don't do anything if we're not using outline
         if(_.isDefault(tag, style, "outlineOffset")) return ""; // check default
         return `outline-offset: ${getStringFor.unitedAttr(style.outlineOffset)};`;
-    }) 
+    });
+
+    const USETEXT = style.USETEXT;
+    const typeStyle: typographyStyle = style.typeStyle;
+    const fontObj: fontObject = typeStyle.fontObj;
+    hmap.set("050000x010", (): string => { // font shorthand
+        if(!USETEXT || !compress) return null; // don't do anything if we're not using text
+
+        // for formal shorthand syntax, refer to https://developer.mozilla.org/en-US/docs/Web/CSS/font
+        const useableValues: string[] = [];
+
+        if(typeStyle.textDecorations.includes("italicize")){ // font style
+            useableValues.push("italic");
+        }
+        // we don't have font-variant for now, but we could add it later if needed
+        if(typeStyle.variation !== getClosestVariation(400, fontObj.variations)){ // font variantion / weight
+            useableValues.push(`${typeStyle.variation}`);
+        }
+        useableValues.push(getStringFor.unitedAttr(typeStyle.size)); // mandatory font size
+        useableValues.push(`/${getStringFor.unitedAttr(typeStyle.lineHeight)}`); // line height. This is mandatory for now because we don't have a "normal" option for line height
+        
+        useableValues.push(fontObj.family); // mandatory font family
+
+        return `font: ${useableValues.join(" ").replace(" /", "/").trim()};`;
+    });
+
+    hmap.set("050000x000", () => { // font family
+        return `font-family: ${fontObj.family};`;
+    });
+    hmap.set("050001x000", () => { // font size
+        return `\nfont-size: ${getStringFor.unitedAttr(typeStyle.size)};`;
+    });
+    hmap.set("050002x000", () => { // font variation
+        if(typeStyle.variation !== getClosestVariation(400, fontObj.variations)){
+            return `font-weight: ${style.typeStyle.variation};`;
+        } return "";
+    });
+    hmap.set("050003x000", () => { // line height
+        return `\nline-height: ${getStringFor.unitedAttr(style.typeStyle.lineHeight)};`;
+    });
+    hmap.set("050004x000", () => { // italicize
+        if(typeStyle.textDecorations.includes("italicize")){ // font style
+            return "\nfont-style: italic;";
+        } return "";
+    });
 
     return hmap;
 }

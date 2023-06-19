@@ -63,6 +63,8 @@
             borderStyleLeft: "hidden",
 
             USEOUTLINE: true,
+            
+            USETEXT: true,
 
             borderColor: initializeColorFromHSLA(0, 84, 52, 100),
         })

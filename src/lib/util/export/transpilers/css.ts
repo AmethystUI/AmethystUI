@@ -66,8 +66,8 @@ const getStyleString = (
         // after generating the current line, we can move on to the next line
         if(newResult !== null){
             const fin = result + " " + getStyleString(verbose, currentChunk, currentLine, {p: (currentColumn.p + 1) as hex8, w: 0}, 2, false);
-            if(verbose) console.log(`<<< [EXIT] Lvl: ${level}; Res: ${fin.trim()}`);
-            return fin.trim();
+            if(verbose) console.log(`<<< [EXIT] Lvl: ${level}; Res: ${fin}`);
+            return fin;
         }
         
         if(verbose) console.log(`<<< [EXIT] Lvl: ${level}; Res: ""`);

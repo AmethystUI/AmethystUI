@@ -5,6 +5,8 @@
  *
  * Please note that these are the default styles provided by browsers and may vary between different 
  * browsers. Not all possible default styles are included in this map.
+ * 
+ * Reference: http://www.daks.me/css_default_values.php
  *
  * @type {Record<HTMLtags, elementStyle>}
  */
