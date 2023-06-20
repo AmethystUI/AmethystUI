@@ -1,6 +1,7 @@
 import getStringFor from "$src/lib/util/toString";
 import _ from "$src/lib/util/common";
 import { getClosestVariation, type fontObject } from "$src/lib/workers/pseudoWorkers/fonts";
+import { toHex8 as hex8, toHex as hex4 } from "../utils/css.util";
 
 type exportFunction = () => string | null;
 
@@ -35,7 +36,7 @@ const genMap = (tag: HTMLtags, style: elementStyle): Map<string, exportFunction>
     hmap.set("000100x010", (): string => { // condensed margin
         const allMarginAttr:elementStyleKeys[] = ["marginTop", "marginRight", "marginBottom", "marginLeft"];
         
-        // if literally all default values exist and they ALL equal to the edited margins, don"t generate anything
+        // if literally all default values exist and they ALL equal to the edited margins, don't generate anything
         if(allMarginAttr.every(attr => _.isDefault(tag, style, attr))) return ""; // check default values
 
         if(compress || _.isEqual(style.marginTop, style.marginRight, style.marginBottom, style.marginLeft)){
@@ -64,7 +65,7 @@ const genMap = (tag: HTMLtags, style: elementStyle): Map<string, exportFunction>
     hmap.set("000200x010", (): string => { // condensed padding
         const allPaddingAttr:elementStyleKeys[] = ["paddingTop", "paddingRight", "paddingBottom", "paddingLeft"];
         
-        // if literally all default values exist and they ALL equal to the edited paddings, don"t generate anything
+        // if literally all default values exist and they ALL equal to the edited paddings, don't generate anything
         if(allPaddingAttr.every(attr => _.isDefault(tag, style, attr))) return ""; // check default values
 
         if(compress || _.isEqual(style.paddingTop, style.paddingRight, style.paddingBottom, style.paddingLeft)){
@@ -132,7 +133,7 @@ const genMap = (tag: HTMLtags, style: elementStyle): Map<string, exportFunction>
     })
 
     hmap.set("020000x000", (): string => { // border all
-        if(!style.USEBACKGROUND) return null; // do not generate if we"re not using a border
+        if(!style.USEBACKGROUND) return null; // do not generate if we're not using a border
         
         if(_.isDefault(tag, style, "backgroundColor")) return ""; // check default values
         
@@ -156,7 +157,7 @@ const genMap = (tag: HTMLtags, style: elementStyle): Map<string, exportFunction>
         style.outlineStyle !== "hidden"
     );
     hmap.set("030000x020", (): string => { // border highest compression
-        if( !USEBORDER || !compress ) return null; // don"t do anything if we"re not compressing or not using a border
+        if( !USEBORDER || !compress ) return null; // don't do anything if we're not compressing or not using a border
         
         const allCheckingAttr:elementStyleKeys[] = ["borderWidthTop", "borderWidthRight", "borderWidthBottom", "borderWidthLeft", "borderStyleTop", "borderStyleRight", "borderStyleBottom", "borderStyleLeft"];
         const isDefaultValue = allCheckingAttr.every(v => _.isDefault(tag, style, v));
@@ -177,78 +178,71 @@ const genMap = (tag: HTMLtags, style: elementStyle): Map<string, exportFunction>
         );
         return `border: ${style.borderWidthTop.v}${style.borderWidthTop.u} ${style.borderStyleTop} ${clrText};`;
     });
-    hmap.set("030000x010", (): string => { // border normal compression
-        if( !USEBORDER || !compress ) return null; // don"t do anything if we"re not compressing or not using a border
+
+    hmap.set("030000x010", (): string => { // border width right
+        if( !USEBORDER || !compress ) return null; // don't do anything if we're not compressing or not using a border
 
         // generate border width and styles
         const widthAttr: elementStyleKeys[] = ["borderWidthTop", "borderWidthRight", "borderWidthBottom", "borderWidthLeft"];
-        const styleAttr: elementStyleKeys[] = ["borderStyleTop", "borderStyleRight", "borderStyleBottom", "borderStyleLeft"];
-
-        let widthStr, styleStr, clrStr = "";
-
-        // if not all width are default values, genereate border width
-        if( !widthAttr.every(v => (!_.isDefault(tag, style, v))) ) {
-            widthStr = `border-width: ${condenseQuadAttr(style.borderWidthTop, style.borderWidthRight, style.borderWidthBottom, style.borderWidthLeft, getStringFor.unitedAttr)};`;
-        }
-        // if not all styles are default values, generate condensed border styles
-        if( !styleAttr.every(v => (!_.isDefault(tag, style, v))) ) {
-            styleStr = `border-style: ${condenseQuadAttr(style.borderStyleTop, style.borderStyleRight, style.borderStyleBottom, style.borderStyleLeft)};`;
-        }
-        // generaete color
-        if( !_.isDefault(tag, style, "borderColor") ){
-            const clr = getStringFor.color(
-                style.borderColor,
-                conf.common.compressionAmt,
-                conf.stylesheets.colorFmt,
-                conf.stylesheets.colorUnitInference,
-            );
-            clrStr = `border-color: ${clr};`;
-        }
-
-        return [widthStr, styleStr, clrStr].join("\n").trim();
+        
+        if( widthAttr.every(v => (!_.isDefault(tag, style, v))) ) return ""; // check for default values
+        return `border-width: ${condenseQuadAttr(style.borderWidthTop, style.borderWidthRight, style.borderWidthBottom, style.borderWidthLeft, getStringFor.unitedAttr)};`
     });
-    hmap.set("030000x000", (): string => { // border no compression
-        if( !USEBORDER ) return null; // don"t do anything if we"re not using a border
-
+    hmap.set("030001x010", (): string => { // border width right
+        if( !USEBORDER || !compress ) return null; // don't do anything if we're not compressing or not using a border
+        
         // generate border width and styles
-        const directions: string[] = ["Top", "Right", "Bottom", "Left"];
+        const styleAttr: elementStyleKeys[] = ["borderStyleTop", "borderStyleRight", "borderStyleBottom", "borderStyleLeft"];
+        
+        if( styleAttr.every(v => (!_.isDefault(tag, style, v))) ) return ""; // check for default values
+        return `\nborder-style: ${condenseQuadAttr(style.borderStyleTop, style.borderStyleRight, style.borderStyleBottom, style.borderStyleLeft)};`;
+    });
+    hmap.set(compress ? "030002x010" : "030004x000", (): string => { // border color
+        if( !USEBORDER || !compress ) return null; // don't do anything if we're not compressing or not using a border
 
-        let clrStr = ""; let borderStrs: string[] = [];
+        // generate color
+        if( _.isDefault(tag, style, "borderColor") ) return ""; // check for default values
+        const clr = getStringFor.color(
+            style.borderColor,
+            conf.common.compressionAmt,
+            conf.stylesheets.colorFmt,
+            conf.stylesheets.colorUnitInference,
+        );
+        return `\nborder-color: ${clr};`;
+    });
 
-        // generate border in all directions
-        for( let i = 0; i < directions.length; i++ ){
-            const dir = directions[i];
-            if( // if both width and style are default values, or if either are hidden or 0, skip this direction
-                ["borderWidth", "borderStyle"].every(v => _.isDefault(tag, style, <elementStyleKeys>`${v}${dir}`)) ||
-                _.isUnitedValueZero( <unitedAttr<number>>style[`borderWidth${dir}`] ) || 
-                _.isEqual( "hidden", style[`borderStyle${dir}`] )
-            ) continue;
-            
-            // push direction to borderStrs
-            const widthStr = `${getStringFor.unitedAttr(<unitedAttr<number>>style[`borderWidth${dir}`])}`;
-            const styleStr = `${style[`borderStyle${dir}`]}`;
-            borderStrs.push(
-                `border-${dir.toLowerCase()}: ${widthStr} ${styleStr};`,
-            );
-        }
+    hmap.set("030000x000", (): string => { // border top
+        if( !USEBORDER ) return null; // don't do anything if we're not using a border
+        
+        if(_.isDefault(tag, style, "borderWidthTop"), _.isDefault(tag, style, "borderStyleTop")) return ""; // check for default values
 
-        // generaete color
-        if( !_.isDefault(tag, style, "borderColor") ){
-            const clr = getStringFor.color(
-                style.borderColor,
-                conf.common.compressionAmt,
-                conf.stylesheets.colorFmt,
-                conf.stylesheets.colorUnitInference,
-            );
-            clrStr = `border-color: ${clr};`;
-        }
+        return `border-top: ${getStringFor.unitedAttr(style.borderWidthTop)} ${style.borderStyleTop};`;
+    });
+    hmap.set("030001x000", (): string => { // border right
+        if( !USEBORDER ) return null; // don't do anything if we're not using a border
+        
+        if(_.isDefault(tag, style, "borderWidthRight"), _.isDefault(tag, style, "borderStyleRight")) return ""; // check for default values
 
-        return [...borderStrs, clrStr].join("\n").trim();
+        return `\nborder-right: ${getStringFor.unitedAttr(style.borderWidthRight)} ${style.borderStyleRight};`;
+    });
+    hmap.set("030002x000", (): string => { // border bottom
+        if(!USEBORDER ) return null; // don't do anything if we're not using a border
+        
+        if(_.isDefault(tag, style, "borderWidthBottom"), _.isDefault(tag, style, "borderStyleBottom")) return ""; // check for default values
+
+        return `\nborder-bottom: ${getStringFor.unitedAttr(style.borderWidthBottom)} ${style.borderStyleBottom};`;
+    });
+    hmap.set("030003x000", (): string => { // border left
+        if(!USEBORDER ) return null; // don't do anything if we're not using a border
+        
+        if(_.isDefault(tag, style, "borderWidthLeft"), _.isDefault(tag, style, "borderStyleLeft")) return ""; // check for default values
+
+        return `\nborder-left: ${getStringFor.unitedAttr(style.borderWidthLeft)} ${style.borderStyleLeft};`;
     });
     
-    const borderRadiusAddress = `0${USEBORDER ? 3 : 4}0100`;
-    hmap.set(`${borderRadiusAddress}x020`, (): string => { // border radius
-        if(!(USEBORDER || USEOUTLINE)) return null; // don"t do anything if we"re not using a border or not compressing
+    const BRchunk = `0${USEBORDER ? 3 : 4}`;
+    hmap.set(`${BRchunk}0100x020`, (): string => { // border radius
+        if(!(USEBORDER || USEOUTLINE)) return null; // don't do anything if we're not using a border or not compressing
 
         const checkDefault:elementStyleKeys[] = ["borderRadiusTop", "borderRadiusRight", "borderRadiusBottom", "borderRadiusLeft"];
 
@@ -261,27 +255,30 @@ const genMap = (tag: HTMLtags, style: elementStyle): Map<string, exportFunction>
         // generate condensed border radius
         return `border-radius: ${condenseQuadAttr(style.borderRadiusTop, style.borderRadiusRight, style.borderRadiusBottom, style.borderRadiusLeft, getStringFor.unitedAttr)};`
     });
-    hmap.set(`${borderRadiusAddress}x010`, (): string => { // border radius expanded
-        if( !(USEBORDER || USEOUTLINE) ) return null; // don"t do anything if we"re not using a border
+    hmap.set(`${BRchunk}0100x010`, (): string => { // border radius top left
+        if( !(USEBORDER || USEOUTLINE) ) return null; // don't do anything if we're not using a border
 
-        // generate border width and styles
-        const directions: string[] = ["Top", "Right", "Bottom", "Left"];
-        const directionLiteral: string[] = ["top-left", "top-right", "bottom-right", "bottom-left"];
-
-        let radiusStrs: string[] = [];
-
-        // generate border in all directions
-        for( let i = 0; i < directions.length; i++ ){
-            const dir = directions[i];
-            if(_.isDefault(tag, style, <elementStyleKeys>`borderRadius${dir}`)) continue; // check for default value
-            
-            // push direction to borderStrs
-            radiusStrs.push(`border-${directionLiteral[i]}-radius: ${getStringFor.unitedAttr(style[`borderRadius${dir}`])};`);
-        }
-
-        return radiusStrs.join("\n").trim();
+        if(_.isDefault(tag, style, "borderRadiusTop")) return ""; // check for default value
+        return `border-top-left-radius: ${getStringFor.unitedAttr(style.borderRadiusTop)};`;
     });
-    
+    hmap.set(`${BRchunk}0101x010`, (): string => { // border radius top right
+        if(!(USEBORDER || USEOUTLINE) ) return null; // don't do anything if we're not using a border
+
+        if(_.isDefault(tag, style, "borderRadiusRight")) return ""; // check for default value
+        return `\nborder-top-right-radius: ${getStringFor.unitedAttr(style.borderRadiusRight)};`;
+    });
+    hmap.set(`${BRchunk}0102x010`, (): string => { // border radius bottom right
+        if(!(USEBORDER || USEOUTLINE) ) return null; // don't do anything if we're not using a border
+
+        if(_.isDefault(tag, style, "borderRadiusBottom")) return ""; // check for default value
+        return `\nborder-bottom-right-radius: ${getStringFor.unitedAttr(style.borderRadiusBottom)};`;
+    });
+    hmap.set(`${BRchunk}0103x010`, (): string => { // border radius bottom left
+        if(!(USEBORDER || USEOUTLINE) ) return null; // don't do anything if we're not using a border
+
+        if(_.isDefault(tag, style, "borderRadiusLeft")) return ""; // check for default value
+        return `\nborder-bottom-left-radius: ${getStringFor.unitedAttr(style.borderRadiusLeft)};`;
+    });
 
     hmap.set("040000x010", (): string => { // outline condensed
         if(!USEOUTLINE || !compress) return null; // don't do anything if we're not compressing
@@ -306,27 +303,29 @@ const genMap = (tag: HTMLtags, style: elementStyle): Map<string, exportFunction>
 
         return useableValues.join(" ").trim();
     });
-    hmap.set("040000x000", (): string => { // outline expanded
+    hmap.set("040001x000", (): string => { // outline width
         if(!USEOUTLINE) return null; // don't do anything if we're not using outline
-        
-        const usableAttr: string[] = [];
-        if(!_.isDefault(tag, style, "outlineWidth")) {
-            usableAttr.push(`outline-width: ${getStringFor.unitedAttr(style.outlineWidth)};`);
-        }
-        usableAttr.push(`outline-style: ${style.outlineStyle};`);
-        if(!_.isDefault(tag, style, "outlineColor")) {
-            const clr = getStringFor.color(
-                style.outlineColor,
-                conf.common.compressionAmt,
-                conf.stylesheets.colorFmt,
-                conf.stylesheets.colorUnitInference,
-            );
-            usableAttr.push(`outline-color: ${clr};`);
-        }
-
-        return usableAttr.join("\n").trim();
+    
+        if(_.isDefault(tag, style, "outlineWidth")) return ""; // check for default value
+        return `outline-width: ${getStringFor.unitedAttr(style.outlineWidth)};`;
     });
+    hmap.set("040002x000", (): string => { // outline style
+        if(!USEOUTLINE) return null; // don't do anything if we're not using outline
 
+        return `\noutline-style: ${style.outlineStyle};`;
+    });
+    hmap.set("040003x000", (): string => { // outline color
+        if(!USEOUTLINE) return null; // don't do anything if we're not using outline
+
+        if(_.isDefault(tag, style, "outlineColor")) return ""; // check for default value
+        return `\noutline-color: ${getStringFor.color(
+            style.outlineColor,
+            conf.common.compressionAmt,
+            conf.stylesheets.colorFmt,
+            conf.stylesheets.colorUnitInference,
+        )};`;
+    });
+    
     hmap.set("040100x000", (): string => { return "" }) // will be radius, if applicable
     
     hmap.set("040200x000", (): string => { // outline offset
@@ -373,11 +372,53 @@ const genMap = (tag: HTMLtags, style: elementStyle): Map<string, exportFunction>
     hmap.set("050003x000", () => { // line height
         return `\nline-height: ${getStringFor.unitedAttr(style.typeStyle.lineHeight)};`;
     });
-    hmap.set("050004x000", () => { // italicize
+    hmap.set("050004x000", () => { // font style
         if(typeStyle.textDecorations.includes("italicize")){ // font style
             return "\nfont-style: italic;";
         } return "";
     });
+    hmap.set("050100x000", () => { // text color
+        return `\ncolor: ${getStringFor.color(
+            style.color,
+            conf.common.compressionAmt,
+            conf.stylesheets.colorFmt,
+            conf.stylesheets.colorUnitInference,
+        )};`;
+    });
+
+    const textChunk = compress ? "05" : "06";
+    let startLine = compress ? 2 : 0;
+    hmap.set(`${textChunk}${hex8(startLine++)}00x100`, (): string => { // text alignment
+        if( !USETEXT ) return null; // don't do anything if we're not using text
+        if(typeStyle.alignment === "left") return ""; // skip if we have no decorations
+        return `text-align: ${typeStyle.alignment};`;
+    });
+    hmap.set(`${textChunk}${hex8(startLine++)}00x100`, (): string => { // text casing (transform)
+        if( !USETEXT ) return null; // don't do anything if we're not using text
+        if(typeStyle.casing === "none") return ""; // skip if we have no decorations
+        return `text-transform: ${typeStyle.casing};`;
+    });
+    hmap.set(`${textChunk}${hex8(startLine++)}00x100`, (): string => { // underline + strike-through 
+        if( !USETEXT ) return null; // don't do anything if we're not using text
+        if(typeStyle.textDecorations.length === 0) return ""; // skip if we have no decorations
+
+        const valueMapper: Record<textDecoration, string> = {
+            italicize: "",
+            underline: "underline",
+            strike: "line-through"
+        }
+        return `text-decoration: ${typeStyle.textDecorations.map(v => valueMapper[v]).join(" ").trim()};`;
+    });
+    hmap.set(`${textChunk}${hex8(startLine++)}00x100`, (): string => { // tracking
+        if( !USETEXT ) return null; // don't do anything if we're not using text
+        if(_.isUnitedValueZero(typeStyle.tracking)) return ""; // skip if we have no decorations
+        return `letter-spacing: ${getStringFor.unitedAttr(typeStyle.tracking)};`;
+    });
+    hmap.set("060000x000", ():string => { return null }); // place holder for if chunk 6 was merged with chunk 5
+
+    hmap.set("070000x000", ():string => { // shadow work
+        return "hi mom";
+    })
 
     return hmap;
 }
