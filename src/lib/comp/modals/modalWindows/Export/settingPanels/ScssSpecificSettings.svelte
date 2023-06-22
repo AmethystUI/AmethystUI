@@ -16,6 +16,3 @@
     <Checkbox name="Nest Styles" {...checkboxStyling}
         checked={nestStyles} on:updateValue={updateNesting}/>
 </SettingsPanel>
-
-<style lang="scss">
-</style>

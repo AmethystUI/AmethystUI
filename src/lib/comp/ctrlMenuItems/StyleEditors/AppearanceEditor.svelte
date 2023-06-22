@@ -1,10 +1,3 @@
-<script lang="ts" context="module">
-    // GLOBAL DEFAULT VALUES
-    export const defaultOpacity = 100;
-    export const defaultOverflow: overflow = "auto";
-    export const defaultFlexAlign: flexAlignment = "none";
-</script>
-
 <script lang="ts">
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
 
@@ -15,11 +8,12 @@
     import MultiToggle from "./Basics/MultiToggle.svelte";
     import { activeStyles } from "$lib/stores/activeStyles";
     import type { multiToggleSelection } from "./Basics/MultiToggle.svelte";
+    import { systemDefaultStyles } from "$src/lib/@const/element.const";
     
     export let currentParentWidth = 360;
     
     // reactive
-        $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
+    $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
     const possibleOverflowStyles:overflow[] = ["auto", "hidden", "scroll", "visible"];
 
@@ -93,25 +87,25 @@
     $: if(!!currentStyle){ // VARIABLE UPDATING AND INITIALIZING
         // opacity
         if(useOpacity){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
-            if(currentStyle.opacity === undefined) currentStyle.opacity = defaultOpacity;
+            if(currentStyle.opacity === undefined) currentStyle.opacity = systemDefaultStyles.opacity;
             opacity = currentStyle.opacity;
         }
         
         // overflows
         if(useOverflowX){
-            if(!currentStyle.overflowX) currentStyle.overflowX = defaultOverflow;
+            if(!currentStyle.overflowX) currentStyle.overflowX = systemDefaultStyles.overflowX;
             overflowX = currentStyle.overflowX;
         } if(useOverflowY){
-            if(!currentStyle.overflowY) currentStyle.overflowY = defaultOverflow;
+            if(!currentStyle.overflowY) currentStyle.overflowY = systemDefaultStyles.overflowY;
             overflowY = currentStyle.overflowY;
         }
 
         // alignments
         if(useAlignX){
-            if(!currentStyle.justifyContent) currentStyle.justifyContent = defaultFlexAlign;
+            if(!currentStyle.justifyContent) currentStyle.justifyContent = systemDefaultStyles.justifyContent;
             alignX = currentStyle.justifyContent;
         } if (useAlignY) {
-            if(!currentStyle.alignItems) currentStyle.alignItems = defaultFlexAlign;
+            if(!currentStyle.alignItems) currentStyle.alignItems = systemDefaultStyles.alignItems;
             alignY = currentStyle.alignItems;
         }
     }

@@ -1,10 +1,8 @@
 import { collection } from "$src/lib/stores/collection";
 import { get } from "svelte/store";
 
-import _ from "../../common";
-
 import { encodeAddr, toHex8, type hex4, type hex8, type weightedPosition, toHex } from "./utils/css.util";
-import { CSSTemplate, generateCSSTemplate } from "./templates/css.template";
+import { generateCSSTemplate, type CSSTemplate } from "./templates/css.template";
 import { exportConfigs } from "../exportManager";
 
 const exportCSS = async () => {
@@ -21,10 +19,10 @@ const exportCSS = async () => {
         const elementType: HTMLtags = currentElement.type;
         
         // generate template tree for current tag
-        generateCSSTemplate(get(exportConfigs), elementType, elementStyle);
+        const template = generateCSSTemplate(get(exportConfigs), elementType, elementStyle);
         // initialize buffer object and generate root style string
         buffer[elementType] = {
-            style: getStyleString(),
+            style: getStyleString(template),
             overrideStyles: {}
         }    
     }
@@ -37,6 +35,7 @@ const exportCSS = async () => {
  * It uses the DFS algorithm to generate the stylesheet code.
  */
 const getStyleString = (
+    template: CSSTemplate,
     verbose: boolean = false,
     currentChunk: weightedPosition = {p: 0, w: 0},
     currentLine: weightedPosition = {p: 0, w: 0},
@@ -48,13 +47,13 @@ const getStyleString = (
 
     if(level === 2){
         // find the highest priority line with the current address.
-        let colWeights: number[] = getAddressWeights(currentChunk, currentLine, currentColumn, 2, verbose);
+        let colWeights: number[] = getAddressWeights(template, currentChunk, currentLine, currentColumn, 2, verbose);
         let newResult: string = null;
         while(colWeights !== null && colWeights.length > 0) {
             const highestWeight = colWeights.pop();
             const currentAddress = encodeAddr(currentChunk, currentLine, {p: currentColumn.p, w: highestWeight as hex4});
 
-            const callback = CSSTemplate.get(currentAddress);
+            const callback = template.get(currentAddress);
             if(callback !== undefined){
                 newResult = callback();
                 if(newResult !== null){
@@ -68,7 +67,7 @@ const getStyleString = (
         
         // after generating the current line, we can move on to the next line
         if(newResult !== null){
-            const fin = result + " " + getStyleString(verbose, currentChunk, currentLine, {p: (currentColumn.p + 1) as hex8, w: 0}, 2, false);
+            const fin = result + " " + getStyleString(template, verbose, currentChunk, currentLine, {p: (currentColumn.p + 1) as hex8, w: 0}, 2, false);
             if(verbose) console.log(`<<< [EXIT] Lvl: ${level}; Res: ${fin}`);
             return fin;
         }
@@ -79,12 +78,12 @@ const getStyleString = (
 
     if(level === 1){
         // find the highest priority line with the current address.
-        let lineWeights: number[] = getAddressWeights(currentChunk, currentLine, currentColumn, 1, verbose);
+        let lineWeights: number[] = getAddressWeights(template, currentChunk, currentLine, currentColumn, 1, verbose);
         while(lineWeights !== null && lineWeights.length > 0) {
             // get the highest line weight
             let highestWeight: number = lineWeights.pop();
             // attempt to generate the current line
-            const tRes = getStyleString(verbose, currentChunk, {p: currentLine.p, w: highestWeight as hex4}, currentColumn, 2, false);
+            const tRes = getStyleString(template, verbose, currentChunk, {p: currentLine.p, w: highestWeight as hex4}, currentColumn, 2, false);
             // assuming everything else works properly, check if tRes is null
             if(tRes !== null && tRes.trim() !== "") { // if tRes is not null, we have a result, and we can break out of the loop
                 result += tRes;
@@ -95,7 +94,7 @@ const getStyleString = (
         
         if(lineWeights !== null){
             // after generating the current line, we can move on to the next line
-            const fin = result + "\n" + getStyleString(verbose, currentChunk, {p: (currentLine.p + 1) as hex8, w: 0}, currentColumn, 1, false);
+            const fin = result + "\n" + getStyleString(template, verbose, currentChunk, {p: (currentLine.p + 1) as hex8, w: 0}, currentColumn, 1, false);
             if(verbose) console.log(`<<< [EXIT] Lvl: ${level}; Res: ${fin.trim()}`);
             return fin.trim();
         }
@@ -105,12 +104,12 @@ const getStyleString = (
     }
 
     // find the highest priority chunk with the current address.
-    let chunkWeights: number[] = getAddressWeights(currentChunk, currentLine, currentColumn, 0, verbose);
+    let chunkWeights: number[] = getAddressWeights(template, currentChunk, currentLine, currentColumn, 0, verbose);
     while(chunkWeights !== null && chunkWeights.length > 0) {
         // get the highest chunk weight
         const highestWeight: number = chunkWeights.pop();
         // attempt to generate a result from this chunk priority
-        const tRes = getStyleString(verbose, {p: currentChunk.p, w: highestWeight as hex4}, currentLine, currentColumn, 1, false);
+        const tRes = getStyleString(template, verbose, {p: currentChunk.p, w: highestWeight as hex4}, currentLine, currentColumn, 1, false);
         // assuming everything else works properly, check if tRes is null
         if(tRes !== null && tRes.trim() !== "") { // if tRes is not null, we have a result, and we can break out of the loop
             result += tRes;
@@ -121,7 +120,7 @@ const getStyleString = (
 
     if(chunkWeights !== null){
         // after generating this chunk, we can move on to the next chunk.
-        let fin = result + "\n\n" + getStyleString(verbose, {p: (currentChunk.p + 1) as hex8, w: 0}, currentLine, currentColumn, 0, false);
+        let fin = result + "\n\n" + getStyleString(template, verbose, {p: (currentChunk.p + 1) as hex8, w: 0}, currentLine, currentColumn, 0, false);
         
         if(init) return fin.trim(); // get rid of stray new lines
         return fin.trim();
@@ -141,6 +140,7 @@ const getStyleString = (
  * @returns {number[]} a list of priority values, sorted from lowest to highest.
  */
 const getAddressWeights = (
+    template: CSSTemplate,
     currentChunk: weightedPosition,
     currentLine: weightedPosition,
     currentColumn: weightedPosition,
@@ -161,7 +161,7 @@ const getAddressWeights = (
     
     const matchRegex = new RegExp(`^${matchAddress}([0-9,a-f]{2}){0,2}x${matchWeight}[0-9,a-f]{0,3}$`)
     const matchedHashKeys: number[] =
-        Array.from(CSSTemplate.keys())
+        Array.from(template.keys())
         .filter(e => matchRegex.test(e))
         .map(e => parseInt(e.split("x")[1][targetAttr], 16));
     if(verbose) console.log(`match addr: ${matchAddress}; match weight: ${matchWeight}; matched: ${matchedHashKeys.length > 0 ? Array.from(new Set(matchedHashKeys)) : "null"}`);

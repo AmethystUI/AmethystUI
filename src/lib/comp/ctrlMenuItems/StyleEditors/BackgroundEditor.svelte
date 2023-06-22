@@ -1,7 +1,3 @@
-<script lang="ts" context="module">
-    export const defaultBgClr = initializeColorFromHSLA(0, 0, 100, 100);
-</script>
-
 <script lang="ts">
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
 
@@ -9,6 +5,7 @@
     import { clearColorPickerRef, mainColorPickerData } from "$lib/stores/colorPickerManager";
     import { initializeColorFromHSLA } from "$lib/util/colorMaths";
     import { activeStyles } from "$lib/stores/activeStyles";
+  import { systemDefaultStyles } from "$src/lib/@const/element.const";
     
     // reactive
         $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
@@ -25,7 +22,7 @@
 
         // background color
         if(useBackgroundColor){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
-            if(!currentStyle["backgroundColor"]) currentStyle["backgroundColor"] = {...defaultBgClr};
+            if(!currentStyle["backgroundColor"]) currentStyle["backgroundColor"] = {...systemDefaultStyles.backgroundColor};
             clr = currentStyle["backgroundColor"];
         }
     }

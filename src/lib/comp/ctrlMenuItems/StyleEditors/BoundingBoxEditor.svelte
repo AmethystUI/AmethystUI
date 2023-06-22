@@ -1,11 +1,3 @@
-<script lang="ts" context="module">
-    // GLOBAL DEFAULT VALUES
-    export const defaultWidth: unitedAttr<number> = { v: 100, u: "px" };
-    export const defaultHeight: unitedAttr<number> = { v: 100, u: "px" };
-    export const defaultMargin: unitedAttr<number> = { v: 0, u: "px" };
-    export const defaultPadding: unitedAttr<number> = { v: 0, u: "px" };
-</script>
-
 <script lang="ts">
     import setImmediate from "$lib/util/setImmediate";
     import { activeStyles } from "$lib/stores/activeStyles";
@@ -13,6 +5,7 @@
 
     import Slider from "./Basics/Slider.svelte";
     import UnitInput from "./Basics/UnitInput.svelte";
+  import { systemDefaultStyles } from "$src/lib/@const/element.const";
 
     export let currentParentWidth = 360;
     
@@ -43,8 +36,8 @@
     $: if(!!currentStyle){ // VARIABLE UPDATING AND INITIALIZING
         // update size
         if(useWidthAndHeight){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
-            if(!currentStyle.width) currentStyle.width = {...defaultWidth};
-            if(!currentStyle.height) currentStyle.height = {...defaultHeight};
+            if(!currentStyle.width) currentStyle.width = {...systemDefaultStyles.width};
+            if(!currentStyle.height) currentStyle.height = {...systemDefaultStyles.height};
             
             cW = currentStyle.width.v;
             cWu = currentStyle.width.u;
@@ -57,10 +50,10 @@
     
         // update margin
         if(useMargin){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
-            if(!currentStyle["marginTop"]) currentStyle["marginTop"] = {...defaultMargin};
-            if(!currentStyle["marginRight"]) currentStyle["marginRight"] = {...defaultMargin};
-            if(!currentStyle["marginBottom"]) currentStyle["marginBottom"] = {...defaultMargin};
-            if(!currentStyle["marginLeft"]) currentStyle["marginLeft"] = {...defaultMargin};
+            if(!currentStyle["marginTop"]) currentStyle["marginTop"] = {...systemDefaultStyles.marginTop};
+            if(!currentStyle["marginRight"]) currentStyle["marginRight"] = {...systemDefaultStyles.marginRight};
+            if(!currentStyle["marginBottom"]) currentStyle["marginBottom"] = {...systemDefaultStyles.marginBottom};
+            if(!currentStyle["marginLeft"]) currentStyle["marginLeft"] = {...systemDefaultStyles.marginLeft};
             
             cMT = currentStyle["marginTop"].v;
             cMTu = currentStyle["marginTop"].u;
@@ -79,10 +72,10 @@
     
         // update padding
         if(usePadding){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
-            if(!currentStyle["paddingTop"]) currentStyle["paddingTop"] = {...defaultPadding};
-            if(!currentStyle["paddingRight"]) currentStyle["paddingRight"] = {...defaultPadding};
-            if(!currentStyle["paddingBottom"]) currentStyle["paddingBottom"] = {...defaultPadding};
-            if(!currentStyle["paddingLeft"]) currentStyle["paddingLeft"] = {...defaultPadding};
+            if(!currentStyle["paddingTop"]) currentStyle["paddingTop"] = {...systemDefaultStyles.paddingTop};
+            if(!currentStyle["paddingRight"]) currentStyle["paddingRight"] = {...systemDefaultStyles.paddingRight};
+            if(!currentStyle["paddingBottom"]) currentStyle["paddingBottom"] = {...systemDefaultStyles.paddingBottom};
+            if(!currentStyle["paddingLeft"]) currentStyle["paddingLeft"] = {...systemDefaultStyles.paddingLeft};
     
             cPT = currentStyle["paddingTop"].v
             cPTu = currentStyle["paddingTop"].u;

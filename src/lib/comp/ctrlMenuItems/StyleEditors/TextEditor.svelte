@@ -1,32 +1,3 @@
-<script lang="ts" context="module">
-    export const defaultFontObj: typographyStyle = {
-        fontObj: {
-            family: "system-ui",
-            appearedName: "System UI",
-            category: "sans-serif",
-            variations: [400, 700],
-            webSafe: true,
-        },
-        variation: 400,
-        textDecorations: [],
-        casing: "none",
-        alignment: "left",
-        size: {
-            v: 14, u: "px"
-        },
-        lineHeight: {
-            v: 100, u: "%"
-        },
-        tracking: {
-            v: 0, u: "px"
-        }
-    }
-    export const defaultTextColor: color = initializeColorFromHSLA(0, 0, 100, 100);
-    export const defaultLeadingContent: string = ""; 
-    export const defaultTrailingContent: string = "";
-    export const defaultPlaceholder: string = "";
-</script>
-
 <script lang="ts">
     import {
         collection,
@@ -99,15 +70,15 @@
 
         // text color
         if(useTypefaceSettings){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
-            if(!currentStyle.color) currentStyle.color = {...defaultTextColor};
+            if(!currentStyle.color) currentStyle.color = {...systemDefaultStyles.color};
             clr = currentStyle.color;
 
             // typeface setup. We have to do some special initialization 
             if(!currentStyle.typeStyle){ // if there's no type style, then we need to set it to the default
-                currentStyle.typeStyle = {...defaultFontObj}; // set current style's type style to the default type style
+                currentStyle.typeStyle = {...systemDefaultStyles.typeStyle}; // set current style's type style to the default type style
                 fontRef = {...currentStyle.typeStyle}; // reflow fontRef
             } else if (Object.keys(currentStyle.typeStyle).length !== Object.keys(fontRef).length) { // if the type style has a different number of properties than the fontRef, we know that we're initializing from an incomplete object. In this case, we need to transfer what we have to the default type style and use that to initialize.
-                fontRef = {...defaultFontObj}; // initialize fontRef with a default type style
+                fontRef = {...systemDefaultStyles.typeStyle}; // initialize fontRef with a default type style
 
                 // update fontRef as needed
                 for(let i = 0; i < Object.keys(currentStyle?.typeStyle ?? {}).length; i++){
@@ -124,16 +95,16 @@
 
         // initial text
         if(useLeadingContent){
-            if(currentStyle.leadingContent === undefined) currentStyle.leadingContent = defaultLeadingContent;
+            if(currentStyle.leadingContent === undefined) currentStyle.leadingContent = systemDefaultStyles.leadingContent;
             leadingContent = currentStyle.leadingContent;
         } if(useTrailingContent){
-            if(currentStyle.trailingContent === undefined) currentStyle.trailingContent = defaultTrailingContent;
+            if(currentStyle.trailingContent === undefined) currentStyle.trailingContent = systemDefaultStyles.trailingContent;
             trailingContent = currentStyle.trailingContent;
         }
 
         // initial place holder
         if(usePlaceholder){
-            if(currentStyle.placeholder === undefined) currentStyle.placeholder = defaultPlaceholder;
+            if(currentStyle.placeholder === undefined) currentStyle.placeholder = systemDefaultStyles.placeholder;
             placeholder = currentStyle.placeholder;
         }
     }
@@ -160,6 +131,7 @@
     import { keepOpenOverlay } from "../../dynamicOverlay/OverlayBase.svelte";
     import { initializeColorFromHSLA } from "$lib/util/colorMaths";
     import { activeStyles } from "$lib/stores/activeStyles";
+  import { systemDefaultStyles } from "$src/lib/@const/element.const";
 
     const toggleUseText = () => {
         if($selectedOverride !== -1){ // if no override is selected

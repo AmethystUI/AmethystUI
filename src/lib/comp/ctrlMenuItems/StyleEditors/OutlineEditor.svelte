@@ -1,9 +1,3 @@
-<script lang="ts" context="module">
-    export const defaultOutlineWidth: unitedAttr<number> = { v: 2.5, u: "px" };
-    export const defaultOutlineColor: color = initializeColorFromHSLA(226, 88, 59, 100);
-    export const defaultOutlineStyle: borderOutlineStyle = "solid";
-</script>
-
 <script lang="ts">
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
 
@@ -14,7 +8,7 @@
     import { clearColorPickerRef, mainColorPickerData } from "$lib/stores/colorPickerManager";
     import { initializeColorFromHSLA } from "$lib/util/colorMaths";
     import { activeStyles } from "$lib/stores/activeStyles";
-    import { defaultBorderRadius } from "./BorderEditor.svelte";
+    import { systemDefaultStyles } from "$src/lib/@const/element.const";
     
     export let currentParentWidth = 360;
     
@@ -53,23 +47,23 @@
 
         // outline width
         if(useWidth){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
-            if(!currentStyle["outlineWidth"]) currentStyle["outlineWidth"] = {...defaultOutlineWidth};
+            if(!currentStyle["outlineWidth"]) currentStyle["outlineWidth"] = {...systemDefaultStyles.outlineWidth};
             cOW = currentStyle["outlineWidth"].v;
             cOWu = currentStyle["outlineWidth"].u;
         }
 
         // border radius (yes border radius also control the outline radius for some reason)
         if(useRadius){
-            if(!currentStyle["borderRadiusTop"]) currentStyle["borderRadiusTop"] = {...defaultBorderRadius};
+            if(!currentStyle["borderRadiusTop"]) currentStyle["borderRadiusTop"] = {...systemDefaultStyles.borderRadiusTop};
             cBRT = currentStyle["borderRadiusTop"].v;
             cBRTu = currentStyle["borderRadiusTop"].u;
-            if(!currentStyle["borderRadiusRight"]) currentStyle["borderRadiusRight"] = {...defaultBorderRadius};
+            if(!currentStyle["borderRadiusRight"]) currentStyle["borderRadiusRight"] = {...systemDefaultStyles.borderRadiusRight};
             cBRR = currentStyle["borderRadiusRight"].v;
             cBRRu = currentStyle["borderRadiusRight"].u;
-            if(!currentStyle["borderRadiusBottom"]) currentStyle["borderRadiusBottom"] = {...defaultBorderRadius};
+            if(!currentStyle["borderRadiusBottom"]) currentStyle["borderRadiusBottom"] = {...systemDefaultStyles.borderRadiusBottom};
             cBRB = currentStyle["borderRadiusBottom"].v;
             cBRBu = currentStyle["borderRadiusBottom"].u;
-            if(!currentStyle["borderRadiusLeft"]) currentStyle["borderRadiusLeft"] = {...defaultBorderRadius};
+            if(!currentStyle["borderRadiusLeft"]) currentStyle["borderRadiusLeft"] = {...systemDefaultStyles.borderRadiusLeft};
             cBRL = currentStyle["borderRadiusLeft"].v;
             cBRLu = currentStyle["borderRadiusLeft"].u;
             cBRAvg = (cBRT + cBRR + cBRB + cBRL) / 4;
@@ -84,13 +78,13 @@
 
         // outline color
         if(useColor){
-            if(!currentStyle["outlineColor"]) currentStyle["outlineColor"] = {...defaultOutlineColor};
+            if(!currentStyle["outlineColor"]) currentStyle["outlineColor"] = {...systemDefaultStyles.outlineColor};
             clr = currentStyle["outlineColor"];
         }
 
         // outline style
         if(useStyle){
-            if(!currentStyle["outlineStyle"]) currentStyle["outlineStyle"] = defaultOutlineStyle
+            if(!currentStyle["outlineStyle"]) currentStyle["outlineStyle"] = systemDefaultStyles.outlineStyle;
             style = currentStyle["outlineStyle"];
         }
     }

@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     svelte(),
   ],
-  
+
   resolve: {
     alias: {
       $src: path.resolve(new URL('./src/', import.meta.url).pathname),

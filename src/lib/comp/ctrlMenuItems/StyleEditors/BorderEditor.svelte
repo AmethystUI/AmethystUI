@@ -1,10 +1,3 @@
-<script lang="ts" context="module">
-    export const defaultBorderWidth: unitedAttr<number> = { v: 2, u: "px" };
-    export const defaultBorderRadius: unitedAttr<number> = { v: 18, u: "pt" };
-    export const defaultBorderColor: color = initializeColorFromHSLA(0, 0, 100, 100);
-    export const defaultBorderStyle: borderOutlineStyle = "solid";
-</script>
-
 <script lang="ts">
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
 
@@ -16,6 +9,7 @@
     import { clearColorPickerRef, mainColorPickerData } from "$lib/stores/colorPickerManager";
     import { initializeColorFromHSLA } from "$lib/util/colorMaths";
     import { activeStyles } from "$lib/stores/activeStyles";
+  import { systemDefaultStyles } from "$src/lib/@const/element.const";
     
     export let currentParentWidth = 360;
     
@@ -63,16 +57,16 @@
 
         // border width
         if(useWidth){ // we're doing this so that we don't have to worry about accidentally setting properties for elements that shouldn't have this property
-            if(!currentStyle["borderWidthTop"]) currentStyle["borderWidthTop"] = {...defaultBorderWidth};
+            if(!currentStyle["borderWidthTop"]) currentStyle["borderWidthTop"] = {...systemDefaultStyles.borderWidthTop};
             cBWT = currentStyle["borderWidthTop"].v;
             cBWTu = currentStyle["borderWidthTop"].u;
-            if(!currentStyle["borderWidthRight"]) currentStyle["borderWidthRight"] = {...defaultBorderWidth};
+            if(!currentStyle["borderWidthRight"]) currentStyle["borderWidthRight"] = {...systemDefaultStyles.borderWidthRight};
             cBWR = currentStyle["borderWidthRight"].v;
             cBWRu = currentStyle["borderWidthRight"].u;
-            if(!currentStyle["borderWidthBottom"]) currentStyle["borderWidthBottom"] = {...defaultBorderWidth};
+            if(!currentStyle["borderWidthBottom"]) currentStyle["borderWidthBottom"] = {...systemDefaultStyles.borderWidthBottom};
             cBWB = currentStyle["borderWidthBottom"].v;
             cBWBu = currentStyle["borderWidthBottom"].u;
-            if(!currentStyle["borderWidthLeft"]) currentStyle["borderWidthLeft"] = {...defaultBorderWidth};
+            if(!currentStyle["borderWidthLeft"]) currentStyle["borderWidthLeft"] = {...systemDefaultStyles.borderWidthLeft};
             cBWL = currentStyle["borderWidthLeft"].v;
             cBWLu = currentStyle["borderWidthLeft"].u;
             cBWAvg = (cBWT + cBWR + cBWB + cBWL) / 4;
@@ -80,16 +74,16 @@
 
         // border radius
         if(useRadius){
-            if(!currentStyle["borderRadiusTop"]) currentStyle["borderRadiusTop"] = {...defaultBorderRadius};
+            if(!currentStyle["borderRadiusTop"]) currentStyle["borderRadiusTop"] = {...systemDefaultStyles.borderRadiusTop};
             cBRT = currentStyle["borderRadiusTop"].v;
             cBRTu = currentStyle["borderRadiusTop"].u;
-            if(!currentStyle["borderRadiusRight"]) currentStyle["borderRadiusRight"] = {...defaultBorderRadius};
+            if(!currentStyle["borderRadiusRight"]) currentStyle["borderRadiusRight"] = {...systemDefaultStyles.borderRadiusRight};
             cBRR = currentStyle["borderRadiusRight"].v;
             cBRRu = currentStyle["borderRadiusRight"].u;
-            if(!currentStyle["borderRadiusBottom"]) currentStyle["borderRadiusBottom"] = {...defaultBorderRadius};
+            if(!currentStyle["borderRadiusBottom"]) currentStyle["borderRadiusBottom"] = {...systemDefaultStyles.borderRadiusBottom};
             cBRB = currentStyle["borderRadiusBottom"].v;
             cBRBu = currentStyle["borderRadiusBottom"].u;
-            if(!currentStyle["borderRadiusLeft"]) currentStyle["borderRadiusLeft"] = {...defaultBorderRadius};
+            if(!currentStyle["borderRadiusLeft"]) currentStyle["borderRadiusLeft"] = {...systemDefaultStyles.borderRadiusLeft};
             cBRL = currentStyle["borderRadiusLeft"].v;
             cBRLu = currentStyle["borderRadiusLeft"].u;
             cBRAvg = (cBRT + cBRR + cBRB + cBRL) / 4;
@@ -97,22 +91,22 @@
 
         // border color
         if(useColor){
-            if(!currentStyle["borderColor"]) currentStyle["borderColor"] = {...defaultBorderColor};
+            if(!currentStyle["borderColor"]) currentStyle["borderColor"] = {...systemDefaultStyles.borderColor};
             clr = currentStyle["borderColor"];
         }
 
         // border style
         if(useStyleTop){
-            if(!currentStyle["borderStyleTop"]) currentStyle["borderStyleTop"] = defaultBorderStyle;
+            if(!currentStyle["borderStyleTop"]) currentStyle["borderStyleTop"] = systemDefaultStyles.borderStyleTop;
             styleTop = currentStyle["borderStyleTop"];
         } if(useStyleRight){
-            if(!currentStyle["borderStyleRight"]) currentStyle["borderStyleRight"] = defaultBorderStyle;
+            if(!currentStyle["borderStyleRight"]) currentStyle["borderStyleRight"] = systemDefaultStyles.borderStyleRight;
             styleRight = currentStyle["borderStyleRight"];
         } if(useStyleBottom){
-            if(!currentStyle["borderStyleBottom"]) currentStyle["borderStyleBottom"] = defaultBorderStyle;
+            if(!currentStyle["borderStyleBottom"]) currentStyle["borderStyleBottom"] = systemDefaultStyles.borderStyleBottom;
             styleBottom = currentStyle["borderStyleBottom"];
         } if(useStyleLeft){
-            if(!currentStyle["borderStyleLeft"]) currentStyle["borderStyleLeft"] = defaultBorderStyle;
+            if(!currentStyle["borderStyleLeft"]) currentStyle["borderStyleLeft"] = systemDefaultStyles.borderStyleLeft;
             styleLeft = currentStyle["borderStyleLeft"];
         }
     }

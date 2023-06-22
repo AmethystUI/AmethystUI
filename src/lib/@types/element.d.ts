@@ -74,10 +74,13 @@ interface elementStyle{
     // scaleY? : number,  
 };
 
+type strictElementStyle = Required<elementStyle>;
+
 // All the styles possible
 type elementStyleKeys = keyof elementStyle;
 
 // globalScope
 
 declare let elementStyle: elementStyle;
+declare let strictElementStyle: strictElementStyle;
 declare let elementStyleKeys: elementStyleKeys;

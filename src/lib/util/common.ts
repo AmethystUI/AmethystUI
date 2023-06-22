@@ -1,7 +1,14 @@
 import { defaultCSSStyles } from "../@const/element.const";
 
-// This module contains many basic functions that are used throughout the app, such as deep object comparison.
-const _ = {
+/**
+ * This module contains many basic functions that are used throughout the app, such as deep value comparisons.
+ * The purpose is to provide custom behaviors for objects or arrays that lodash does not support. And is taylored to the need of the application.
+ * 
+ * Since we're using this concurrently with lodash, this module will be called `cutil` for Common Utilities instead of the normal underscore (`_`).
+ * 
+ * ...It's a really fucking stupid name but whatever.
+*/
+const cutil = {
     isEqual: function (...items: Object[]): boolean {
         // fetch keys from every obj to see if they are equal first
         const root = items[0];
@@ -67,4 +74,4 @@ const _ = {
     }
 }
 
-export default _;
+export default cutil;

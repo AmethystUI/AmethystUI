@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "run-p --print-label dev:*",
-        "dev:vite": "vite",
+        "dev:vite": "vite --port 8080",
         "dev:swrk": "rollup -c rollup.config.js -w",
         "build": "tsc && vite build && rollup -c rollup.config.js",
         "serve": "vite preview",
@@ -17,6 +17,7 @@
         "@rollup/plugin-typescript": "^11.1.0",
         "@sveltejs/vite-plugin-svelte": "^2.0.3",
         "@tsconfig/svelte": "^4.0.1",
+        "lodash": "^4.17.21",
         "npm-run-all": "^4.1.5",
         "path": "^0.12.7",
         "rollup": "^3.21.0",

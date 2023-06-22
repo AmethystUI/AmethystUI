@@ -1,3 +1,5 @@
+import { initializeColorFromHSLA } from "../util/colorMaths"
+
 /**
  * This is a mapping of HTML tags to their default styles. Each key is an HTML tag, and its value 
  * is an object representing the default styles for that tag. The style object includes CSS properties
@@ -7,6 +9,8 @@
  * browsers. Not all possible default styles are included in this map.
  * 
  * Reference: http://www.daks.me/css_default_values.php
+ * 
+ * THIS IS ***NOT*** A MAPPING OF SYSTEM DEFAULT VALUES!!
  *
  * @type {Record<HTMLtags, elementStyle>}
  */
@@ -171,4 +175,61 @@ export const defaultCSSStyles: Record<HTMLtags | "COM", elementStyle> = {
     },
     PROGRESS: {},
     TEXTAREA: {},
+}
+
+export const systemDefaultStyles: strictElementStyle = {
+    width: { v: 100, u: "px" }, height: { v: 100, u: "px" },
+    marginTop: { v: 0, u: "px" }, marginRight: { v: 0, u: "px" }, marginBottom: { v: 0, u: "px" }, marginLeft: { v: 0, u: "px" },
+    paddingTop: { v: 0, u: "px" }, paddingRight: { v: 0, u: "px" }, paddingBottom: { v: 0, u: "px" }, paddingLeft: { v: 0, u: "px" },
+    
+    opacity: 100,
+    overflowX: "auto", overflowY: "auto",
+    display: "flex", justifyContent: "none", alignItems: "none",
+    flexDirection: "row",
+    
+    USEBACKGROUND: false,
+    backgroundColor: initializeColorFromHSLA(0, 0, 100, 100),
+    
+    USEBORDER: false,
+    borderWidthTop: { v: 2, u: "px" }, borderWidthRight: { v: 2, u: "px" }, borderWidthBottom: { v: 2, u: "px" }, borderWidthLeft: { v: 2, u: "px" },
+    borderRadiusTop: { v: 18, u: "pt" }, borderRadiusRight: { v: 18, u: "pt" }, borderRadiusBottom: { v: 18, u: "pt" }, borderRadiusLeft: { v: 18, u: "pt" },
+    borderColor: initializeColorFromHSLA(0, 0, 100, 100),
+    borderStyleTop: "solid", borderStyleRight: "solid", borderStyleBottom: "solid", borderStyleLeft: "solid",
+
+    USEOUTLINE: false,
+    outlineWidth: { v: 2.5, u: "px" },
+    outlineOffset: { v: 2, u: "px" },
+    outlineColor: initializeColorFromHSLA(226, 88, 59, 100),
+    outlineStyle: "solid",
+
+    USETEXT: false,
+    leadingContent: "", trailingContent: "",
+    color: initializeColorFromHSLA(0, 0, 100, 100),
+    typeStyle: {
+        fontObj: {
+            family: "system-ui",
+            appearedName: "System UI",
+            category: "sans-serif",
+            variations: [400, 700],
+            webSafe: true,
+        },
+        variation: 400,
+        textDecorations: [],
+        casing: "none",
+        alignment: "left",
+        size: {
+            v: 14, u: "px"
+        },
+        lineHeight: {
+            v: 100, u: "%"
+        },
+        tracking: {
+            v: 0, u: "px"
+        }
+    },
+    placeholder: "",
+    
+    USESHADOW: false,
+    boxShadows: [],
+    MuxBoxShadClr: null,
 }

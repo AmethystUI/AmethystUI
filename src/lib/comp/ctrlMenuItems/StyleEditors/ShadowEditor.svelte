@@ -1,5 +1,4 @@
 <script lang="ts" context="module">
-    export const defaultShadows: boxShadow[] = [];
     export const defaultNewShadow: boxShadow = {
         x: {v:2, u:"px"},
         y: {v:2, u:"px"},
@@ -24,9 +23,10 @@
     import { openColorPicker } from "../../dynamicOverlay/overlays/ColorPickerOverlay.svelte";
     import { keepOpenOverlay } from "../../dynamicOverlay/OverlayBase.svelte";
     import { activeStyles } from "$lib/stores/activeStyles";
-    import { fade, fly } from "svelte/transition";
+    import { fade } from "svelte/transition";
     import { flip } from "svelte/animate";
-  import { cubicOut } from "svelte/easing";
+    import { cubicOut } from "svelte/easing";
+  import { systemDefaultStyles } from "$src/lib/@const/element.const";
 
     let indicatorOffset = 8.5;
 
@@ -45,7 +45,7 @@
         // currentStyle["USESHADOW"] = true; // debugging force open
 
         // update shadows
-        if(!currentStyle["boxShadows"]) currentStyle["boxShadows"] = [...defaultShadows];
+        if(!currentStyle["boxShadows"]) currentStyle["boxShadows"] = [...systemDefaultStyles.boxShadows];
         shadows = currentStyle.boxShadows;
     }
 
