@@ -334,9 +334,9 @@ const genMap = (tag: HTMLtags, style: elementStyle): Map<string, exportFunction>
         return `outline-offset: ${getStringFor.unitedAttr(style.outlineOffset)};`;
     });
 
-    const USETEXT = style.USETEXT;
-    const typeStyle: typographyStyle = style.typeStyle;
-    const fontObj: fontObject = typeStyle.fontObj;
+    const typeStyle: typographyStyle = style.typeStyle ?? null;
+    const fontObj: fontObject = typeStyle?.fontObj ?? null;
+    const USETEXT = style.USETEXT && !!typeStyle && !fontObj;
     hmap.set("050000x010", (): string => { // font shorthand
         if(!USETEXT || !compress) return null; // don't do anything if we're not using text
 
@@ -359,25 +359,31 @@ const genMap = (tag: HTMLtags, style: elementStyle): Map<string, exportFunction>
     });
 
     hmap.set("050000x000", () => { // font family
+        if(!USETEXT || !compress) return null; // don't do anything if we're not using text
         return `font-family: ${fontObj.family};`;
     });
     hmap.set("050001x000", () => { // font size
+        if(!USETEXT || !compress) return null; // don't do anything if we're not using text
         return `\nfont-size: ${getStringFor.unitedAttr(typeStyle.size)};`;
     });
     hmap.set("050002x000", () => { // font variation
+        if(!USETEXT || !compress) return null; // don't do anything if we're not using text
         if(typeStyle.variation !== getClosestVariation(400, fontObj.variations)){
             return `font-weight: ${style.typeStyle.variation};`;
         } return "";
     });
     hmap.set("050003x000", () => { // line height
+        if(!USETEXT || !compress) return null; // don't do anything if we're not using text
         return `\nline-height: ${getStringFor.unitedAttr(style.typeStyle.lineHeight)};`;
     });
     hmap.set("050004x000", () => { // font style
+        if(!USETEXT || !compress) return null; // don't do anything if we're not using text
         if(typeStyle.textDecorations.includes("italicize")){ // font style
             return "\nfont-style: italic;";
         } return "";
     });
     hmap.set("050100x000", () => { // text color
+        if(!USETEXT || !compress) return null; // don't do anything if we're not using text
         return `\ncolor: ${getStringFor.color(
             style.color,
             conf.common.compressionAmt,

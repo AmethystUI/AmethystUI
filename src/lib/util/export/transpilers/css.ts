@@ -12,7 +12,7 @@ const exportCSS = async () => {
     const coll: element[] = get(collection);
 
     // create new buffer object
-    let buffer: simpleExportBuffer;
+    let buffer: simpleExportBuffer = {};
 
     // loop through every element to generate its relevant stylesheet code
     for(let i = 0; i < coll.length; i++) {
@@ -22,11 +22,14 @@ const exportCSS = async () => {
         
         // generate template tree for current tag
         generateCSSTemplate(get(exportConfigs), elementType, elementStyle);
-        // fetch root style
-        let rootStyleString = getStyleString();
-
-        console.log(rootStyleString);
+        // initialize buffer object and generate root style string
+        buffer[elementType] = {
+            style: getStyleString(),
+            overrideStyles: {}
+        }    
     }
+
+    console.log(buffer);
 }
 
 /**

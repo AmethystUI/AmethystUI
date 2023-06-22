@@ -51,8 +51,8 @@ const _ = {
         const defaultVal = defaultCSSStyles[htmlTag][attribute] ?? defaultCSSStyles.COM[attribute];
 
         // check if default value exists first
-        if(defaultVal === undefined){
-            return style[attribute] === undefined;
+        if(style[attribute] === undefined || defaultVal === undefined){
+            return false;
         }
 
         if(Object.keys(defaultVal).length === 0) return defaultVal === style[attribute]; // non-object comparison

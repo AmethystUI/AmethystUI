@@ -1,7 +1,6 @@
-const setImmediate = async (callback: () => void): Promise<void> => {
-    return new Promise<void>(res => setTimeout(() => {
-        callback();
-        res();
+const setImmediate = async <T>(callback: () => T): Promise<T> => {
+    return new Promise<T>(res => setTimeout(() => {
+        res(callback());
     }, 0));
 };
 
