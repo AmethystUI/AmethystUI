@@ -24,11 +24,14 @@
     import { openColorPicker } from "../../dynamicOverlay/overlays/ColorPickerOverlay.svelte";
     import { keepOpenOverlay } from "../../dynamicOverlay/OverlayBase.svelte";
     import { activeStyles } from "$lib/stores/activeStyles";
+    import { fade, fly } from "svelte/transition";
+    import { flip } from "svelte/animate";
+  import { cubicOut } from "svelte/easing";
 
     let indicatorOffset = 8.5;
 
     // reactive
-        $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
+    $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
     let shadows:boxShadow[];
     // we don't have a color defined here because we're using MuxBoxShadClr as a multiplexer
@@ -42,8 +45,8 @@
         // currentStyle["USESHADOW"] = true; // debugging force open
 
         // update shadows
-        if(!currentStyle["boxShadows"]) currentStyle["boxShadows"] = defaultShadows;
-        shadows = currentStyle["boxShadows"];
+        if(!currentStyle["boxShadows"]) currentStyle["boxShadows"] = [...defaultShadows];
+        shadows = currentStyle.boxShadows;
     }
 
     const toggleUseShadow = () => {
@@ -55,12 +58,11 @@
         // turn useShadow on first
         currentStyle["USESHADOW"] = true;
 
-        console.log("ADD EVENT");
-
-        // add the new shadow to shadowList
-        currentStyle["boxShadows"] = [{...defaultNewShadow}, ...currentStyle["boxShadows"]];
+        // add the new shadow to shadowList. The shadow must be deep copied.
+        currentStyle.boxShadows = [JSON.parse(JSON.stringify(defaultNewShadow)), ...currentStyle.boxShadows];
 
         $collection = $collection;
+        demuxID++; 
     }
     const removeShadow = (id:number) => {
         currentStyle["boxShadows"] = [...shadows.slice(0,id), ...shadows.slice(id+1)];
@@ -105,7 +107,7 @@
         currentColor = shadows[demuxID].color;        
         
         // set mux color to target color. Because this is typescript, we're directly giving the color REFRENCE to the mux. So we don't have to write another funciton for demuxing
-        currentStyle["MuxBoxShadClr"] = currentColor;
+        currentStyle.MuxBoxShadClr = currentColor;
     }
 
     // color updating. We have to use mutli-plexing for this task as the color picker only works with base level colors.
@@ -169,7 +171,11 @@
                     <!-- the list of shadows -->
                     {#each shadows as shadow, i (shadow)}
                         <!-- a single container -->
-                        <section class="shadow-editor-container" style="{i === demuxID ? "z-index: 2" : "z-index: 0"}">
+                        <section
+                            animate:flip={{duration: 400, easing: cubicOut}}
+                            transition:fade={{duration: 250, easing: cubicOut}}
+                            class="shadow-editor-container" style="z-index: {i === demuxID ? 2 : 0}"
+                        >
                             <!-- the color preview & button. Bind all elements that matches the demux ID. We can also use this feature to highlight the blocks or do something special with it -->
                             <div class="color-preview">
                                 <div style={`background-color: rgba(${shadow.color.r}, ${shadow.color.g}, ${shadow.color.b}, ${shadow.color.a}%)`} on:mousedown={()=>{openOverlay(i)}}></div>
@@ -227,7 +233,7 @@
                                 on:focused={() => {updateDemuxID(i)}}
                                 hasMargin={true} sub={true}/>
     
-                            <button on:click={() => removeShadow(i)}>
+                            <button on:click={() => removeShadow(i)} title="Delete shadow">
                                 <img src="/src/assets/icons/trash.svg" alt="">
                             </button>
                         </section>

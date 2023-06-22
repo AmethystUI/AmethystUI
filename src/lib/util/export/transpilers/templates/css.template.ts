@@ -416,8 +416,33 @@ const genMap = (tag: HTMLtags, style: elementStyle): Map<string, exportFunction>
     });
     hmap.set("060000x000", ():string => { return null }); // place holder for if chunk 6 was merged with chunk 5
 
+    const USESHADOWS = style.USESHADOW && style.boxShadows.length > 0;
     hmap.set("070000x000", ():string => { // shadow work
-        return "hi mom";
+        if( !USESHADOWS ) return null; // do not generate if we're not using shadows
+
+        let shadows: string[] = [];
+
+        // loop through shadows. Formal syntax defined at: https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow#formal_syntax
+        for(let i = 0; i < style.boxShadows.length; i++) {
+            const v = style.boxShadows[i];
+            let vStr = "";
+            
+            vStr += getStringFor.unitedAttr(v.x) + " ";
+            vStr += getStringFor.unitedAttr(v.y) + " ";
+            if(!_.isUnitedValueZero(v.radius) || !_.isUnitedValueZero(v.grow)) vStr += getStringFor.unitedAttr(v.radius) + " ";
+            if(!_.isUnitedValueZero(v.grow)) vStr += getStringFor.unitedAttr(v.grow) + " ";
+            
+            vStr += getStringFor.color(
+                v.color,
+                conf.common.compressionAmt,
+                conf.stylesheets.colorFmt,
+                conf.stylesheets.colorUnitInference,
+            );
+
+            shadows.push(vStr);
+        }
+
+        return `box-shadow: ${shadows.join(", ")};`;
     })
 
     return hmap;

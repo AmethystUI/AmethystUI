@@ -75,7 +75,7 @@
         <!-- shadow editor -->
         <ShadowEditor/>
         
-        <div style="min-height:65px; height:65px"></div>
+        <div style="min-height:50%; height:50%"></div>
     {/if}
 </main>
 
