@@ -4,6 +4,9 @@ import { get } from "svelte/store";
 import { encodeAddr, toHex8, type hex4, type hex8, type weightedPosition, toHex } from "./utils/css.util";
 import { generateCSSTemplate, type CSSTemplate } from "./templates/css.template";
 import { exportConfigs } from "../exportManager";
+import cutil from "../../common";
+import { systemDefaultStyles } from "$src/lib/@const/element.const";
+import _ from "lodash";
 
 const exportCSS = async () => {
     // Get current collection
@@ -19,14 +22,43 @@ const exportCSS = async () => {
         const elementType: HTMLtags = currentElement.type;
         
         // generate template tree for current tag
-        const template = generateCSSTemplate(get(exportConfigs), elementType, elementStyle);
+        const rootTemplate = generateCSSTemplate(get(exportConfigs), elementType, elementStyle);
         // initialize buffer object and generate root style string
         buffer[elementType] = {
-            style: getStyleString(template),
+            style: getStyleString(rootTemplate),
+            psuedoElmnts: {},
             overrideStyles: {}
-        }    
-    }
+        }
 
+        // generate styles for pseudo elements first
+        if(elementStyle.USETEXT && !!elementStyle.leadingContent){
+            buffer[elementType].psuedoElmnts["before"] = `content: ${elementStyle.leadingContent};`;
+        }
+        if(elementStyle.USETEXT && !!elementStyle.trailingContent){
+            buffer[elementType].psuedoElmnts["after"] = `content: ${elementStyle.trailingContent};`;
+        }
+
+        // export all overrides
+        for(let j = 0; j < currentElement.styleOverrides.length; j++) {
+            const overrideElmnt = currentElement.styleOverrides[j];
+            const paddedElmntStyle = _.defaultsDeep(elementStyle, systemDefaultStyles);
+            const overrideStyle = cutil.findDiff(overrideElmnt.style, paddedElmntStyle);
+
+            if(Object.keys(overrideStyle).length === 0) continue; // skip if there are no differences in this override. We don't need it.
+            
+            // add all transpilation flags to override styles
+            // Object.keys(paddedElmntStyle).forEach(v => {
+            //     if(v.toUpperCase() === v) {overrideStyle[v] = paddedElmntStyle[v];}
+            // })
+
+            console.log(overrideStyle);
+
+            // generate style template
+            const overrideTemplate = generateCSSTemplate(<exportConfig>{...get(exportConfigs), common: {compressionAmt: 0}}, elementType, overrideStyle, false);
+            buffer[elementType].overrideStyles[overrideElmnt.name] = getStyleString(overrideTemplate);
+        }
+    }
+    
     console.log(buffer);
 }
 
@@ -55,7 +87,14 @@ const getStyleString = (
 
             const callback = template.get(currentAddress);
             if(callback !== undefined){
-                newResult = callback();
+                try{
+                    newResult = callback();
+                } catch(e) {
+                    console.warn(`[${currentAddress}] Non-fatal transpilation failure:\n${e}`);
+                    // if we haven't reached the end of the weights, continue searching. Otherwise we should move on ot the next attribute
+                    newResult = colWeights.length > 0 ? null : "";
+                }
+
                 if(newResult !== null){
                     if(verbose) console.log(`[OK] ${currentAddress}`)
                     result += newResult;

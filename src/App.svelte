@@ -22,7 +22,7 @@
     import getStyleSetting from "$lib/comp/display/displayElements/elementStyleSettings";
     import ElementDisplay from "$lib/comp/display/ElementDisplay.svelte";
     import { activeStyles } from "$lib/stores/activeStyles";
-    import { addComponent, collection, focusedComponent, focusedOverride, layerBlurLock, selectedComponent, selectedOverride } from "$lib/stores/collection"
+    import { addComponent, addOverride, collection, focusedComponent, focusedOverride, layerBlurLock, selectedComponent, selectedOverride } from "$lib/stores/collection"
     import { currentView } from "$lib/stores/viewingManager";
     import { mainModalData, progressModalData } from "$lib/stores/modalManager";
     import ModalBase from "$lib/comp/modals/Modal.svelte";
@@ -68,6 +68,8 @@
 
             borderColor: initializeColorFromHSLA(0, 84, 52, 100),
         })
+
+        addOverride(0);
 
         setImmediate(() => {
             // simulate clicking on it

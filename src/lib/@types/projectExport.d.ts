@@ -29,16 +29,21 @@ interface exportConfig extends PartialRecord<colorFmt, Record<string, any>> {
  */
 type styleBufferObject = {
     style: string,
+    psuedoElmnts: Record<string, string>,
     overrideStyles: Record<string, string>
 }
 
 interface simpleExportBuffer extends PartialRecord<HTMLtags, styleBufferObject> {
     [] : {
-        style: string,
+        style: string;
+        psuedoElmnts: {
+            name: string;
+            style: string;
+        };
         overrideStyles: {
             name: string;
             style: string;
-        }
+        };
     }
 }
 

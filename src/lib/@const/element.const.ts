@@ -27,6 +27,7 @@ export const defaultCSSStyles: Record<HTMLtags | "COM", elementStyle> = {
         paddingLeft: { v: 0, u: "px" },
         overflowX: "auto",
         overflowY: "auto",
+        justifyContent: "none", alignItems: "none",
 
         borderStyleTop: "solid",
         borderStyleRight: "solid",

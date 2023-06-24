@@ -9,11 +9,12 @@ type exportFunction = () => string | null;
 export type CSSTemplate = Map<string, exportFunction>;
 
 // fill style and generate the map
-export const generateCSSTemplate = (config: exportConfig, elementType: HTMLtags, elementStyle: elementStyle): CSSTemplate => {
-    return genMap(elementType, <strictElementStyle> _.defaultsDeep(elementStyle, systemDefaultStyles), config);
+export const generateCSSTemplate = (config: exportConfig, elementType: HTMLtags, elementStyle: elementStyle, padStyle = true): CSSTemplate => {
+    const style = padStyle ? <strictElementStyle>_.defaultsDeep(elementStyle, systemDefaultStyles) : elementStyle;
+    return genMap(elementType, config, style, !padStyle);
 }
 
-const genMap = (tag: HTMLtags, style: elementStyle, conf: exportConfig): Map<string, exportFunction> => {
+const genMap = (tag: HTMLtags, conf: exportConfig, style: elementStyle, fuckingDoItAnyways = false): Map<string, exportFunction> => {
     const hmap: Map<string, exportFunction> = new Map<string, exportFunction>();
     const compress: boolean = conf.common.compressionAmt > 0;
 
@@ -110,19 +111,20 @@ const genMap = (tag: HTMLtags, style: elementStyle, conf: exportConfig): Map<str
         if(cutil.isDefault(tag, style, "overflowY")) return ""; // check default values
         return `overflowY: ${style.overflowY};`;
     });
+
     hmap.set("010200x000", (): string => { // display
         // this might change in the future, but we'll keep it how it is for now
-        if(style.justifyContent !== "none" || style.alignItems !== "none"){
-            return `display: flex;`;
+        if(cutil.isDefault(tag, style, "justifyContent") && cutil.isDefault(tag, style, "alignItems")){
+            return null; // end generation if no display is used at ALL
         }
-        return null;
+        return `display: flex;`;
     })
     hmap.set("010201x000", (): string => { // justify content
-        if(style.justifyContent === "none") return "";
+        if(cutil.isDefault(tag, style, "justifyContent")) return "";
         return `justify-content: ${style.justifyContent};`;
     })
     hmap.set("010202x000", (): string => { // align items
-        if(style.alignItems === "none") return "";
+        if(cutil.isDefault(tag, style, "alignItems")) return "";
         return `align-items: ${style.alignItems};`;
     })
 
@@ -144,12 +146,12 @@ const genMap = (tag: HTMLtags, style: elementStyle, conf: exportConfig): Map<str
         style.USEBORDER &&
         !cutil.isUnitedValueZero(style.borderWidthTop, style.borderWidthRight, style.borderWidthBottom, style.borderWidthRight) &&
         !cutil.isEqual("hidden", style.borderStyleTop, style.borderStyleRight, style.borderStyleBottom, style.borderStyleLeft)
-    );
+    ) || fuckingDoItAnyways;
     const USEOUTLINE: boolean = (
         style.USEOUTLINE &&
         !cutil.isUnitedValueZero(style.outlineWidth) &&
         style.outlineStyle !== "hidden"
-    );
+    ) || fuckingDoItAnyways;
     hmap.set("030000x020", (): string => { // border highest compression
         if( !USEBORDER || !compress ) return null; // don't do anything if we're not compressing or not using a border
         
@@ -208,30 +210,46 @@ const genMap = (tag: HTMLtags, style: elementStyle, conf: exportConfig): Map<str
     hmap.set("030000x000", (): string => { // border top
         if( !USEBORDER ) return null; // don't do anything if we're not using a border
         
-        if(cutil.isDefault(tag, style, "borderWidthTop"), cutil.isDefault(tag, style, "borderStyleTop")) return ""; // check for default values
+        let usableValues: string[] = ["border-top:"];
+        if(!cutil.isDefault(tag, style, "borderWidthTop")) usableValues.push(getStringFor.unitedAttr(style.borderWidthTop));
+        if(!cutil.isDefault(tag, style, "borderStyleTop")) usableValues.push(style.borderStyleTop);
 
-        return `border-top: ${getStringFor.unitedAttr(style.borderWidthTop)} ${style.borderStyleTop};`;
+        if(usableValues.length === 1) return ""; // continue gen due to default values
+
+        return usableValues.join(" ").trim() + ";";
     });
     hmap.set("030001x000", (): string => { // border right
         if( !USEBORDER ) return null; // don't do anything if we're not using a border
         
-        if(cutil.isDefault(tag, style, "borderWidthRight"), cutil.isDefault(tag, style, "borderStyleRight")) return ""; // check for default values
+        let usableValues: string[] = ["border-right:"];
+        if(!cutil.isDefault(tag, style, "borderWidthRight")) usableValues.push(getStringFor.unitedAttr(style.borderWidthTop));
+        if(!cutil.isDefault(tag, style, "borderStyleRight")) usableValues.push(style.borderStyleTop);
 
-        return `\nborder-right: ${getStringFor.unitedAttr(style.borderWidthRight)} ${style.borderStyleRight};`;
+        if(usableValues.length === 1) return ""; // continue gen due to default values
+
+        return usableValues.join(" ").trim() + ";";
     });
     hmap.set("030002x000", (): string => { // border bottom
-        if(!USEBORDER ) return null; // don't do anything if we're not using a border
+        if( !USEBORDER ) return null; // don't do anything if we're not using a border
         
-        if(cutil.isDefault(tag, style, "borderWidthBottom"), cutil.isDefault(tag, style, "borderStyleBottom")) return ""; // check for default values
+        let usableValues: string[] = ["border-bottom:"];
+        if(!cutil.isDefault(tag, style, "borderWidthBottom")) usableValues.push(getStringFor.unitedAttr(style.borderWidthTop));
+        if(!cutil.isDefault(tag, style, "borderStyleBottom")) usableValues.push(style.borderStyleTop);
 
-        return `\nborder-bottom: ${getStringFor.unitedAttr(style.borderWidthBottom)} ${style.borderStyleBottom};`;
+        if(usableValues.length === 1) return ""; // continue gen due to default values
+
+        return usableValues.join(" ").trim() + ";";
     });
     hmap.set("030003x000", (): string => { // border left
-        if(!USEBORDER ) return null; // don't do anything if we're not using a border
+        if( !USEBORDER ) return null; // don't do anything if we're not using a border
         
-        if(cutil.isDefault(tag, style, "borderWidthLeft"), cutil.isDefault(tag, style, "borderStyleLeft")) return ""; // check for default values
+        let usableValues: string[] = ["border-left:"];
+        if(!cutil.isDefault(tag, style, "borderWidthLeft")) usableValues.push(getStringFor.unitedAttr(style.borderWidthTop));
+        if(!cutil.isDefault(tag, style, "borderStyleLeft")) usableValues.push(style.borderStyleTop);
 
-        return `\nborder-left: ${getStringFor.unitedAttr(style.borderWidthLeft)} ${style.borderStyleLeft};`;
+        if(usableValues.length === 1) return ""; // continue gen due to default values
+
+        return usableValues.join(" ").trim() + ";";
     });
     
     const BRchunk = `0${USEBORDER ? 3 : 4}`;
@@ -295,20 +313,21 @@ const genMap = (tag: HTMLtags, style: elementStyle, conf: exportConfig): Map<str
             useableValues.push(clr);
         }
 
-        return useableValues.join(" ").trim();
+        return useableValues.join(" ").trim() + ";";
     });
-    hmap.set("040001x000", (): string => { // outline width
+    hmap.set("040000x000", (): string => { // outline width
         if(!USEOUTLINE) return null; // don't do anything if we're not using outline
     
         if(cutil.isDefault(tag, style, "outlineWidth")) return ""; // check for default value
         return `outline-width: ${getStringFor.unitedAttr(style.outlineWidth)};`;
     });
-    hmap.set("040002x000", (): string => { // outline style
+    hmap.set("040001x000", (): string => { // outline style
         if(!USEOUTLINE) return null; // don't do anything if we're not using outline
-
+        
+        if(cutil.isDefault(tag, style, "outlineStyle")) return ""; // check for default value
         return `\noutline-style: ${style.outlineStyle};`;
     });
-    hmap.set("040003x000", (): string => { // outline color
+    hmap.set("040002x000", (): string => { // outline color
         if(!USEOUTLINE) return null; // don't do anything if we're not using outline
 
         if(cutil.isDefault(tag, style, "outlineColor")) return ""; // check for default value
@@ -330,7 +349,7 @@ const genMap = (tag: HTMLtags, style: elementStyle, conf: exportConfig): Map<str
 
     const typeStyle: typographyStyle = style.typeStyle ?? null;
     const fontObj: fontObject = typeStyle?.fontObj ?? null;
-    const USETEXT = style.USETEXT && !!typeStyle && !!fontObj;
+    const USETEXT = ( style.USETEXT && !!typeStyle && !!fontObj ) || fuckingDoItAnyways;
     hmap.set("050000x010", (): string => { // font shorthand
         if(!USETEXT || !compress) return null; // don't do anything if we're not using text
 
@@ -353,31 +372,31 @@ const genMap = (tag: HTMLtags, style: elementStyle, conf: exportConfig): Map<str
     });
 
     hmap.set("050000x000", () => { // font family
-        if(!USETEXT || !compress) return null; // don't do anything if we're not using text
+        if(!USETEXT) return null; // don't do anything if we're not using text
         return `font-family: ${fontObj.family};`;
     });
     hmap.set("050001x000", () => { // font size
-        if(!USETEXT || !compress) return null; // don't do anything if we're not using text
+        if(!USETEXT) return null; // don't do anything if we're not using text
         return `\nfont-size: ${getStringFor.unitedAttr(typeStyle.size)};`;
     });
     hmap.set("050002x000", () => { // font variation
-        if(!USETEXT || !compress) return null; // don't do anything if we're not using text
+        if(!USETEXT) return null; // don't do anything if we're not using text
         if(typeStyle.variation !== getClosestVariation(400, fontObj.variations)){
             return `font-weight: ${style.typeStyle.variation};`;
         } return "";
     });
     hmap.set("050003x000", () => { // line height
-        if(!USETEXT || !compress) return null; // don't do anything if we're not using text
+        if(!USETEXT) return null; // don't do anything if we're not using text
         return `\nline-height: ${getStringFor.unitedAttr(style.typeStyle.lineHeight)};`;
     });
     hmap.set("050004x000", () => { // font style
-        if(!USETEXT || !compress) return null; // don't do anything if we're not using text
+        if(!USETEXT) return null; // don't do anything if we're not using text
         if(typeStyle.textDecorations.includes("italicize")){ // font style
             return "\nfont-style: italic;";
         } return "";
     });
     hmap.set("050100x000", () => { // text color
-        if(!USETEXT || !compress) return null; // don't do anything if we're not using text
+        if(!USETEXT) return null; // don't do anything if we're not using text
         return `\ncolor: ${getStringFor.color(
             style.color,
             conf.common.compressionAmt,
@@ -416,7 +435,7 @@ const genMap = (tag: HTMLtags, style: elementStyle, conf: exportConfig): Map<str
     });
     hmap.set("060000x000", ():string => { return null }); // place holder for if chunk 6 was merged with chunk 5
 
-    const USESHADOWS = style.USESHADOW && style.boxShadows.length > 0;
+    const USESHADOWS = ( style.USESHADOW && style.boxShadows.length > 0 ) || fuckingDoItAnyways;
     hmap.set("070000x000", ():string => { // shadow work
         if( !USESHADOWS ) return null; // do not generate if we're not using shadows
 

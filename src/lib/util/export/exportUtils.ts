@@ -1,5 +1,3 @@
-import setImmediate from "../setImmediate"
-
 import { openDB as openDBWithIDB } from "idb";
 import type { IDBPObjectStore, IDBPTransaction, IDBPDatabase } from "idb";
 import { fontDBName, TTFObjectStore, type fontBinary } from "$lib/workers/fontInstaller.worker";

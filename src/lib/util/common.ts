@@ -1,4 +1,5 @@
 import { defaultCSSStyles } from "../@const/element.const";
+import _ from "lodash";
 
 /**
  * This module contains many basic functions that are used throughout the app, such as deep value comparisons.
@@ -29,7 +30,11 @@ const cutil = {
                 // compare keys
                 for (let j = 0; j < rootKey.length; j++) {
                     // if the values are not equal, return false
-                    if (root[rootKey[j] ]!== items[i][itemKey[j]]) return false;
+                    if(typeof root[rootKey[j]] === "object" && typeof items[i][rootKey[j]] !== "object"){
+                        if(!this.isEqual(root[rootKey[j]], items[i][rootKey[j]])) return false;
+                    } else if (root[rootKey[j]] !== items[i][itemKey[j]]){
+                        return false;
+                    }
                 }
             }
     
@@ -44,7 +49,7 @@ const cutil = {
     },
     isUnitedValueZero: function (...items: unitedAttr<number>[]){
         // check if the values are all equal to 0
-        return items.every(item => item.v === 0);
+        return items.every(item => !!(item?.v === 0));
     },
     isUnitedValueEqual: function (...items: unitedAttr<number>[]){
         // check if the values are all equal to 0 first
@@ -58,9 +63,8 @@ const cutil = {
         const defaultVal = defaultCSSStyles[htmlTag][attribute] ?? defaultCSSStyles.COM[attribute];
 
         // check if default value exists first
-        if(style[attribute] === undefined || defaultVal === undefined){
-            return false;
-        }
+        if(style[attribute] === undefined) return true; // do not generate anything if there is no value
+        if(defaultVal === undefined) return false; // do not generate anything if there is no value
 
         if(Object.keys(defaultVal).length === 0) return defaultVal === style[attribute]; // non-object comparison
         return this.isUnitedValueEqual(defaultVal, style[attribute]);
@@ -70,6 +74,22 @@ const cutil = {
         for (let i = 0; i < numTimes; i++) {
             result += str;
         }
+        return result;
+    },
+    findDiff: function (src: elementStyle, ref: elementStyle): elementStyle {
+        const result: elementStyle = {};
+        
+        for (const key in src) {
+            if (!ref.hasOwnProperty(key)) {
+                // if key from A is not in B, add to result.
+                result[key] = src[key];
+            } else {
+                if (!this.isUnitedValueEqual(src[key], ref[key]) && !_.isEqual(src[key], ref[key])) {
+                    result[key] = src[key];
+                }
+            }
+        }
+        
         return result;
     }
 }
