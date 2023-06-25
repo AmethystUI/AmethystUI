@@ -5,7 +5,7 @@
 
     import Slider from "./Basics/Slider.svelte";
     import UnitInput from "./Basics/UnitInput.svelte";
-  import { systemDefaultStyles } from "$src/lib/@const/element.const";
+    import { systemDefaultStyles } from "$src/lib/@const/element.const";
 
     export let currentParentWidth = 360;
     

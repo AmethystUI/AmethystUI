@@ -20,7 +20,7 @@
     export let currentParentWidth = 360;
     
     // reactive
-        $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
+    $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
     // document components
     let colorPreviewSquare:HTMLDivElement;
@@ -256,10 +256,10 @@
                 
                 <TextAreaInput name={"Trailing Text"} placeHolder={"Lorem ipsum dolor sit amet."} v={trailingContent} hasMargin={false} sub={true} currentParenteWidth={currentParentWidth} on:updateValue={e => updateTextContent(e, false)}/>
             {/if}
-            {#if usePlaceholder}
-                <!-- Placeholder -->
+            <!-- Placeholder -->
+            <!-- {#if usePlaceholder}
                 <TextAreaInput name={"Placeholder"} placeHolder={"Lorem ipsum dolor sit amet."} v={placeholder} hasMargin={false} sub={true} currentParenteWidth={currentParentWidth} on:updateValue={updatePlaceholder}/>
-            {/if}
+            {/if} -->
 
             <!-- Typeface settings. All the text appearnace stuff goes here -->
             {#if useTypefaceSettings}

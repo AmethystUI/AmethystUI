@@ -877,8 +877,9 @@
             font-size: 12px;
             color: $secondarys6;
             font-variation-settings: "wght" 400;
-
+            
             a{
+                font-size: 12px;
                 color: $secondarys6;
             }
         }

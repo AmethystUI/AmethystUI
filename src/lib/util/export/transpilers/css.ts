@@ -81,24 +81,26 @@ const genCSS = (buffer: simpleExportBuffer): string => {
         for(let j = 0; j < pElmntKeys.length; j++) {
             const pElmntName = pElmntKeys[j];
             result += `${tagStr}::${pElmntName} {\n`; // opening bracket
-            result += indentLines(buffer[tag].psuedoElmnts[pElmntName].style);
-            result += "\n} "; // closing bracket
+            result += indentLines(buffer[tag].psuedoElmnts[pElmntName]);
+            result += "\n}\n"; // closing bracket
         }
-        result.trimEnd();
+        result = result.trimEnd();
         
         // prep for override classes
-        result += "\n";
+        result += "\n\n";
         const overrideKeys = Object.keys(buffer[tag].overrideStyles);
         for(let j = 0; j < overrideKeys.length; j++) {
             const overrideName = overrideKeys[j];
-            result += `${tagStr}::${overrideName} {\n`; // opening bracket
-            result += indentLines(buffer[tag].overrideStyles[overrideName].style);
-            result += "\n}\n"; // closing bracket
+            result += `${tagStr}.${overrideName} {\n`; // opening bracket
+            result += indentLines(buffer[tag].overrideStyles[overrideName]);
+            result += "\n}\n\n"; // closing bracket
+
+            // TODO: add pseudo elements to override class in the future I fucking give up for now.
         }
-        result.trimEnd();
+        result = result.trimEnd();
         
         // prep for next tag
-        result += "\n\n";
+        result += "\n\n\n";
     }
 
     return result.trimEnd();
