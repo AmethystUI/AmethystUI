@@ -33,19 +33,7 @@ type styleBufferObject = {
     overrideStyles: Record<string, string>
 }
 
-interface simpleExportBuffer extends PartialRecord<HTMLtags, styleBufferObject> {
-    [] : {
-        style: string;
-        psuedoElmnts: {
-            name: string;
-            style: string;
-        };
-        overrideStyles: {
-            name: string;
-            style: string;
-        };
-    }
-}
+type simpleExportBuffer = PartialRecord<HTMLtags, styleBufferObject>;
 
 type exportableFileTypes = "css" | "scss" | "less" | "styl" | "svelte" | "json";
 

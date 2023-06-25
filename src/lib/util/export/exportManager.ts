@@ -74,9 +74,9 @@ export const exportTextFile = async (fileName: string, fileType: exportableFileT
 
 export const startExport = async () => {
     // bring up progress modal first
-    await openProgressModal("Exporting", 20);
+    // await openProgressModal("Exporting", 20);
 
     await exportCSS();
 
-    POC.set(12);
+    // POC.set(12);
 }

@@ -14,7 +14,7 @@ export const generateCSSTemplate = (config: exportConfig, elementType: HTMLtags,
     return genMap(elementType, config, style, !padStyle);
 }
 
-const genMap = (tag: HTMLtags, conf: exportConfig, style: elementStyle, fuckingDoItAnyways = false): Map<string, exportFunction> => {
+const genMap = (tag: HTMLtags, conf: exportConfig, style: elementStyle, forceGen = false): Map<string, exportFunction> => {
     const hmap: Map<string, exportFunction> = new Map<string, exportFunction>();
     const compress: boolean = conf.common.compressionAmt > 0;
 
@@ -146,12 +146,12 @@ const genMap = (tag: HTMLtags, conf: exportConfig, style: elementStyle, fuckingD
         style.USEBORDER &&
         !cutil.isUnitedValueZero(style.borderWidthTop, style.borderWidthRight, style.borderWidthBottom, style.borderWidthRight) &&
         !cutil.isEqual("hidden", style.borderStyleTop, style.borderStyleRight, style.borderStyleBottom, style.borderStyleLeft)
-    ) || fuckingDoItAnyways;
+    ) || forceGen;
     const USEOUTLINE: boolean = (
         style.USEOUTLINE &&
         !cutil.isUnitedValueZero(style.outlineWidth) &&
         style.outlineStyle !== "hidden"
-    ) || fuckingDoItAnyways;
+    ) || forceGen;
     hmap.set("030000x020", (): string => { // border highest compression
         if( !USEBORDER || !compress ) return null; // don't do anything if we're not compressing or not using a border
         
@@ -349,7 +349,7 @@ const genMap = (tag: HTMLtags, conf: exportConfig, style: elementStyle, fuckingD
 
     const typeStyle: typographyStyle = style.typeStyle ?? null;
     const fontObj: fontObject = typeStyle?.fontObj ?? null;
-    const USETEXT = ( style.USETEXT && !!typeStyle && !!fontObj ) || fuckingDoItAnyways;
+    const USETEXT = ( style.USETEXT && !!typeStyle && !!fontObj ) || forceGen;
     hmap.set("050000x010", (): string => { // font shorthand
         if(!USETEXT || !compress) return null; // don't do anything if we're not using text
 
@@ -435,7 +435,7 @@ const genMap = (tag: HTMLtags, conf: exportConfig, style: elementStyle, fuckingD
     });
     hmap.set("060000x000", ():string => { return null }); // place holder for if chunk 6 was merged with chunk 5
 
-    const USESHADOWS = ( style.USESHADOW && style.boxShadows.length > 0 ) || fuckingDoItAnyways;
+    const USESHADOWS = ( style.USESHADOW && style.boxShadows.length > 0 ) || forceGen;
     hmap.set("070000x000", ():string => { // shadow work
         if( !USESHADOWS ) return null; // do not generate if we're not using shadows
 

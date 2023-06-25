@@ -32,10 +32,10 @@ const exportCSS = async () => {
 
         // generate styles for pseudo elements first
         if(elementStyle.USETEXT && !!elementStyle.leadingContent){
-            buffer[elementType].psuedoElmnts["before"] = `content: ${elementStyle.leadingContent};`;
+            buffer[elementType].psuedoElmnts["before"] = `content: "${elementStyle.leadingContent}";`;
         }
         if(elementStyle.USETEXT && !!elementStyle.trailingContent){
-            buffer[elementType].psuedoElmnts["after"] = `content: ${elementStyle.trailingContent};`;
+            buffer[elementType].psuedoElmnts["after"] = `content: "${elementStyle.trailingContent}";`;
         }
 
         // export all overrides
@@ -45,13 +45,6 @@ const exportCSS = async () => {
             const overrideStyle = cutil.findDiff(overrideElmnt.style, paddedElmntStyle);
 
             if(Object.keys(overrideStyle).length === 0) continue; // skip if there are no differences in this override. We don't need it.
-            
-            // add all transpilation flags to override styles
-            // Object.keys(paddedElmntStyle).forEach(v => {
-            //     if(v.toUpperCase() === v) {overrideStyle[v] = paddedElmntStyle[v];}
-            // })
-
-            console.log(overrideStyle);
 
             // generate style template
             const overrideTemplate = generateCSSTemplate(<exportConfig>{...get(exportConfigs), common: {compressionAmt: 0}}, elementType, overrideStyle, false);
@@ -60,6 +53,55 @@ const exportCSS = async () => {
     }
     
     console.log(buffer);
+    console.log(genCSS(buffer));
+}
+
+const genCSS = (buffer: simpleExportBuffer): string => {
+    const tags = Object.keys(buffer);
+    let result = "";
+
+    const indentLines = (str: string): string => {
+        if(str === undefined) return "";
+
+        const lines = str.split("\n");
+        return lines.map(line => "\t" + line).join("\n").trimEnd();
+    }
+
+    for(let i = 0; i < tags.length; i++) {
+        const tag = tags[i];
+        const tagStr = tag.toLowerCase();
+        // add root style first
+        result += `${tagStr} {\n`; // opening bracket
+        result += indentLines(buffer[tag].style);
+        result += "\n}"; // closing bracket
+
+        // prep for pseudo elements
+        result += " ";
+        const pElmntKeys = Object.keys(buffer[tag].psuedoElmnts);
+        for(let j = 0; j < pElmntKeys.length; j++) {
+            const pElmntName = pElmntKeys[j];
+            result += `${tagStr}::${pElmntName} {\n`; // opening bracket
+            result += indentLines(buffer[tag].psuedoElmnts[pElmntName].style);
+            result += "\n} "; // closing bracket
+        }
+        result.trimEnd();
+        
+        // prep for override classes
+        result += "\n";
+        const overrideKeys = Object.keys(buffer[tag].overrideStyles);
+        for(let j = 0; j < overrideKeys.length; j++) {
+            const overrideName = overrideKeys[j];
+            result += `${tagStr}::${overrideName} {\n`; // opening bracket
+            result += indentLines(buffer[tag].overrideStyles[overrideName].style);
+            result += "\n}\n"; // closing bracket
+        }
+        result.trimEnd();
+        
+        // prep for next tag
+        result += "\n\n";
+    }
+
+    return result.trimEnd();
 }
 
 /**
