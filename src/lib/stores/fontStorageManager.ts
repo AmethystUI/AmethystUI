@@ -1,5 +1,4 @@
 import { writable } from "svelte/store";
-import type { fontObject } from "$lib/workers/pseudoWorkers/fonts";
 import { mainFontPickerData } from "./fontPickerManager";
 
 /**

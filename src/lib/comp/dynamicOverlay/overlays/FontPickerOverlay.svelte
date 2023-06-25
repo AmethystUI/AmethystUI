@@ -6,7 +6,6 @@
     import { mainFontPickerData } from "$lib/stores/fontPickerManager";
     import { initializeMainFontPickerData, storedFontData } from "$lib/stores/fontStorageManager";
     import { beautifiedFontName, fontExtensionToFormats, getClosestVariation, getFontNameValue, searchFontIndex } from "$lib/workers/pseudoWorkers/fonts";
-    import type { fontObject, variationURL } from "$lib/workers/pseudoWorkers/fonts";
 
     const componentID = crypto.randomUUID();
 

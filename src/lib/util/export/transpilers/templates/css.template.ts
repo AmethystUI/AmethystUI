@@ -1,6 +1,6 @@
 import getStringFor from "$src/lib/util/toString";
 import cutil from "$src/lib/util/common";
-import { getClosestVariation, type fontObject } from "$src/lib/workers/pseudoWorkers/fonts";
+import { getClosestVariation } from "$src/lib/workers/pseudoWorkers/fonts";
 import { toHex8 as hex8, toHex as hex4 } from "../utils/css.util";
 import { systemDefaultStyles } from "$src/lib/@const/element.const";
 import _ from "lodash";
@@ -366,14 +366,14 @@ const genMap = (tag: HTMLtags, conf: exportConfig, style: elementStyle, forceGen
         useableValues.push(getStringFor.unitedAttr(typeStyle.size)); // mandatory font size
         useableValues.push(`/${getStringFor.unitedAttr(typeStyle.lineHeight)}`); // line height. This is mandatory for now because we don't have a "normal" option for line height
         
-        useableValues.push(fontObj.family); // mandatory font family
+        useableValues.push(`"${fontObj.family}"`); // mandatory font family
 
         return `font: ${useableValues.join(" ").replace(" /", "/").trim()};`;
     });
 
     hmap.set("050000x000", () => { // font family
         if(!USETEXT) return null; // don't do anything if we're not using text
-        return `font-family: ${fontObj.family};`;
+        return `font-family: "${fontObj.family}";`;
     });
     hmap.set("050001x000", () => { // font size
         if(!USETEXT) return null; // don't do anything if we're not using text

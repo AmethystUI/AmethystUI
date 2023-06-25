@@ -31,14 +31,16 @@
         checked={integrateFonts} on:updateValue={updateIntegration}/>
 
     {#if integrateFonts}
-        <Checkbox name="Load Full Typeface" {...checkboxStyling}
-        checked={loadFullTypeface} on:updateValue={updateMinimization}/>
-    
         <section>
-            <Checkbox name="Localize Fonts with Base64" {...checkboxStyling}
-                checked={localizeFonts} on:updateValue={updateLocalization}/>
-            <InfoTag info="Base64 localization will allow fonts to be loaded even when offline. But it will also significantly increase the file size, and may impact page load performance." margin="0px 0px 0px 7px"/>
+            <Checkbox name="Load Full Typeface" {...checkboxStyling} checked={loadFullTypeface} on:updateValue={updateMinimization}/>
+            <InfoTag info="Create an @font-face definition for all weights of a typeface, even if it's not used in this specific stylesheet." margin="0px 0px 0px 7px"/>
         </section>
+    
+        <!-- TODO: enable in future versions -->
+        <!-- <section>
+            <Checkbox name="Localize Fonts with Base64" {...checkboxStyling} checked={localizeFonts} on:updateValue={updateLocalization}/>
+            <InfoTag info="Base64 localization will allow fonts to be loaded even when offline. But it will also significantly increase the file size, and may impact page load performance." margin="0px 0px 0px 7px"/>
+        </section> -->
     {/if}
 </SettingsPanel>
 

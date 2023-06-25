@@ -52,13 +52,127 @@ const exportCSS = async () => {
         }
     }
     
-    console.log(buffer);
-    console.log(genCSS(buffer));
+    let finalCSS = "";
+    finalCSS += genCSS(buffer);
+
+    if(get(exportConfigs).stylesheets.fontIntegration) {
+        const fontCSS = genFontFaces(coll, get(exportConfigs).stylesheets.loadFullTypeface);
+        if(!!fontCSS){
+            finalCSS += `\n\n/* ========== FONT DEFINITIONS ========== */\n\n${fontCSS}`;
+        }
+    }
+
+    console.log(finalCSS);
+}
+
+const genFontFaces = (collection: element[], loadFull = false, useBase64 = false): string => {
+    // find all font families used in the stylesheet
+    const getFamily = (style: elementStyle): string => {
+        if(!style.USETEXT) return "";
+        const typeStyle: typographyStyle = style.typeStyle;
+        const fontObj: fontObject = typeStyle?.fontObj;
+        const familyName: string = fontObj?.family;
+        if(!typeStyle || !fontObj || familyName === undefined) return "";
+        return familyName;
+    }
+    // this is such a fucking stupid way to do this.
+    const getVariationURL = (targetVar: number, variationURLs: variationURL[]): string => {
+        if(!variationURLs) return null;
+        for(let i = 0; i < variationURLs.length; i++) {
+            if(variationURLs[i].variation === targetVar) return variationURLs[i].url;
+        } return null;
+    }
+
+    let fontFace: Record<string, number[]> = {};
+    let allVariations: Record<string, variationURL[]> = {};
+
+    const addNewFontFace = (original: typeof fontFace, newFamily: string, typeStyle: typographyStyle): typeof fontFace => {
+        const fontObj: fontObject = typeStyle.fontObj;
+
+        // do not add new font face if the new family is a web safe font
+        if(fontObj.webSafe) return original;
+        
+        original[newFamily] = Array.from(new Set([...(original[newFamily] ?? []), typeStyle.variation])); // do not include duplicate variations
+
+        return original;
+    }
+
+    // cache used font faces
+
+    for(let i = 0; i < collection.length; i++) {
+        // find element root fonts
+        const currentElement = collection[i];
+        const elementStyle: elementStyle = currentElement.style;
+        const rootFamily = getFamily(elementStyle);
+        if(rootFamily !== "") {
+            const typeStyle: typographyStyle = elementStyle.typeStyle;
+            // update usable font faces
+            fontFace = addNewFontFace(fontFace, rootFamily, typeStyle);
+            // record all styles
+            if(!!typeStyle?.fontObj?.fileURLs && !allVariations[rootFamily]) allVariations[rootFamily] = typeStyle.fontObj.fileURLs;
+        }
+        
+        // find fonts in all overrides
+        for(let j = 0; j < currentElement.styleOverrides.length; j++) {
+            const overrideElmnt = currentElement.styleOverrides[j];
+            const overrideStyle = overrideElmnt.style;
+            const overrideFamily = getFamily(overrideStyle);
+            if(overrideFamily !== "") {
+                const typeStyle: typographyStyle = overrideStyle.typeStyle;
+                // update usable font faces
+                fontFace = addNewFontFace(fontFace, overrideFamily, typeStyle);
+                // record all styles
+                if(!!typeStyle?.fontObj?.fileURLs && !allVariations[overrideFamily]) allVariations[overrideFamily] = typeStyle.fontObj.fileURLs;
+            }
+        }
+    }
+    
+    // create font face definitions
+    let result = "";
+    const fontFaceKeys = Object.keys(fontFace);
+    const getFontFaceStr = (family: string, variation: number, src: string, srcType?: string): string => {
+        let result = "";
+
+        result += "@font-face {\n";
+        result += `\tfont-family: ${family};\n`;
+        result += `\tsrc: url('${src}')`;
+        if(!!srcType) result += `format('${srcType}')`;
+        result += ";\n";
+        result += `\tfont-weight: ${variation};\n`;
+        result += "}";
+        
+        return result;
+    }
+
+    
+    for(let i = 0; i < fontFaceKeys.length; i++) {
+        const currentFamily = fontFaceKeys[i];
+        const currentFontFace = fontFace[currentFamily];
+
+        if(loadFull){
+            for(let j = 0; j < allVariations[currentFamily].length; j++) {
+                const targetFontFace = allVariations[currentFamily][j];
+                result += getFontFaceStr(currentFamily, targetFontFace.variation, targetFontFace.url) + "\n";
+            }
+        } else {
+            for(let j = 0; j < currentFontFace.length; j++) {
+                const targetVariation = currentFontFace[j];
+                const targetVarURLs = allVariations[currentFamily];
+
+                result += getFontFaceStr(currentFamily, targetVariation, getVariationURL(targetVariation, targetVarURLs)) + "\n";
+            }
+        }
+        
+        result += "\n";
+    }
+
+    return result.trim();
 }
 
 const genCSS = (buffer: simpleExportBuffer): string => {
     const tags = Object.keys(buffer);
     let result = "";
+    let usedFonts: string[] = [];
 
     const indentLines = (str: string): string => {
         if(str === undefined) return "";
@@ -102,7 +216,6 @@ const genCSS = (buffer: simpleExportBuffer): string => {
         // prep for next tag
         result += "\n\n\n";
     }
-
     return result.trimEnd();
 }
 

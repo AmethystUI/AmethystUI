@@ -50,6 +50,37 @@ interface boxShadow extends shadow { // box shadow
     grow: unitedAttr<number>,
 }
 
+
+/**
+ * Map every variation in a font to a URL
+ */
+interface variationURL{
+    variation: number,
+    url: string
+}
+/**
+ * Represents a single, reduced typeface object returned by the Google Fonts API.
+ * 
+ * @note THIS DOES NOT DEFINE THE RAW OBJECT RECIEVED FROM GOOGLE FONTS
+ * 
+ * @property {string} family - The family name of the font.
+ * @property {string} version - The version of the font.
+ * @property {string} lastModified - The date when the font was last modified.
+ * @property {string[]} files - An array of file paths to the font files. The keys also shows what weights this font supports.
+ * @property {string} category - The category of the font.
+ */
+interface fontObject {
+    family: string,
+    appearedName?: string,
+    version?: string,
+    lastModified?: string,
+    fileURLs?: variationURL[], // the URLs asssociated with each fileURL. We'lll use these URLs to access the TTF binaries and convert them to base64
+    localURLs?: variationURL[],
+    variations: number[],
+    category: typeCategories,
+    webSafe: boolean,
+}
+
 interface typographyStyle {
     fontObj?: fontObject, // the font object that contains most of the information we need
     variation?: number, // basically the weight
@@ -103,5 +134,7 @@ declare let element : element;
 declare let unitedAttr : unitedAttr;
 declare let shadow : shadow;
 declare let boxShadow : boxShadow;
+declare let variationURL : variationURL;
+declare let fontObject : fontObject;
 declare let typographyStyle : typographyStyle;
 declare let color : color;

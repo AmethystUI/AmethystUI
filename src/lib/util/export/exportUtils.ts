@@ -1,7 +1,7 @@
 import { openDB as openDBWithIDB } from "idb";
 import type { IDBPObjectStore, IDBPTransaction, IDBPDatabase } from "idb";
 import { fontDBName, TTFObjectStore, type fontBinary } from "$lib/workers/fontInstaller.worker";
-import { searchFontIndex, type fontObject } from "$src/lib/workers/pseudoWorkers/fonts";
+import { searchFontIndex } from "$src/lib/workers/pseudoWorkers/fonts";
 import { systemDefaultStyles } from "$src/lib/@const/element.const";
 
 const openDB = async (db: IDBPDatabase): Promise<IDBPDatabase> => {

@@ -6,7 +6,7 @@ const sw = self as unknown as ServiceWorkerGlobalScope & typeof globalThis;
 
 import { type IDBPDatabase, openDB } from "idb";
 import { batchSize, fontLimit, fontSorting } from "./configs/fontLoading.config";
-import { cleanFiles, getClosestVariation, type variationURL } from "./pseudoWorkers/fonts";
+import { cleanFiles, getClosestVariation } from "./pseudoWorkers/fonts";
 
 /**
  * The structure of font data as received from Google Font

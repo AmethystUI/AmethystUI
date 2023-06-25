@@ -3,29 +3,6 @@
 import { fontLimit, fontSorting } from "../configs/fontLoading.config";
 
 /**
- * Represents a single, reduced typeface object returned by the Google Fonts API.
- * 
- * @note THIS DOES NOT DEFINE THE RAW OBJECT RECIEVED FROM GOOGLE FONTS
- * 
- * @property {string} family - The family name of the font.
- * @property {string} version - The version of the font.
- * @property {string} lastModified - The date when the font was last modified.
- * @property {string[]} files - An array of file paths to the font files. The keys also shows what weights this font supports.
- * @property {string} category - The category of the font.
- */
-export interface fontObject {
-    family: string,
-    appearedName?: string,
-    version?: string,
-    lastModified?: string,
-    fileURLs?: variationURL[], // the URLs asssociated with each fileURL. We'lll use these URLs to access the TTF binaries and convert them to base64
-    localURLs?: variationURL[],
-    variations: number[],
-    category: typeCategories,
-    webSafe: boolean,
-}
-
-/**
  * A list of web safe fonts that can be used. Not that web safe fonts only support normal and bold variations
  */
 const webSafeFonts: fontObject[] = [
@@ -315,13 +292,6 @@ export function getFontNameValue(key: string | number, mode: "name" | "value" | 
     return result ?? "NA";
 }
 
-/**
- * Map every variation in a font to a URL
- */
-export interface variationURL{
-    variation: number,
-    url: string
-}
 /**
  * Removes italic font files from the provided font attributes object and returns the cleaned font attributes object.
  * @param files - The font attributes object to be cleaned.
