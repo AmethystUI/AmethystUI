@@ -18,10 +18,8 @@
     const disp = createEventDispatcher();
     
     let inputText: HTMLParagraphElement;
-    let inputTextContainer: HTMLElement;
     let searchIcon: HTMLImageElement;
     let dispatchLocked = true;
-    let colorPreviewSquare: HTMLDivElement; // the square that previews the text color
     
     let initialValue: string = typeface.fontObj.appearedName ?? typeface.fontObj.family; // the input will reset to this value if there is nothing, or if there is an error. This must be recorded every time the input is focused.
 
@@ -112,12 +110,12 @@
 <main style={`${hasMargin ? "margin-right:6px" : ""}; width:${100+widthGrowPerc}%; ${minWidth !== "" ? `min-width:${minWidth}` : ""}`}>
     <Title name={name} sub={sub} align={alignTitle}/>
     
-    <section bind:this={inputTextContainer} on:mousedown={() => {setTimeout(() => {inputText.focus()}, 0)}}>
+    <section on:mousedown={() => {setTimeout(() => {inputText.focus()}, 0)}}>
         <!-- Search text -->
         <p bind:this={inputText} class="preview-text" contenteditable={true} spellcheck={false}
         on:keydown={checkEnterPress} on:focus={focusInput} on:blur={unFocusInput} on:mousedown={keepOpenOverlay} on:input={updateSearchQuery}
         style="font-family: '{typeface.fontObj.family}', 'Inter', 'system-ui', 'Tahoma', 'sans-serif'"></p>
-
+        
         <!-- Search icon -->
         <img bind:this={searchIcon} id="search-icon" src="/src/assets/icons/search.svg" alt="">
     </section>

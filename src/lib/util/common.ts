@@ -13,7 +13,7 @@ const cutil = {
     isEqual: function (...items: Object[]): boolean {
         // fetch keys from every obj to see if they are equal first
         const root = items[0];
-        if(root === undefined) return false; // do not compare undefined values
+        if(root === undefined || root === null) return false; // do not compare undefined values
 
         // check if the root is an iterable object or not
         const rootKey = Object.keys(root);

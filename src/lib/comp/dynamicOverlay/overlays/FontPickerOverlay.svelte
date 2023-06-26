@@ -12,7 +12,6 @@
     const sessionStorageKey = "fonts";
 
     let fontListContainer: HTMLElement;
-    let variationListContainer: HTMLElement;
 
     /**
      * Opens the color picker as well as the overlay frame and sets the color reference and name.
@@ -680,7 +679,7 @@
                 </section>
 
                 <!-- section section for all the font variations avaiable -->
-                <section bind:this={variationListContainer} id="variation-list-container">
+                <section id="variation-list-container">
                     {#if !!fineFilteredFontContent[selectedFontIndex] && !!fineFilteredFontContent[selectedFontIndex]["variations"]}
                         <!-- Iterate through every variation for the chosen font -->
                         {#each fineFilteredFontContent[selectedFontIndex].variations as variation}

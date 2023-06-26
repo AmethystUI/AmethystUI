@@ -194,7 +194,7 @@ const genMap = (tag: HTMLtags, conf: exportConfig, style: elementStyle, forceGen
         return `\nborder-style: ${condenseQuadAttr(style.borderStyleTop, style.borderStyleRight, style.borderStyleBottom, style.borderStyleLeft)};`;
     });
     hmap.set(compress ? "030002x010" : "030004x000", (): string => { // border color
-        if( !USEBORDER || !compress ) return null; // don't do anything if we're not compressing or not using a border
+        if( !USEBORDER ) return null; // don't do anything if we're not using a border
 
         // generate color
         if( cutil.isDefault(tag, style, "borderColor") ) return ""; // check for default values
