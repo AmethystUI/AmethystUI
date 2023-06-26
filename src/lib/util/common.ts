@@ -63,6 +63,7 @@ const cutil = {
         const defaultVal = defaultCSSStyles[htmlTag][attribute] ?? defaultCSSStyles.COM[attribute];
 
         // check if default value exists first
+        console.log(style[attribute]);
         if(style[attribute] === undefined) return true; // do not generate anything if there is no value
         if(defaultVal === undefined) return false; // do not generate anything if there is no value
 

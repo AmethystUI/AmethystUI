@@ -175,22 +175,23 @@ const genMap = (tag: HTMLtags, conf: exportConfig, style: elementStyle, forceGen
         return `border: ${style.borderWidthTop.v}${style.borderWidthTop.u} ${style.borderStyleTop} ${clrText};`;
     });
 
-    hmap.set("030000x010", (): string => { // border width right
+    hmap.set("030000x010", (): string => { // border width
         if( !USEBORDER || !compress ) return null; // don't do anything if we're not compressing or not using a border
 
         // generate border width and styles
         const widthAttr: elementStyleKeys[] = ["borderWidthTop", "borderWidthRight", "borderWidthBottom", "borderWidthLeft"];
         
-        if( widthAttr.every(v => (!cutil.isDefault(tag, style, v))) ) return ""; // check for default values
+        console.log( widthAttr.map(v => style[v]) );
+        if( widthAttr.every(v => cutil.isDefault(tag, style, v)) ) return ""; // check for default values
         return `border-width: ${condenseQuadAttr(style.borderWidthTop, style.borderWidthRight, style.borderWidthBottom, style.borderWidthLeft, getStringFor.unitedAttr)};`
     });
-    hmap.set("030001x010", (): string => { // border width right
+    hmap.set("030001x010", (): string => { // border style
         if( !USEBORDER || !compress ) return null; // don't do anything if we're not compressing or not using a border
         
         // generate border width and styles
         const styleAttr: elementStyleKeys[] = ["borderStyleTop", "borderStyleRight", "borderStyleBottom", "borderStyleLeft"];
         
-        if( styleAttr.every(v => (!cutil.isDefault(tag, style, v))) ) return ""; // check for default values
+        // required border style generation
         return `\nborder-style: ${condenseQuadAttr(style.borderStyleTop, style.borderStyleRight, style.borderStyleBottom, style.borderStyleLeft)};`;
     });
     hmap.set(compress ? "030002x010" : "030004x000", (): string => { // border color
