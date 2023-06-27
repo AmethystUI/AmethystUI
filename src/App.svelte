@@ -28,8 +28,8 @@
     import ModalBase from "$lib/comp/modals/Modal.svelte";
     import ProgressOverlay from "$lib/comp/modals/ProgressOverlay.svelte";
     import setImmediate from "$lib/util/setImmediate";
-    import { onMount } from "svelte";
-    import { initializeColorFromHSLA } from "./lib/util/colorMaths";
+    import { onMount, tick } from "svelte";
+    import { initializeColorFromHSLA, initializeColorFromRGBA } from "./lib/util/colorMaths";
 
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
@@ -46,7 +46,7 @@
     document.onmousedown = defaultMouseDownAction;
 
     // DEBUG: 
-    onMount(() => {
+    onMount(async () => {
         addComponent("DIV", {
             USEBORDER: true,
             borderWidthTop: {v:69, u:"px"},
@@ -57,26 +57,57 @@
             borderRadiusRight: {v:38, u:"pt"},
             borderRadiusBottom: {v:48, u:"px"},
             borderRadiusLeft: {v:38, u:"px"},
-            borderStyleTop: "solid",
-            borderStyleRight: "dashed",
-            borderStyleBottom: "solid",
-            borderStyleLeft: "hidden",
+            // borderStyleTop: "solid",
+            // borderStyleRight: "dashed",
+            // borderStyleBottom: "solid",
+            // borderStyleLeft: "hidden",
 
             USEOUTLINE: true,
             
             USETEXT: true,
 
+            leadingContent: "Hi mom",
+            color: initializeColorFromRGBA(0, 0, 0, 100),
+            
             borderColor: initializeColorFromHSLA(0, 84, 52, 100),
+
+            USESHADOW: true,
         })
-
+        
+        await tick();
+        
         addOverride(0);
-
-        setImmediate(() => {
-            // simulate clicking on it
-            $selectedComponent = 0;
-            $focusedComponent = 0;
-            $collection = $collection;
-        });
+        
+        await tick();
+        
+        // simulate clicking on it
+        $selectedComponent = 0;
+        $focusedComponent = 0;
+        $collection = $collection;
+        
+        await tick();
+        
+        $collection[0].styleOverrides[0].style = {
+            ...$collection[0].styleOverrides[0].style,
+            
+            borderWidthTop: {v:0, u:"px"},
+            borderWidthRight: {v:19, u:"px"},
+            borderWidthBottom: {v:24, u:"px"},
+            borderWidthLeft: {v:32, u:"px"},
+            
+            borderRadiusTop: {v:100, u:"px"},
+            borderRadiusRight: {v:100, u:"px"},
+            borderRadiusBottom: {v:100, u:"px"},
+            borderRadiusLeft: {v:100, u:"px"},
+            
+            borderColor: initializeColorFromHSLA(102, 84, 51, 100),
+            
+            outlineColor: initializeColorFromHSLA(50, 88, 59, 100),
+            
+            leadingContent: "",
+            
+            outlineOffset: {v: 50, u: "px"}
+        };
     });
 
     $: if(!!currentStyle){

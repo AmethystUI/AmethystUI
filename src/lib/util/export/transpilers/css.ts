@@ -46,9 +46,26 @@ const exportCSS = async () => {
 
             if(Object.keys(overrideStyle).length === 0) continue; // skip if there are no differences in this override. We don't need it.
 
-            // generate style template
+            // generate style template for override
             const overrideTemplate = generateCSSTemplate(<exportConfig>{...get(exportConfigs), common: {compressionAmt: 0}}, elementType, overrideStyle, false);
-            buffer[elementType].overrideStyles[overrideElmnt.name] = getStyleString(overrideTemplate);
+            buffer[elementType].overrideStyles[overrideElmnt.name] = {
+                style: getStyleString(overrideTemplate),
+                psuedoElmnts: {},
+            };
+
+            // generate pseudo elements for override
+            if(
+                ( overrideStyle.USETEXT || elementStyle.USETEXT ) &&
+                ( overrideStyle.leadingContent ?? "" ) !== elementStyle.leadingContent
+            ) {
+                buffer[elementType].overrideStyles[overrideElmnt.name].psuedoElmnts["before"] = `content: "${overrideStyle.leadingContent ?? ""}";`;
+            }
+            if(
+                ( overrideStyle.USETEXT || elementStyle.USETEXT ) &&
+                ( overrideStyle.trailingContent ?? "" ) !== elementStyle.trailingContent
+            ){
+                buffer[elementType].overrideStyles[overrideElmnt.name].psuedoElmnts["after"] = `content: "${overrideStyle.trailingContent ?? ""}";`;
+            }
         }
     }
     
@@ -172,7 +189,6 @@ const genFontFaces = (collection: element[], loadFull = false, useBase64 = false
 const genCSS = (buffer: simpleExportBuffer): string => {
     const tags = Object.keys(buffer);
     let result = "";
-    let usedFonts: string[] = [];
 
     const indentLines = (str: string): string => {
         if(str === undefined) return "";
@@ -184,32 +200,44 @@ const genCSS = (buffer: simpleExportBuffer): string => {
     for(let i = 0; i < tags.length; i++) {
         const tag = tags[i];
         const tagStr = tag.toLowerCase();
+        const rootBufferObj: styleBufferObject = buffer[tag];
+
         // add root style first
         result += `${tagStr} {\n`; // opening bracket
-        result += indentLines(buffer[tag].style);
+        result += indentLines(rootBufferObj.style);
         result += "\n}"; // closing bracket
 
         // prep for pseudo elements
-        result += " ";
-        const pElmntKeys = Object.keys(buffer[tag].psuedoElmnts);
-        for(let j = 0; j < pElmntKeys.length; j++) {
-            const pElmntName = pElmntKeys[j];
-            result += `${tagStr}::${pElmntName} {\n`; // opening bracket
-            result += indentLines(buffer[tag].psuedoElmnts[pElmntName]);
+        result += "\n";
+        const rootPsuedoElmntKeys = Object.keys(rootBufferObj.psuedoElmnts);
+        for(let j = 0; j < rootPsuedoElmntKeys.length; j++) {
+            const rootPsuedoElmntName = rootPsuedoElmntKeys[j];
+            result += `${tagStr}::${rootPsuedoElmntName} {\n`; // opening bracket
+            result += indentLines(rootBufferObj.psuedoElmnts[rootPsuedoElmntName]);
             result += "\n}\n"; // closing bracket
         }
         result = result.trimEnd();
         
         // prep for override classes
         result += "\n\n";
-        const overrideKeys = Object.keys(buffer[tag].overrideStyles);
+        const overrideKeys = Object.keys(rootBufferObj.overrideStyles);
         for(let j = 0; j < overrideKeys.length; j++) {
             const overrideName = overrideKeys[j];
-            result += `${tagStr}.${overrideName} {\n`; // opening bracket
-            result += indentLines(buffer[tag].overrideStyles[overrideName]);
-            result += "\n}\n\n"; // closing bracket
+            const header = `${tagStr}.${overrideName}`
+            const overrideBufferObj: styleBufferObject = rootBufferObj.overrideStyles[overrideName];
 
-            // TODO: add pseudo elements to override class in the future I fucking give up for now.
+            result += `${header} {\n`; // opening bracket
+            result += indentLines(overrideBufferObj.style);
+            result += "\n}\n"; // closing bracket
+
+            // generate pseudo elements for override
+            const overridePsuedoElmntKeys = Object.keys(overrideBufferObj.psuedoElmnts);
+            for(let k = 0; k < overridePsuedoElmntKeys.length; k++) {
+                const overridePsuedoElmntName = rootPsuedoElmntKeys[k];
+                result += `${header}::${overridePsuedoElmntName} {\n`; // opening bracket
+                result += indentLines(overrideBufferObj.psuedoElmnts[overridePsuedoElmntName]);
+                result += "\n}\n"; // closing bracket
+            }
         }
         result = result.trimEnd();
         

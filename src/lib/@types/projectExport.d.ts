@@ -30,7 +30,7 @@ interface exportConfig extends PartialRecord<colorFmt, Record<string, any>> {
 type styleBufferObject = {
     style: string,
     psuedoElmnts: Record<string, string>,
-    overrideStyles: Record<string, string>
+    overrideStyles?: Record<string, styleBufferObject>
 }
 
 type simpleExportBuffer = PartialRecord<HTMLtags, styleBufferObject>;

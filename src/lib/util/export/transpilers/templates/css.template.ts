@@ -181,7 +181,6 @@ const genMap = (tag: HTMLtags, conf: exportConfig, style: elementStyle, forceGen
         // generate border width and styles
         const widthAttr: elementStyleKeys[] = ["borderWidthTop", "borderWidthRight", "borderWidthBottom", "borderWidthLeft"];
         
-        console.log( widthAttr.map(v => style[v]) );
         if( widthAttr.every(v => cutil.isDefault(tag, style, v)) ) return ""; // check for default values
         return `border-width: ${condenseQuadAttr(style.borderWidthTop, style.borderWidthRight, style.borderWidthBottom, style.borderWidthLeft, getStringFor.unitedAttr)};`
     });
@@ -211,54 +210,54 @@ const genMap = (tag: HTMLtags, conf: exportConfig, style: elementStyle, forceGen
     hmap.set("030000x000", (): string => { // border top
         if( !USEBORDER ) return null; // don't do anything if we're not using a border
         
-        let usableValues: string[] = ["border-top:"];
-        if( !(cutil.isDefault(tag, style, "borderWidthTop") && cutil.isDefault(tag, style, "borderStyleTop")) ) {
-            usableValues.push(getStringFor.unitedAttr(style.borderWidthTop));
-            usableValues.push(style.borderStyleTop);
+        if(!!style.borderWidthTop && !!style.borderStyleTop){ // if both style and width exist, use border attr
+            return `border-top: ${getStringFor.unitedAttr(style.borderWidthTop)} ${style.borderStyleTop};`
+        } else if (!!style.borderWidthTop){ // generate only the width attr
+            return `border-top-width: ${getStringFor.unitedAttr(style.borderWidthTop)};`
+        } else if(!!style.borderStyleTop) { // generate only the style attr
+            return `border-top-style: ${style.borderStyleTop};`
+        } else { // continue gen due to undefined attr
+            return "";
         }
-
-        if(usableValues.length === 1) return ""; // continue gen due to default values
-
-        return usableValues.join(" ").trim() + ";";
     });
     hmap.set("030001x000", (): string => { // border right
         if( !USEBORDER ) return null; // don't do anything if we're not using a border
         
-        let usableValues: string[] = ["border-right:"];
-        if( !(cutil.isDefault(tag, style, "borderWidthRight") && cutil.isDefault(tag, style, "borderStyleRight")) ) {
-            usableValues.push(getStringFor.unitedAttr(style.borderWidthRight));
-            usableValues.push(style.borderStyleRight);
+        if(!!style.borderWidthRight && !!style.borderStyleRight){ // if both style and width exist, use border attr
+            return `border-right: ${getStringFor.unitedAttr(style.borderWidthRight)} ${style.borderStyleRight};`
+        } else if (!!style.borderWidthRight){ // generate only the width attr
+            return `border-right-width: ${getStringFor.unitedAttr(style.borderWidthRight)};`
+        } else if(!!style.borderStyleRight) { // generate only the style attr
+            return `border-right-style: ${style.borderStyleRight};`
+        } else { // continue gen due to undefined attr
+            return "";
         }
-
-        if(usableValues.length === 1) return ""; // continue gen due to default values
-
-        return usableValues.join(" ").trim() + ";";
     });
     hmap.set("030002x000", (): string => { // border bottom
         if( !USEBORDER ) return null; // don't do anything if we're not using a border
         
-        let usableValues: string[] = ["border-bottom:"];
-        if( !(cutil.isDefault(tag, style, "borderWidthBottom") && cutil.isDefault(tag, style, "borderStyleBottom")) ) {
-            usableValues.push(getStringFor.unitedAttr(style.borderWidthBottom));
-            usableValues.push(style.borderStyleBottom);
-        };
-
-        if(usableValues.length === 1) return ""; // continue gen due to default values
-
-        return usableValues.join(" ").trim() + ";";
+        if(!!style.borderWidthBottom && !!style.borderStyleBottom){ // if both style and width exist, use border attr
+            return `border-bottom: ${getStringFor.unitedAttr(style.borderWidthBottom)} ${style.borderStyleBottom};`
+        } else if (!!style.borderWidthBottom){ // generate only the width attr
+            return `border-bottom-width: ${getStringFor.unitedAttr(style.borderWidthBottom)};`
+        } else if(!!style.borderStyleBottom) { // generate only the style attr
+            return `border-bottom-style: ${style.borderStyleBottom};`
+        } else { // continue gen due to undefined attr
+            return "";
+        }
     });
     hmap.set("030003x000", (): string => { // border left
         if( !USEBORDER ) return null; // don't do anything if we're not using a border
         
-        let usableValues: string[] = ["border-left:"];
-        if( !(cutil.isDefault(tag, style, "borderWidthLeft") && cutil.isDefault(tag, style, "borderStyleLeft")) ) {
-            usableValues.push(getStringFor.unitedAttr(style.borderWidthLeft));
-            usableValues.push(style.borderStyleLeft);
+        if(!!style.borderWidthLeft && !!style.borderStyleLeft){ // if both style and width exist, use border attr
+            return `border-left: ${getStringFor.unitedAttr(style.borderWidthLeft)} ${style.borderStyleLeft};`
+        } else if (!!style.borderWidthLeft){ // generate only the width attr
+            return `border-left-width: ${getStringFor.unitedAttr(style.borderWidthLeft)};`
+        } else if(!!style.borderStyleLeft) { // generate only the style attr
+            return `border-left-style: ${style.borderStyleLeft};`
+        } else { // continue gen due to undefined attr
+            return "";
         }
-
-        if(usableValues.length === 1) return ""; // continue gen due to default values
-
-        return usableValues.join(" ").trim() + ";";
     });
     
     const BRchunk = `0${USEBORDER ? 3 : 4}`;
@@ -447,6 +446,9 @@ const genMap = (tag: HTMLtags, conf: exportConfig, style: elementStyle, forceGen
     const USESHADOWS = ( style.USESHADOW && style.boxShadows.length > 0 ) || forceGen;
     hmap.set("070000x000", ():string => { // shadow work
         if( !USESHADOWS ) return null; // do not generate if we're not using shadows
+
+        // this should only run during force generation due to how USESHADOWS is defined
+        if(style.boxShadows.length === 0) return "box-shadow: none";
 
         let shadows: string[] = [];
 
