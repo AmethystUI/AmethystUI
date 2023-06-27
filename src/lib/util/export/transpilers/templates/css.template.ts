@@ -212,8 +212,10 @@ const genMap = (tag: HTMLtags, conf: exportConfig, style: elementStyle, forceGen
         if( !USEBORDER ) return null; // don't do anything if we're not using a border
         
         let usableValues: string[] = ["border-top:"];
-        if(!cutil.isDefault(tag, style, "borderWidthTop")) usableValues.push(getStringFor.unitedAttr(style.borderWidthTop));
-        if(!cutil.isDefault(tag, style, "borderStyleTop")) usableValues.push(style.borderStyleTop);
+        if( !(cutil.isDefault(tag, style, "borderWidthTop") && cutil.isDefault(tag, style, "borderStyleTop")) ) {
+            usableValues.push(getStringFor.unitedAttr(style.borderWidthTop));
+            usableValues.push(style.borderStyleTop);
+        }
 
         if(usableValues.length === 1) return ""; // continue gen due to default values
 
@@ -223,8 +225,10 @@ const genMap = (tag: HTMLtags, conf: exportConfig, style: elementStyle, forceGen
         if( !USEBORDER ) return null; // don't do anything if we're not using a border
         
         let usableValues: string[] = ["border-right:"];
-        if(!cutil.isDefault(tag, style, "borderWidthRight")) usableValues.push(getStringFor.unitedAttr(style.borderWidthTop));
-        if(!cutil.isDefault(tag, style, "borderStyleRight")) usableValues.push(style.borderStyleTop);
+        if( !(cutil.isDefault(tag, style, "borderWidthRight") && cutil.isDefault(tag, style, "borderStyleRight")) ) {
+            usableValues.push(getStringFor.unitedAttr(style.borderWidthRight));
+            usableValues.push(style.borderStyleRight);
+        }
 
         if(usableValues.length === 1) return ""; // continue gen due to default values
 
@@ -234,8 +238,10 @@ const genMap = (tag: HTMLtags, conf: exportConfig, style: elementStyle, forceGen
         if( !USEBORDER ) return null; // don't do anything if we're not using a border
         
         let usableValues: string[] = ["border-bottom:"];
-        if(!cutil.isDefault(tag, style, "borderWidthBottom")) usableValues.push(getStringFor.unitedAttr(style.borderWidthTop));
-        if(!cutil.isDefault(tag, style, "borderStyleBottom")) usableValues.push(style.borderStyleTop);
+        if( !(cutil.isDefault(tag, style, "borderWidthBottom") && cutil.isDefault(tag, style, "borderStyleBottom")) ) {
+            usableValues.push(getStringFor.unitedAttr(style.borderWidthBottom));
+            usableValues.push(style.borderStyleBottom);
+        };
 
         if(usableValues.length === 1) return ""; // continue gen due to default values
 
@@ -245,8 +251,10 @@ const genMap = (tag: HTMLtags, conf: exportConfig, style: elementStyle, forceGen
         if( !USEBORDER ) return null; // don't do anything if we're not using a border
         
         let usableValues: string[] = ["border-left:"];
-        if(!cutil.isDefault(tag, style, "borderWidthLeft")) usableValues.push(getStringFor.unitedAttr(style.borderWidthTop));
-        if(!cutil.isDefault(tag, style, "borderStyleLeft")) usableValues.push(style.borderStyleTop);
+        if( !(cutil.isDefault(tag, style, "borderWidthLeft") && cutil.isDefault(tag, style, "borderStyleLeft")) ) {
+            usableValues.push(getStringFor.unitedAttr(style.borderWidthLeft));
+            usableValues.push(style.borderStyleLeft);
+        }
 
         if(usableValues.length === 1) return ""; // continue gen due to default values
 
