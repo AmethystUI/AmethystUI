@@ -6,9 +6,15 @@ import { generateCSSTemplate, type CSSTemplate } from "./templates/css.template"
 import { exportConfigs } from "../exportManager";
 import cutil from "../../common";
 import { systemDefaultStyles } from "$src/lib/@const/element.const";
+import setImmediate from "../../setImmediate";
 import _ from "lodash";
+import { progressController } from "$src/lib/comp/overlays/overlayWindows/progress/progressOverlayManager";
 
-const exportCSS = async () => {
+export const estimateSteps = (): number => {
+    return get(collection).length;
+}
+
+const exportCSS = async (usePC = true) => {
     // Get current collection
     const coll: element[] = get(collection);
 
@@ -17,56 +23,62 @@ const exportCSS = async () => {
 
     // loop through every element to generate its relevant stylesheet code
     for(let i = 0; i < coll.length; i++) {
-        const currentElement = coll[i];
-        const elementStyle: elementStyle = currentElement.style;
-        const elementType: HTMLtags = currentElement.type;
-        
-        // generate template tree for current tag
-        const rootTemplate = generateCSSTemplate(get(exportConfigs), elementType, elementStyle);
-        // initialize buffer object and generate root style string
-        buffer[elementType] = {
-            style: getStyleString(rootTemplate),
-            psuedoElmnts: {},
-            overrideStyles: {}
-        }
+        await setImmediate(() => {
 
-        // generate styles for pseudo elements first
-        if(elementStyle.USETEXT && !!elementStyle.leadingContent){
-            buffer[elementType].psuedoElmnts["before"] = `content: "${elementStyle.leadingContent}";`;
-        }
-        if(elementStyle.USETEXT && !!elementStyle.trailingContent){
-            buffer[elementType].psuedoElmnts["after"] = `content: "${elementStyle.trailingContent}";`;
-        }
-
-        // export all overrides
-        for(let j = 0; j < currentElement.styleOverrides.length; j++) {
-            const overrideElmnt = currentElement.styleOverrides[j];
-            const paddedElmntStyle = _.defaultsDeep(elementStyle, systemDefaultStyles);
-            const overrideStyle = cutil.findDiff(overrideElmnt.style, paddedElmntStyle);
-
-            if(Object.keys(overrideStyle).length === 0) continue; // skip if there are no differences in this override. We don't need it.
-
-            // generate style template for override
-            const overrideTemplate = generateCSSTemplate(<exportConfig>{...get(exportConfigs), common: {compressionAmt: 0}}, elementType, overrideStyle, false);
-            buffer[elementType].overrideStyles[overrideElmnt.name] = {
-                style: getStyleString(overrideTemplate),
+            const currentElement = coll[i];
+            const elementStyle: elementStyle = currentElement.style;
+            const elementType: HTMLtags = currentElement.type;
+            
+            // generate template tree for current tag
+            const rootTemplate = generateCSSTemplate(get(exportConfigs), elementType, elementStyle);
+            // initialize buffer object and generate root style string
+            buffer[elementType] = {
+                style: getStyleString(rootTemplate),
                 psuedoElmnts: {},
-            };
+                overrideStyles: {}
+            }
+    
+            // generate styles for pseudo elements first
+            if(elementStyle.USETEXT && !!elementStyle.leadingContent){
+                buffer[elementType].psuedoElmnts["before"] = `content: "${elementStyle.leadingContent}";`;
+            }
+            if(elementStyle.USETEXT && !!elementStyle.trailingContent){
+                buffer[elementType].psuedoElmnts["after"] = `content: "${elementStyle.trailingContent}";`;
+            }
+    
+            // export all overrides
+            for(let j = 0; j < currentElement.styleOverrides.length; j++) {
+                const overrideElmnt = currentElement.styleOverrides[j];
+                const paddedElmntStyle = _.defaultsDeep(elementStyle, systemDefaultStyles);
+                const overrideStyle = cutil.findDiff(overrideElmnt.style, paddedElmntStyle);
+    
+                if(Object.keys(overrideStyle).length === 0) continue; // skip if there are no differences in this override. We don't need it.
+    
+                // generate style template for override
+                const overrideTemplate = generateCSSTemplate(<exportConfig>{...get(exportConfigs), common: {compressionAmt: 0}}, elementType, overrideStyle, false);
+                buffer[elementType].overrideStyles[overrideElmnt.name] = {
+                    style: getStyleString(overrideTemplate),
+                    psuedoElmnts: {},
+                };
+    
+                // generate pseudo elements for override
+                if(
+                    ( overrideStyle.USETEXT || elementStyle.USETEXT ) &&
+                    ( overrideStyle.leadingContent ?? "" ) !== elementStyle.leadingContent
+                ) {
+                    buffer[elementType].overrideStyles[overrideElmnt.name].psuedoElmnts["before"] = `content: "${overrideStyle.leadingContent ?? ""}";`;
+                }
+                if(
+                    ( overrideStyle.USETEXT || elementStyle.USETEXT ) &&
+                    ( overrideStyle.trailingContent ?? "" ) !== elementStyle.trailingContent
+                ){
+                    buffer[elementType].overrideStyles[overrideElmnt.name].psuedoElmnts["after"] = `content: "${overrideStyle.trailingContent ?? ""}";`;
+                }
+            }
 
-            // generate pseudo elements for override
-            if(
-                ( overrideStyle.USETEXT || elementStyle.USETEXT ) &&
-                ( overrideStyle.leadingContent ?? "" ) !== elementStyle.leadingContent
-            ) {
-                buffer[elementType].overrideStyles[overrideElmnt.name].psuedoElmnts["before"] = `content: "${overrideStyle.leadingContent ?? ""}";`;
-            }
-            if(
-                ( overrideStyle.USETEXT || elementStyle.USETEXT ) &&
-                ( overrideStyle.trailingContent ?? "" ) !== elementStyle.trailingContent
-            ){
-                buffer[elementType].overrideStyles[overrideElmnt.name].psuedoElmnts["after"] = `content: "${overrideStyle.trailingContent ?? ""}";`;
-            }
-        }
+            // advance progress controller if requested
+            if(usePC) progressController.advance();
+        })
     }
     
     let finalCSS = "";

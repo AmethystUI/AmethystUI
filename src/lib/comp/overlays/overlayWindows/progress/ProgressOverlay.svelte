@@ -13,12 +13,12 @@
     $: realProgress = $progressOverlayData.currentStep / $progressOverlayData.totalSteps * 100;
     $: progressTween.set(realProgress); // update the tween dynamically
     const progressTween = tweened(0, {
-		duration: 1000,
+		duration: 300,
 		easing: linear
 	});
 </script>
 
-<section transition:fly={{y: -50, opacity: 0, duration:700, delay: 100, easing: expoOut}}>
+<section in:fly={{y: -50, opacity: 0, duration:700, delay: 100, easing: expoOut}}>
     <div class="progress-bar" style="background: conic-gradient(hsl(270,100%,60%) {$progressTween}%, transparent 0%)"></div>
     
     <p>{$progressOverlayData.taskName}</p>

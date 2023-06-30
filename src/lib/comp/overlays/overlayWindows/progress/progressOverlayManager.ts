@@ -31,6 +31,8 @@ export const openProgressModal = (taskName: string, totalSteps: number): Promise
             if (ready) { // when ready, resolve with utilFunctions
                 // unsubscribe from progressModalReady to prevent memory leaks
                 unsub();
+                // reset overlay ready to false
+                overlayReady.set(false);
                 res();
             }
         });
@@ -40,10 +42,12 @@ export const openProgressModal = (taskName: string, totalSteps: number): Promise
 export const progressController = {
     async set (newStep: number, description = undefined) { // update the progress only. This does not pend result when the total step is reached.
         progressOverlayData.update(dat => {
-            dat.currentStep = newStep;
+            dat.currentStep = Math.min(newStep, get(progressOverlayData).totalSteps);
             dat.stepDescription = description;
             return dat;
         });
+        // wait for animation finish in case if we're awaiting
+        await new Promise(res => setTimeout(res, 300));
     },
     async advance (description = undefined) { // update the progress only. This does not pend result when the total step is reached.
         progressOverlayData.update(dat => {
@@ -51,6 +55,8 @@ export const progressController = {
             dat.stepDescription = description;
             return dat;
         });
+        // wait for animation finish in case if we're awaiting
+        await new Promise(res => setTimeout(res, 300));
     },
     async pendResult() { // instantly set the current step to the final step, and set the state to "pending"
         this.set(get(progressOverlayData).totalSteps);
@@ -58,6 +64,8 @@ export const progressController = {
             dat.state = "pending";
             return dat;
         });
+        // wait for animation finish in case if we're awaiting
+        await new Promise(res => setTimeout(res, 300));
     },
     async successResult() { // set the state to "success"
         // only allow this state to be set when the state is in "pending"

@@ -3,11 +3,14 @@
  * It also defines certain types and objects such as the available export formats, as well as the available settings for each file type.
  */
 
-import { writable } from "svelte/store"
+import { get, writable } from "svelte/store"
 import { progressController as PC } from "$src/lib/comp/overlays/overlayWindows/progress/progressOverlayManager";
 import exportCSS from "./transpilers/css";
+
+import { estimateSteps as estimateCSSsteps } from "./transpilers/css"
+
 import { openProgressModal } from "$src/lib/comp/overlays/overlayWindows/progress/progressOverlayManager";
-import { closeOverlay } from "$src/lib/comp/dynamicOverlay/DynamicOverlay.svelte";
+import { closeOverlay } from "$src/lib/comp/overlays/overlayManager";
 
 /**
  * A union type that represents supported file types.
@@ -74,12 +77,29 @@ export const exportTextFile = async (fileName: string, fileType: exportableFileT
 }
 
 export const startExport = async () => {
+    // estimate progress steps first
+    let steps = 0;
+    switch(get(targetFileType)){
+        case "css":
+            steps = estimateCSSsteps();
+            break;
+        case "json":
+            steps = 1;
+            break;
+        default:
+            break;
+    }
+    
+    console.log(steps);
+
     // bring up progress modal first
-    await openProgressModal("Exporting", 2);
+    await openProgressModal("Exporting", steps);
     
     await exportCSS();
-    
-    PC.set(12);
 
-    closeOverlay();
+    await PC.pendResult();
+
+    setTimeout(() => {
+        closeOverlay();
+    }, 300);
 }

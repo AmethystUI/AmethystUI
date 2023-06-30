@@ -7,11 +7,14 @@
             iconDir : "/src/assets/icons/css.svg",
             val : "css",
             alt : "CSS"
-        }, {
-            iconDir : "/src/assets/icons/scss.svg",
-            val : "scss",
-            alt : "SCSS"
-        }, {
+        },
+        // TODO: enable in future versions
+        // {
+        //     iconDir : "/src/assets/icons/scss.svg",
+        //     val : "scss",
+        //     alt : "SCSS"
+        // },
+        {
             iconDir : "/src/assets/icons/json.svg",
             val : "json",
             alt : "JSON"
