@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-    import { closeModal } from "$lib/stores/modalManager";
+    import { closeModal } from "$src/lib/comp/modals/modalManager";
     import { alignmentType, type multiToggleSelection } from "$lib/comp/ctrlMenuItems/StyleEditors/Basics/MultiToggle.svelte";
 
     const configFilters:multiToggleSelection<exportableFileTypes>[] = [

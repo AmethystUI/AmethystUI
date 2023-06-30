@@ -4,9 +4,10 @@
  */
 
 import { writable } from "svelte/store"
-import { openProgressModal } from "$src/lib/stores/modalManager"
-import { progressOverlayController as POC } from "../UI/progressOverlayController";
+import { progressController as PC } from "$src/lib/comp/overlays/overlayWindows/progress/progressOverlayManager";
 import exportCSS from "./transpilers/css";
+import { openProgressModal } from "$src/lib/comp/overlays/overlayWindows/progress/progressOverlayManager";
+import { closeOverlay } from "$src/lib/comp/dynamicOverlay/DynamicOverlay.svelte";
 
 /**
  * A union type that represents supported file types.
@@ -75,8 +76,10 @@ export const exportTextFile = async (fileName: string, fileType: exportableFileT
 export const startExport = async () => {
     // bring up progress modal first
     await openProgressModal("Exporting", 2);
-
+    
     await exportCSS();
+    
+    PC.set(12);
 
-    POC.set(12);
+    closeOverlay();
 }

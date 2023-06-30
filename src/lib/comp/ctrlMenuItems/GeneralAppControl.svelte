@@ -47,7 +47,7 @@
     import RegularControl from "./GeneralAppControl/RegularControl.svelte";
     import DropdownControl, { type menuItem } from "./GeneralAppControl/DropdownControl.svelte";
     import type { dropdownStatusType } from "../ctrlMenus/TopMenu.svelte";
-    import { openModal } from "$lib/stores/modalManager";
+    import { openModal } from "$src/lib/comp/modals/modalManager";
 
     export let dropdownStatus: dropdownStatusType = {
         currentID : "",

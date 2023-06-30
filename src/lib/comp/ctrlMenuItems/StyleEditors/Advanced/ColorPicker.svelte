@@ -6,7 +6,7 @@
     import { mainColorPickerData } from "$lib/stores/colorPickerManager";
 
     import { openColorPicker } from "../../../dynamicOverlay/overlays/ColorPickerOverlay.svelte";
-    import { keepOpenOverlay } from "../../../dynamicOverlay/OverlayBase.svelte";
+    import { keepOpenOverlay } from "../../../dynamicOverlay/DynamicOverlay.svelte";
 
     export let name:string;
     export let sub = false;

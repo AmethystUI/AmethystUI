@@ -128,7 +128,7 @@
     // ====================== UPDATE FUNCTIONS ======================
 
     import { beautifiedFontName, getFontNameValue, standardizedFontName } from "$lib/workers/pseudoWorkers/fonts";
-    import { keepOpenOverlay } from "../../dynamicOverlay/OverlayBase.svelte";
+    import { keepOpenOverlay } from "../../dynamicOverlay/DynamicOverlay.svelte";
     import { activeStyles } from "$lib/stores/activeStyles";
     import { systemDefaultStyles } from "$src/lib/@const/element.const";
 

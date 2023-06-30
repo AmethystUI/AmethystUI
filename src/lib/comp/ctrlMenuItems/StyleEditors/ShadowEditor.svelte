@@ -17,11 +17,11 @@
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
 
     import UnitInput from "./Basics/UnitInput.svelte";
-    import { mainOverlayData } from "$lib/stores/dynamicOverlayManager";
+    import { mainDoverlayData } from "$lib/stores/dynamicOverlayManager";
     import { mainColorPickerData, clearColorPickerRef } from "$lib/stores/colorPickerManager";
     
     import { openColorPicker } from "../../dynamicOverlay/overlays/ColorPickerOverlay.svelte";
-    import { keepOpenOverlay } from "../../dynamicOverlay/OverlayBase.svelte";
+    import { keepOpenOverlay } from "../../dynamicOverlay/DynamicOverlay.svelte";
     import { activeStyles } from "$lib/stores/activeStyles";
     import { fade } from "svelte/transition";
     import { flip } from "svelte/animate";
@@ -135,7 +135,7 @@
         clearColorPickerRef();
     }
     // if the picker visible and selects the shadow, we should show the indicator. This is true for all cases
-    $: if((!!$mainOverlayData.visible || !!$mainOverlayData.dragLocked) && $mainColorPickerData.refName === "MuxBoxShadClr" && shadows.length > 0){
+    $: if((!!$mainDoverlayData.visible || !!$mainDoverlayData.dragLocked) && $mainColorPickerData.refName === "MuxBoxShadClr" && shadows.length > 0){
         if(!showEditorIndicator) showEditorIndicator = true;
     } else {
         if(showEditorIndicator) showEditorIndicator = false;

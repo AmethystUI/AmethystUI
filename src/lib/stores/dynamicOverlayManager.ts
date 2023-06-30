@@ -20,7 +20,7 @@ export interface overlayData {
     activeComponentID : string
 }
 
-export let mainOverlayData = writable<overlayData>({
+export let mainDoverlayData = writable<overlayData>({
     x : 0,
     y : 0,
     w : 250,
@@ -38,32 +38,32 @@ export let mainOverlayData = writable<overlayData>({
 });
 
 export const setX = (val:number):Promise<void> => {
-    let currentVal:overlayData = get(mainOverlayData);
+    let currentVal:overlayData = get(mainDoverlayData);
     
     // do not update if drag locked is on
     if(currentVal.dragLocked) return;
 
     currentVal.x = val;
-    mainOverlayData.set({...currentVal});
+    mainDoverlayData.set({...currentVal});
 }
 export const setY = (val:number) => {
-    let currentVal:overlayData = get(mainOverlayData);
+    let currentVal:overlayData = get(mainDoverlayData);
         
     // do not update if drag locked is on
     if(currentVal.dragLocked) return;
 
     currentVal.y = val;
-    mainOverlayData.set({...currentVal});
+    mainDoverlayData.set({...currentVal});
 }
 export const setSelectedElmnt = (elmntNum?:number, overrideNum?:number) => {
     setTimeout(() => {
-        let currentVal:overlayData = get(mainOverlayData);
-        mainOverlayData.set({...currentVal});
+        let currentVal:overlayData = get(mainDoverlayData);
+        mainDoverlayData.set({...currentVal});
     }, 0);
 }
 
 // clears all prop references
 export const clearElmnt = () => {
-    let currentVal:overlayData = get(mainOverlayData);
-    mainOverlayData.set({...currentVal});
+    let currentVal:overlayData = get(mainDoverlayData);
+    mainDoverlayData.set({...currentVal});
 }

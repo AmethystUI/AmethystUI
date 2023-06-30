@@ -13,7 +13,7 @@
     import flipAnimate from '../../../../util/flipAnimate';
     import { mainFontPickerData } from '../../../../stores/fontPickerManager';
     import Title from '../Basics/Title.svelte';
-    import { keepOpenOverlay } from '../../../dynamicOverlay/OverlayBase.svelte';
+    import { keepOpenOverlay } from '../../../dynamicOverlay/DynamicOverlay.svelte';
     
     const disp = createEventDispatcher();
     

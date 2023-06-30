@@ -14,7 +14,7 @@
 
 <script lang="ts">
     import { get } from "svelte/store";
-    import DynamicOverlay from "$lib/comp/dynamicOverlay/OverlayBase.svelte";
+    import DynamicOverlay from "$src/lib/comp/dynamicOverlay/DynamicOverlay.svelte";
     import LeftMenu from "$lib/comp/ctrlMenus/LeftMenu.svelte";
     import RightMenu from "$lib/comp/ctrlMenus/RightMenu.svelte";
     import TopMenu from "$lib/comp/ctrlMenus/TopMenu.svelte";
@@ -24,12 +24,12 @@
     import { activeStyles } from "$lib/stores/activeStyles";
     import { addComponent, addOverride, collection, focusedComponent, focusedOverride, layerBlurLock, selectedComponent, selectedOverride } from "$lib/stores/collection"
     import { currentView } from "$lib/stores/viewingManager";
-    import { mainModalData, progressModalData } from "$lib/stores/modalManager";
+    import { mainModalData } from "$src/lib/comp/modals/modalManager";
     import ModalBase from "$lib/comp/modals/Modal.svelte";
-    import ProgressOverlay from "$lib/comp/modals/ProgressOverlay.svelte";
-    import setImmediate from "$lib/util/setImmediate";
+    import OverlayBase from "./lib/comp/overlays/Overlay.svelte";
     import { onMount, tick } from "svelte";
     import { initializeColorFromHSLA, initializeColorFromRGBA } from "./lib/util/colorMaths";
+    import { mainOverlayData } from "./lib/comp/overlays/overlayManager";
 
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
@@ -138,8 +138,8 @@
         <ModalBase />
     {/if}
 
-    {#if $progressModalData.opened}
-        <ProgressOverlay />
+    {#if $mainOverlayData.opened}
+        <OverlayBase />
     {/if}
 </main>
 

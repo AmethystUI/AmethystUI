@@ -2,7 +2,7 @@
 
 <!-- control functions for the overlay -->
 <script lang="ts" context="module">
-    import { openOverlayFrame } from "../OverlayBase.svelte";
+    import { openOverlayFrame } from "../DynamicOverlay.svelte";
     import { mainFontPickerData } from "$lib/stores/fontPickerManager";
     import { initializeMainFontPickerData, storedFontData } from "$lib/stores/fontStorageManager";
     import { beautifiedFontName, fontExtensionToFormats, getClosestVariation, getFontNameValue, searchFontIndex } from "$lib/workers/pseudoWorkers/fonts";
@@ -48,10 +48,10 @@
 
     // track if drag is locked or not to update our overlay sizing. We only want to update something when it's necessary
     // also track visible because hiding and showing it is weird
-    let dragLocked = get(mainOverlayData).dragLocked;
-    let lastDragLocked = get(mainOverlayData).dragLocked;
-    let visible = get(mainOverlayData).visible;
-    let lastVisible = get(mainOverlayData).visible;
+    let dragLocked = get(mainDoverlayData).dragLocked;
+    let lastDragLocked = get(mainDoverlayData).dragLocked;
+    let visible = get(mainDoverlayData).visible;
+    let lastVisible = get(mainDoverlayData).visible;
 
     let mainContainer:HTMLElement;
     let mainTitleContainer:HTMLElement;
@@ -102,8 +102,8 @@
      const updateOverlaySize = (forceUpdate = false) => { // we can forcefully override and update anyways
         setTimeout(() => { // set time out here so that elements have a chance to load
             // we only want to run when there's a change in drag and last dragged, or when an override is called
-            dragLocked = get(mainOverlayData).dragLocked;
-            visible = get(mainOverlayData).visible;
+            dragLocked = get(mainDoverlayData).dragLocked;
+            visible = get(mainDoverlayData).visible;
     
             // the element checking basically ensures there's something to update
             if(dragLocked === lastDragLocked && visible === lastVisible && !!mainContainer){
@@ -113,7 +113,7 @@
             // code starts executing here, if there is a change between dragLocked
     
             // If the update isn't an override, really only these code should be executed
-            mainOverlayData.update(overlayDat => {overlayDat.w = normalOverlayWidth; return overlayDat});
+            mainDoverlayData.update(overlayDat => {overlayDat.w = normalOverlayWidth; return overlayDat});
     
             // these determine how to update the sizing based on the mode
             if(!!dragLocked){ // how to update the overlay when it's dragged out
@@ -135,7 +135,7 @@
             }
     
             // update values
-            mainOverlayData.update(overlayDat => {
+            mainDoverlayData.update(overlayDat => {
                 overlayDat.h = targetHeight;
                 overlayDat.cursorOffsetY = targetCursorOffset;
                 return overlayDat;
@@ -155,7 +155,7 @@
     import FontPickerOverlay from "./FontPickerOverlay.svelte"; // this import causes circular dependency warning in the compiler, but it works for now. It might be an issue in the future, so keep an eye out on this line.
     
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
-    import { mainOverlayData } from "$lib/stores/dynamicOverlayManager";
+    import { mainDoverlayData } from "$lib/stores/dynamicOverlayManager";
     import { get } from "svelte/store";
     import MultiSelect, { textDecoration, typeFilters } from "$lib/comp/ctrlMenuItems/StyleEditors/Basics/MultiSelect.svelte";
     import MultiToggle, { textAlignment, textCasing } from "$lib/comp/ctrlMenuItems/StyleEditors/Basics/MultiToggle.svelte";

@@ -5,13 +5,13 @@
     import { setX, setY } from "$lib/stores/dynamicOverlayManager";
 
     // position & sizing tweening setup. These values are constantly being updated, so they have a flat accelerations.
-    const xTween = tweened(get(mainOverlayData).x, {easing: linear});
-    const yTween = tweened(get(mainOverlayData).y, {easing: linear});
-    const wTween = tweened(get(mainOverlayData).w, {easing: linear});
-    const hTween = tweened(get(mainOverlayData).h, {easing: linear});
+    const xTween = tweened(get(mainDoverlayData).x, {easing: linear});
+    const yTween = tweened(get(mainDoverlayData).y, {easing: linear});
+    const wTween = tweened(get(mainDoverlayData).w, {easing: linear});
+    const hTween = tweened(get(mainDoverlayData).h, {easing: linear});
 
     // the drag handle elements and tracker
-    let dragHandleBar:HTMLDivElement, dragArea:HTMLDivElement, overlayScaler:HTMLElement, overlayContainer:HTMLElement;
+    let dragHandleBar:HTMLDivElement, overlayScaler:HTMLElement, overlayContainer:HTMLElement;
     let dragThreshold = 100; // px
     let initCurX:number, initCurY:number;
     let initOverlayX:number, initOverlayY:number;
@@ -45,7 +45,7 @@
 
         // update overlay size based on content
 
-        mainOverlayData.update(overlayDat => { // update the overlay
+        mainDoverlayData.update(overlayDat => { // update the overlay
             overlayDat.overlayLocked=true; // lock overlay so it doesn't click off when activating
             overlayDat.isOpening = true;
             overlayDat.activeComponentID = componentID; // update active component ID
@@ -54,7 +54,7 @@
 
         // reset the opening latch so we can still close the overlay
         setTimeout(() => {
-            mainOverlayData.update(overlayDat => {
+            mainDoverlayData.update(overlayDat => {
                 overlayDat.isOpening = false;
                 return overlayDat
             });
@@ -63,15 +63,15 @@
         setTimeout(() => {
             trackOverlay(trackingTarget, false);
 
-            mainOverlayData.update(overlayDat => { // update the overlay
+            mainDoverlayData.update(overlayDat => { // update the overlay
                 overlayDat.visible=true; // show overlay
                 return overlayDat
             });
         }, 30); // 30ms update window for the width to change properly and shit. Again, not the best practice but whatever.
 
         // clear last tracking
-        cancelAnimationFrame(get(mainOverlayData).positionTrackingID);
-        mainOverlayData.update(overlayDat => {overlayDat.positionTrackingID = undefined; return overlayDat}); // We're setting trackingID to undefined so we can clear it.
+        cancelAnimationFrame(get(mainDoverlayData).positionTrackingID);
+        mainDoverlayData.update(overlayDat => {overlayDat.positionTrackingID = undefined; return overlayDat}); // We're setting trackingID to undefined so we can clear it.
         
         // update the position of the overlay and show it
         trackOverlay(trackingTarget, trackContinuously);
@@ -87,17 +87,17 @@
      */
     export function closeOverlay():void {
         // cancel position tracking
-        cancelAnimationFrame(get(mainOverlayData).positionTrackingID);
+        cancelAnimationFrame(get(mainDoverlayData).positionTrackingID);
         
         setTimeout(() => {
-            if(get(mainOverlayData).isOpening){ // when this execisOpeningmeans that the reopening latch is opened and we shouldn't close the overlay. We will reset the latch and then close it on the next call.
-                mainOverlayData.update(overlayDat => {overlayDat.isOpening = false; return overlayDat});
+            if(get(mainDoverlayData).isOpening){ // when this execisOpeningmeans that the reopening latch is opened and we shouldn't close the overlay. We will reset the latch and then close it on the next call.
+                mainDoverlayData.update(overlayDat => {overlayDat.isOpening = false; return overlayDat});
                 return;
             }
     
             overlayScaler.style.transitionDuration = "300ms";
     
-            mainOverlayData.update(overlayDat => {
+            mainDoverlayData.update(overlayDat => {
                 overlayDat.visible = false; // hide the overlay
                 overlayDat.dragLocked = false; // undo drag lock
                 overlayDat.overlayLocked = false; // undo overlay lock
@@ -107,7 +107,7 @@
             })
 
             // clear tracking animation
-            mainOverlayData.update(overlayDat => {overlayDat.positionTrackingID = undefined; return overlayDat});
+            mainDoverlayData.update(overlayDat => {overlayDat.positionTrackingID = undefined; return overlayDat});
 
             // reset content
             content1 = null;
@@ -125,27 +125,27 @@
      * This function prevents the overlay from closing when open. It is mostly used to keep the overlay open.
      */
     export function keepOpenOverlay():void {
-        mainOverlayData.update(overlayDat => {overlayDat.overlayLocked=true; return overlayDat}); // lock overlay so it doesn't click off when clicking on the picker
-        if(get(mainOverlayData).visible) mainOverlayData.update(overlayDat => {overlayDat.visible=true; return overlayDat});
+        mainDoverlayData.update(overlayDat => {overlayDat.overlayLocked=true; return overlayDat}); // lock overlay so it doesn't click off when clicking on the picker
+        if(get(mainDoverlayData).visible) mainDoverlayData.update(overlayDat => {overlayDat.visible=true; return overlayDat});
     }
 
     // ======================== NON EXPORTABLES ========================
 
     // close the overlay with a click
     const closeOverlayWithMouse = (e:MouseEvent) => {
-        if(!get(mainOverlayData).overlayLocked && !get(mainOverlayData).dragLocked){ // if not locked, remove picker overlay
+        if(!get(mainDoverlayData).overlayLocked && !get(mainDoverlayData).dragLocked){ // if not locked, remove picker overlay
             closeOverlay();
         }
     }
     
     // close the overlay with a key press
     const closeOverlayWithKey = (e:KeyboardEvent) => {
-        if(!get(mainOverlayData).dragLocked && !!e["key"] && e["key"] === "Escape") closeOverlay();
+        if(!get(mainDoverlayData).dragLocked && !!e["key"] && e["key"] === "Escape") closeOverlay();
     }
 
     // unlock the overlay with a mouse up
     const unlockOverlay = () => {
-        mainOverlayData.update(overlayDat => {
+        mainDoverlayData.update(overlayDat => {
             overlayDat.overlayLocked = false;
             return overlayDat
         });
@@ -163,22 +163,22 @@
         const targetBB:DOMRect = target.getBoundingClientRect(); // get target position
         
         // set the X and Y position of the overlay and animate them. The min and max is for clamping the window position to be within the bounds of the window
-        setX(Math.round(Math.min( window.innerWidth - get(mainOverlayData).w/2 - 6, Math.max( get(mainOverlayData).w/2 + 6, targetBB.x - get(mainOverlayData).w/2 - 20 ) )));
-        setY(Math.round(Math.min( window.innerHeight - get(mainOverlayData).h/2 - 6, Math.max( get(mainOverlayData).h/2 + 6, targetBB.y + 20 ) )));
+        setX(Math.round(Math.min( window.innerWidth - get(mainDoverlayData).w/2 - 6, Math.max( get(mainDoverlayData).w/2 + 6, targetBB.x - get(mainDoverlayData).w/2 - 20 ) )));
+        setY(Math.round(Math.min( window.innerHeight - get(mainDoverlayData).h/2 - 6, Math.max( get(mainDoverlayData).h/2 + 6, targetBB.y + 20 ) )));
 
-        xTween.set(get(mainOverlayData).x, {duration: !visible ? 0.001 : 200});
-        wTween.set(get(mainOverlayData).w, {duration: !visible ? 0.001 : 200});
-        yTween.set(get(mainOverlayData).y, {duration: !visible ? 0.001 : 200});
-        hTween.set(get(mainOverlayData).h, {duration: !visible ? 0.001 : 200});
+        xTween.set(get(mainDoverlayData).x, {duration: !visible ? 0.001 : 200});
+        wTween.set(get(mainDoverlayData).w, {duration: !visible ? 0.001 : 200});
+        yTween.set(get(mainDoverlayData).y, {duration: !visible ? 0.001 : 200});
+        hTween.set(get(mainDoverlayData).h, {duration: !visible ? 0.001 : 200});
 
         // set the tweens to the destination if it's accurate enough
-        if(Math.round(get(xTween)) === get(mainOverlayData).x) xTween.set(get(mainOverlayData).x, {duration: 0.001})
-        if(Math.round(get(yTween)) === get(mainOverlayData).y) yTween.set(get(mainOverlayData).y, {duration: 0.001})
-        if(Math.round(get(wTween)) === get(mainOverlayData).w) wTween.set(get(mainOverlayData).w, {duration: 0.001})
-        if(Math.round(get(hTween)) === get(mainOverlayData).h) hTween.set(get(mainOverlayData).h, {duration: 0.001})
+        if(Math.round(get(xTween)) === get(mainDoverlayData).x) xTween.set(get(mainDoverlayData).x, {duration: 0.001})
+        if(Math.round(get(yTween)) === get(mainDoverlayData).y) yTween.set(get(mainDoverlayData).y, {duration: 0.001})
+        if(Math.round(get(wTween)) === get(mainDoverlayData).w) wTween.set(get(mainDoverlayData).w, {duration: 0.001})
+        if(Math.round(get(hTween)) === get(mainDoverlayData).h) hTween.set(get(mainDoverlayData).h, {duration: 0.001})
 
         if(trackContinuously) { // continuously update the trackingID
-            mainOverlayData.update(overlayDat => { // the part that updates the overlayData with the new trackingID
+            mainDoverlayData.update(overlayDat => { // the part that updates the overlayData with the new trackingID
                 // get new animation frame
                 overlayDat.positionTrackingID = requestAnimationFrame(() => trackOverlay(target, trackContinuously));
                 return overlayDat;
@@ -245,7 +245,7 @@
     import { tweened } from 'svelte/motion';
 	import { linear } from 'svelte/easing';
     
-    import { mainOverlayData } from "$lib/stores/dynamicOverlayManager";
+    import { mainDoverlayData } from "$lib/stores/dynamicOverlayManager";
 
     $: x = $xTween;
     $: y = $yTween;
@@ -253,16 +253,16 @@
     $: h = $hTween;
 
     // update overlay position, size, and visibility
-    $: if(!!$mainOverlayData){
-        visible = $mainOverlayData.visible;
+    $: if(!!$mainDoverlayData){
+        visible = $mainDoverlayData.visible;
         
         // this is to prevent the overlay from getting scrolled out of view. We only activate this when we're not dragging on the picker
-        if(!$mainOverlayData.dragLocked){
-            if($mainOverlayData.y - $mainOverlayData.h/2 <= 10){
-                $mainOverlayData.y = 10 + $mainOverlayData.h/2;
+        if(!$mainDoverlayData.dragLocked){
+            if($mainDoverlayData.y - $mainDoverlayData.h/2 <= 10){
+                $mainDoverlayData.y = 10 + $mainDoverlayData.h/2;
             }
-            else if($mainOverlayData.y + $mainOverlayData.h/2 > window.innerHeight - 10){
-                $mainOverlayData.y = window.innerHeight - 10 - $mainOverlayData.h/2;
+            else if($mainDoverlayData.y + $mainDoverlayData.h/2 > window.innerHeight - 10){
+                $mainDoverlayData.y = window.innerHeight - 10 - $mainDoverlayData.h/2;
             }
         }
     }
@@ -276,18 +276,18 @@
         initCurY = e.clientY;
 
         // track initial overlay positions
-        initOverlayX = $mainOverlayData.x;
-        initOverlayY = $mainOverlayData.y;
+        initOverlayX = $mainDoverlayData.x;
+        initOverlayY = $mainDoverlayData.y;
         // calculate offset
         offsetCurX = initCurX - overlayContainer.getBoundingClientRect().x;
         offsetCurY = initCurY - overlayContainer.getBoundingClientRect().y;
 
         // reset all cursor offsets
-        $mainOverlayData.cursorOffsetX = 0;
-        $mainOverlayData.cursorOffsetY = 0;
+        $mainDoverlayData.cursorOffsetX = 0;
+        $mainDoverlayData.cursorOffsetY = 0;
 
         // scale up window if dragged when snapped
-        if($mainOverlayData.dragLocked) overlayScaler.style.transform = `scale(${overlayPickupSize}%) translate3d(0px, 0px, 0px)`;
+        if($mainDoverlayData.dragLocked) overlayScaler.style.transform = `scale(${overlayPickupSize}%) translate3d(0px, 0px, 0px)`;
 
         // add event listeners
         window.addEventListener("mousemove", dragWindow);
@@ -302,53 +302,53 @@
 
         const largestDelta = Math.max(Math.abs(deltaX), Math.abs(deltaY));
         // move the handle to show it being unsnapped
-        if(!$mainOverlayData.dragLocked){
+        if(!$mainDoverlayData.dragLocked){
             // dragHandleBar.style.transform = `translate3d(${deltaX/3}px, ${deltaY/3}px, 0px)`;
             overlayScaler.style.transform = `scale(${100 + (largestDelta * (overlayPickupSize-100) / dragThreshold)}%) translate3d(${deltaX/2.5}px, ${deltaY/2.5}px, 0px)`;
         }
 
-        if(largestDelta > dragThreshold || $mainOverlayData.dragLocked){
+        if(largestDelta > dragThreshold || $mainDoverlayData.dragLocked){
             // when this if statement executes, the window has either been snapped off or is dragged normally
-            if(!$mainOverlayData.dragLocked){
+            if(!$mainDoverlayData.dragLocked){
                 overlayScaler.style.transitionDuration = `${800}ms`;
                 overlayScaler.style.transform = `scale(${overlayPickupSize}%) translate3d(0px, 0px, 0px)`
                 dragHandleBar.style.transitionDuration = `${800}ms`;
                 dragHandleBar.style.transform = `translate3d(0px, 0px, 0px)`;
 
                 // when it snaps off, retrack the initial pos X and Y of cursor and overlay
-                initOverlayX = e.clientX - offsetCurX + $mainOverlayData.w/2;
-                initOverlayY = e.clientY - offsetCurY + $mainOverlayData.h/2;
+                initOverlayX = e.clientX - offsetCurX + $mainDoverlayData.w/2;
+                initOverlayY = e.clientY - offsetCurY + $mainDoverlayData.h/2;
                 initCurX = e.clientX;
                 initCurY = e.clientY;
             }
             
             // snap the window x and y to cursor position
-            $mainOverlayData.dragLocked = true;
+            $mainDoverlayData.dragLocked = true;
 
             // update frame size to the correct size;
             updateFrameSize(true);
 
             // prevent user dragging overlay out of window
             // I have no idea why this abomination works but it's not broken so i'm not gonna fix it
-            if(e.clientX - offsetCurX > 10 && e.clientX - offsetCurX + $mainOverlayData.w < (window.innerWidth - 10)){ // X axis
-                $mainOverlayData.x = initOverlayX + deltaX + ($mainOverlayData.initialDrag ? $mainOverlayData.cursorOffsetX : 0);
+            if(e.clientX - offsetCurX > 10 && e.clientX - offsetCurX + $mainDoverlayData.w < (window.innerWidth - 10)){ // X axis
+                $mainDoverlayData.x = initOverlayX + deltaX + ($mainDoverlayData.initialDrag ? $mainDoverlayData.cursorOffsetX : 0);
             } else {
                 if(e.clientX - offsetCurX <= 10){
-                    $mainOverlayData.x = 10 + $mainOverlayData.w/2;
+                    $mainDoverlayData.x = 10 + $mainDoverlayData.w/2;
                 }
                 else{
-                    $mainOverlayData.x = window.innerWidth - $mainOverlayData.w/2 - 10;
+                    $mainDoverlayData.x = window.innerWidth - $mainDoverlayData.w/2 - 10;
                 }
             }
 
-            if(e.clientY - offsetCurY > 12 && e.clientY - offsetCurY + $mainOverlayData.h < (window.innerHeight - 12)){ // Y axis
-                $mainOverlayData.y = initOverlayY + deltaY +  ($mainOverlayData.initialDrag ? $mainOverlayData.cursorOffsetY : 0);
+            if(e.clientY - offsetCurY > 12 && e.clientY - offsetCurY + $mainDoverlayData.h < (window.innerHeight - 12)){ // Y axis
+                $mainDoverlayData.y = initOverlayY + deltaY +  ($mainDoverlayData.initialDrag ? $mainDoverlayData.cursorOffsetY : 0);
             } else {
                 if(e.clientY - offsetCurY <= 12){
-                    $mainOverlayData.y = 12 + $mainOverlayData.h/2;
+                    $mainDoverlayData.y = 12 + $mainDoverlayData.h/2;
                 }
                 else{
-                    $mainOverlayData.y = window.innerHeight - $mainOverlayData.h/2 - 12;
+                    $mainDoverlayData.y = window.innerHeight - $mainDoverlayData.h/2 - 12;
                 }
             }
 
@@ -363,8 +363,8 @@
         dragHandleBar.style.transform = `translate3d(0px, 0px, 0px)`;
 
         // update the initialDrag latch
-        if(!!$mainOverlayData.dragLocked){
-            $mainOverlayData.initialDrag = false;
+        if(!!$mainDoverlayData.dragLocked){
+            $mainDoverlayData.initialDrag = false;
         }
 
         window.removeEventListener("mousemove", dragWindow);
@@ -372,36 +372,36 @@
     }
 
     const lockOverlay = () => {
-        $mainOverlayData.overlayLocked = true;
+        $mainDoverlayData.overlayLocked = true;
     }
     const unlockOverlay = () => {
         setTimeout(() => {
-            $mainOverlayData.overlayLocked = false;
+            $mainDoverlayData.overlayLocked = false;
         }, 0);
     }
 
     // detect when window changes width, and adjust the position of color picker as needed
     window.addEventListener("resize", e => {
-        if(!$mainOverlayData.dragLocked) return; // only activate when dragLocked
+        if(!$mainDoverlayData.dragLocked) return; // only activate when dragLocked
         
-        if($mainOverlayData.x - $mainOverlayData.w/2 <= 10){
-            $mainOverlayData.x = 10 + $mainOverlayData.w/2;
+        if($mainDoverlayData.x - $mainDoverlayData.w/2 <= 10){
+            $mainDoverlayData.x = 10 + $mainDoverlayData.w/2;
         }
-        else if($mainOverlayData.x + $mainOverlayData.w/2 > window.innerWidth - 10){
-            $mainOverlayData.x = window.innerWidth - $mainOverlayData.w/2 - 10;
+        else if($mainDoverlayData.x + $mainDoverlayData.w/2 > window.innerWidth - 10){
+            $mainDoverlayData.x = window.innerWidth - $mainDoverlayData.w/2 - 10;
         }
-        if($mainOverlayData.y - $mainOverlayData.h/2 <= 10){
-            $mainOverlayData.y = 10 + $mainOverlayData.h/2;
+        if($mainDoverlayData.y - $mainDoverlayData.h/2 <= 10){
+            $mainDoverlayData.y = 10 + $mainDoverlayData.h/2;
         }
-        else if($mainOverlayData.y + $mainOverlayData.h/2 > window.innerHeight - 10){
-            $mainOverlayData.y = window.innerHeight - 10 - $mainOverlayData.h/2;
+        else if($mainDoverlayData.y + $mainDoverlayData.h/2 > window.innerHeight - 10){
+            $mainDoverlayData.y = window.innerHeight - 10 - $mainDoverlayData.h/2;
         }
     })
 </script>
 
-<section bind:this={overlayContainer} id="overlayContainer" class={`${visible ? `${$mainOverlayData.dragLocked ? "" : ""}` : "hidden"}`} style={`transform: translate3d(${x - $mainOverlayData.w/2}px,${y - $mainOverlayData.h/2}px,0px); width: ${$mainOverlayData.w}px; height: ${$mainOverlayData.h}px`}>
+<section bind:this={overlayContainer} id="overlayContainer" class={`${visible ? `${$mainDoverlayData.dragLocked ? "" : ""}` : "hidden"}`} style={`transform: translate3d(${x - $mainDoverlayData.w/2}px,${y - $mainDoverlayData.h/2}px,0px); width: ${$mainDoverlayData.w}px; height: ${$mainDoverlayData.h}px`}>
     <main on:mousedown={lockOverlay} on:mouseup={unlockOverlay} style={`
-            transform: scale(${$mainOverlayData.visible ? 100 : 80}%);
+            transform: scale(${$mainDoverlayData.visible ? 100 : 80}%);
         `} bind:this={overlayScaler}>
         
         <!-- background that can change size -->
@@ -421,7 +421,7 @@
         </div>
 
         <!-- drag handle -->
-        <div bind:this={dragArea} id="drag-handle" on:mousedown={startDragWindow} style={`transform: translate3d(0px, -${h/2-17}px, 0px)`}>
+        <div id="drag-handle" on:mousedown={startDragWindow} style={`transform: translate3d(0px, -${h/2-17}px, 0px)`}>
             <!-- for decorative purposes only -->
             <div id="handle-bar" bind:this={dragHandleBar}>
                 <div></div>
