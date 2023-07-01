@@ -1,17 +1,11 @@
 import { writable, get } from 'svelte/store';
 
-export interface status{
-    name: string,
-    saved: boolean,
-    autoSavetoCloud: boolean,
-    alwaysShowSaveStatus: boolean
-};
-
-export let fileStat = writable<status>({
+const defaultFileSettings = {
     name: "Untitled",
     saved: false,
     autoSavetoCloud: false,
     alwaysShowSaveStatus: false
-});
+}
+export let fileSettings = writable<typeof defaultFileSettings>(defaultFileSettings);
 
-export let saveName = writable<string>(get(fileStat).name);
+export let saveName = writable<string>(get(fileSettings).name);

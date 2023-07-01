@@ -1,11 +1,18 @@
 import { writable } from "svelte/store";
-import type { modalOverlayData } from "../modals/modalManager";
 
-export const mainOverlayData = writable<modalOverlayData>({
+const knownID = ["progress"] as const;
+export type overlayID = typeof knownID[number];
+
+interface overlayInfo {
+    opened: boolean;
+    windowID: overlayID | null;
+}
+
+export const mainOverlayData = writable<overlayInfo>({
     opened: false,
-    windowID: ""
+    windowID: null
 });
-export let openOverlay = (id: string) => {
+export let openOverlay = (id: overlayID) => {
     mainOverlayData.set({
         opened: true,
         windowID: id
@@ -16,7 +23,7 @@ export let closeOverlay = () => {
 
     mainOverlayData.set({
         opened: false,
-        windowID: ""
+        windowID: null
     })
 }
 

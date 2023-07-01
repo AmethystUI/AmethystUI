@@ -54,10 +54,10 @@
                 }
                 a{
                     color: $primaryl9;
-                    border-color: none;
+                    border-color: $primaryl9;
 
                     &:hover{
-                        background: $primaryl9;
+                        background-color: $primaryl9;
                         color: $primary;
                     }
                 }
@@ -75,10 +75,11 @@
                 }
                 a{
                     color: $primary;
+                    border-color: $primary;
                     background-color: none;
 
                     &:hover{
-                        background: $primary;
+                        background-color: $primary;
                         color: $secondary;
                     }
                 }
@@ -101,11 +102,9 @@
             }
 
             a{
-                transition: $transitionDuration linear;
-                transition-property: border-color;
-                text-decoration: none;
-                font-size: 14px;
-                padding: 8px 12px 8px 12px; margin-top: 40px;
+                text-decoration: none; box-sizing: border-box;
+                font-size: 13px;
+                padding: 7px 15px; margin-top: 40px;
                 border: 1.5px solid;
                 border-radius: 8px;
                 font-variation-settings: "wght" 600;

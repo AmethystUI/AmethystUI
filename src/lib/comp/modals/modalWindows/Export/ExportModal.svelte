@@ -56,7 +56,7 @@
     import CompressionSettings from "./settingPanels/CompressionSettings.svelte";
     import ScssSpecificSettings from "./settingPanels/ScssSpecificSettings.svelte";
     import { startExport } from "$lib/util/export/exportManager";
-    import { fileStat, saveName } from "$src/lib/stores/fileStatus";
+    import { fileSettings, saveName } from "$src/lib/stores/fileStatus";
 
     $: currentFilterIndex = configFilters.map(item => item.val).indexOf($targetFileType);
 
@@ -128,7 +128,7 @@
 
     <!-- file name & export -->
     <section id="export-container">
-        <input bind:this={saveNameInput} on:keypress={updateSaveName} type="text" value="{$saveName}" placeholder="{$fileStat.name}"/>
+        <input bind:this={saveNameInput} on:keypress={updateSaveName} type="text" value="{$saveName}" placeholder="{$fileSettings.name}"/>
         
         <!-- cancel export -->
         <button class="secondary-btn" style="margin: 0px 10px 0px 10px" on:click={closeModal}>Cancel</button>

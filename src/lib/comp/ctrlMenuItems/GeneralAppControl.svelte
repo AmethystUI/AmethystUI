@@ -81,10 +81,10 @@
 
 <!-- HTML -->
 <main bind:this={mainContainer}>
-    <!-- TODO: contact server later to get pfp -->
-    <DropdownControl alt="My Account" id="accountConfig" items={accountItems} {...dropdownStatus} on:openDropdown={openOverlay} on:closeDropdown={() => closeOverlay()} on:keepOpenDropdown={keepOpenDropdown} on:updateCurrentID={updateCurrentID} evenSpacing={true} showArrow={false} showHoverEffect={false}>
+    <!-- TODO: contact server later to get pfp and do account verificatino -->
+    <!-- <DropdownControl alt="My Account" id="accountConfig" items={accountItems} {...dropdownStatus} on:openDropdown={openOverlay} on:closeDropdown={() => closeOverlay()} on:keepOpenDropdown={keepOpenDropdown} on:updateCurrentID={updateCurrentID} evenSpacing={true} showArrow={false} showHoverEffect={false}>
         <img id="pfp" src="/src/assets/pngs/testpfp.png" alt="">
-    </DropdownControl>
+    </DropdownControl> -->
 
     <!-- export -->
     <RegularControl imageURI="/src/assets/icons/share.svg" alt="Export" cta={() => openModal("export")} />

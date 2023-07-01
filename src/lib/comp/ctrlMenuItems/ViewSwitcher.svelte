@@ -1,5 +1,6 @@
 <script lang="ts">
     import { currentView, type viewTypes } from "$lib/stores/viewingManager";
+    import { openModal } from "../modals/modalManager";
     import MultiToggle, { type multiToggleSelection } from "./StyleEditors/Basics/MultiToggle.svelte";
 
     const viewToggleElements:multiToggleSelection<viewTypes>[] = [
@@ -20,11 +21,16 @@
         // assign value
         currentView.set(value);
     }
+
+    const openAboutApp = () => {
+        openModal("appinfo");
+    }
 </script>
 
 <!-- HTML -->
 <main>
-    <a href="https://google.com"><img src="/src/assets/svgs/emblem_flat.svg" alt=""></a>
+    <button on:click={openAboutApp}><img src="/src/assets/svgs/emblem_flat.svg" alt=""></button>
+    
     <section>
         <MultiToggle elements={viewToggleElements} selection={0} on:valueChange={updateView}/>
         <div style="width: 10px"></div>
@@ -43,7 +49,8 @@
             display: flex; justify-content: center; align-items: center;
         }
 
-        a{
+        button{
+            background: none; border: none; outline: none;
             opacity:0.25;
             transition: opacity 100ms ease;
             user-select: none; -webkit-user-select: none; -webkit-user-drag: none;

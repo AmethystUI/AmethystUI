@@ -134,7 +134,7 @@
     <!-- color picker overlay -->
     <DynamicOverlay />
 
-    {#if $mainModalData.opened}
+    {#if $mainModalData.opened && $mainModalData.windowID !== null}
         <ModalBase />
     {/if}
 

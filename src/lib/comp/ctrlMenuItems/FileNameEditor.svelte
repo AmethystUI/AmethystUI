@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { fileStat, saveName } from "$lib/stores/fileStatus";
+    import { fileSettings, saveName } from "$lib/stores/fileStatus";
 
     export let leftMenuWidth = 260;
     export let controlSectionWidth = 500;
@@ -9,9 +9,9 @@
     const preventNewline = (e:KeyboardEvent):void =>{
         if(e.key === "Enter" || e.key === "Escape"){
             e.preventDefault();
-            $fileStat.name = trimName(fileNameField.textContent)
-            $saveName = $fileStat.name; // update save name
-            fileNameField.textContent = $fileStat.name;
+            $fileSettings.name = trimName(fileNameField.textContent)
+            $saveName = $fileSettings.name; // update save name
+            fileNameField.textContent = $fileSettings.name;
             fileNameField.blur();
             return;
         }
@@ -52,16 +52,16 @@
 
 <!-- HTML -->
 <main>
-    <span contenteditable=true placeholder="Untitled" on:keypress={preventNewline} on:paste={pastePlainText} bind:this={fileNameField} style="max-width:calc(100vw - {leftMenuWidth}px - {controlSectionWidth}px)">{$fileStat.name}</span>
+    <span contenteditable=true placeholder="Untitled" on:keypress={preventNewline} on:paste={pastePlainText} bind:this={fileNameField} style="max-width:calc(100vw - {leftMenuWidth}px - {controlSectionWidth}px)">{$fileSettings.name}</span>
 
-    {#if $fileStat.alwaysShowSaveStatus}
-        {#if !$fileStat.saved}
+    {#if $fileSettings.alwaysShowSaveStatus}
+        {#if !$fileSettings.saved}
             <p>Edited</p>
         {:else}
             <p>Saved</p>
         {/if}
     {:else}
-        {#if !$fileStat.saved}
+        {#if !$fileSettings.saved}
             <p>Edited</p>
         {/if}
     {/if}
