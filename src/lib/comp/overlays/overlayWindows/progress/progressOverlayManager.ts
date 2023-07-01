@@ -75,7 +75,6 @@ export const progressController = {
         // update to success 
         if (get(progressOverlayData).state === "pending") {
             progressOverlayData.update(dat => {
-                dat.taskName = "Export Successful!";
                 dat.state = "success";
                 return dat;
             });
