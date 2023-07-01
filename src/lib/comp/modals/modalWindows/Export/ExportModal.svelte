@@ -50,17 +50,49 @@
 
 <script lang="ts">
     import MultiToggle from "$lib/comp/ctrlMenuItems/StyleEditors/Basics/MultiToggle.svelte";
-    import { nonStylesheetTypes } from "$src/lib/util/export/exportManager";
+    import { nonStylesheetTypes, targetFileType } from "$src/lib/util/export/exportManager";
     import ColorSettings from "./settingPanels/ColorSettings.svelte";
     import FontSettings from "./settingPanels/FontSettings.svelte";
     import CompressionSettings from "./settingPanels/CompressionSettings.svelte";
     import ScssSpecificSettings from "./settingPanels/ScssSpecificSettings.svelte";
     import { startExport } from "$lib/util/export/exportManager";
+    import { fileStat, saveName } from "$src/lib/stores/fileStatus";
 
-    let currentConfigFilter: exportableFileTypes = "css";
-    $: currentFilterIndex = configFilters.map(item => item.val).indexOf(currentConfigFilter);
+    $: currentFilterIndex = configFilters.map(item => item.val).indexOf($targetFileType);
 
-    const updateConfigFilter = (e: CustomEvent) => currentConfigFilter = e.detail.value;
+    const updateConfigFilter = (e: CustomEvent) => $targetFileType = e.detail.value;
+
+    let saveNameInput: HTMLInputElement;
+
+    const sanitizeFilename = (input: string): string => {
+        // Remove forbidden characters
+        const forbiddenChars = /[<>:"\/\\|?*\x00-\x1F]/g;
+        let sanitized = input.replace(forbiddenChars, '');
+
+        // Remove reserved filenames for Windows
+        const reservedNames = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(\..*)?$/i;
+        if (reservedNames.test(sanitized)) {
+            sanitized = "file_" + sanitized;
+        }
+
+        // Windows filenames cannot end with a space or dot
+        sanitized = sanitized.replace(/[. ]+$/, '');
+
+        return sanitized;
+    }
+    const updateSaveName = (e: KeyboardEvent) => {
+        if(e.key === "Enter"){
+            // save the new input save as the save name
+            const newName = sanitizeFilename(saveNameInput.value);
+            if(newName.length > 0) $saveName = newName;
+        }
+        
+        if(e.key === "Enter" || e.key === "Escape"){
+            saveNameInput.blur();
+            // update value field
+            saveNameInput.value = $saveName;
+        }
+    };
 </script>
 
 <main>
@@ -79,13 +111,13 @@
         
         <section id="setting-panels-container">
             <!-- Common Stylesheet Configs -->
-            {#if !nonStylesheetTypes.includes(currentConfigFilter)}
+            {#if !nonStylesheetTypes.includes($targetFileType)}
                 <ColorSettings {...configPanelStyling}/>
                 <FontSettings {...configPanelStyling}/>
             {/if}
 
             <!-- SCSS only configs -->
-            {#if currentConfigFilter === "scss"}
+            {#if $targetFileType === "scss"}
                 <ScssSpecificSettings {...configPanelStyling}/>
             {/if}
 
@@ -96,7 +128,7 @@
 
     <!-- file name & export -->
     <section id="export-container">
-        <input type="text" value="Untitled" placeholder="Untitled"/>
+        <input bind:this={saveNameInput} on:keypress={updateSaveName} type="text" value="{$saveName}" placeholder="{$fileStat.name}"/>
         
         <!-- cancel export -->
         <button class="secondary-btn" style="margin: 0px 10px 0px 10px" on:click={closeModal}>Cancel</button>

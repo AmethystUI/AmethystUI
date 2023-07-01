@@ -10,7 +10,9 @@ import exportCSS from "./transpilers/css";
 import { estimateSteps as estimateCSSsteps } from "./transpilers/css"
 
 import { openProgressModal } from "$src/lib/comp/overlays/overlayWindows/progress/progressOverlayManager";
-import { closeOverlay } from "$src/lib/comp/overlays/overlayManager";
+import { closeOverlay, overlayClosable } from "$src/lib/comp/overlays/overlayManager";
+import { saveName } from "$src/lib/stores/fileStatus";
+import exportJSON, { estimateSteps as estimateJSONsteps } from "./transpilers/json";
 
 /**
  * A union type that represents supported file types.
@@ -78,28 +80,51 @@ export const exportTextFile = async (fileName: string, fileType: exportableFileT
 
 export const startExport = async () => {
     // estimate progress steps first
-    let steps = 0;
+    let steps = 1;
     switch(get(targetFileType)){
         case "css":
             steps = estimateCSSsteps();
             break;
         case "json":
-            steps = 1;
+            steps = estimateJSONsteps();
             break;
         default:
             break;
     }
-    
-    console.log(steps);
 
+    const failExport = async (err: Error) => {
+        console.error(err); // log err
+        await PC.errorResult(err); // show error screen
+        overlayClosable.set(true); // allow users to dismiss the overlay if needed
+        await new Promise(res => setTimeout(res, 5000)); // wait 5 seconds before closing
+        closeOverlay();
+    }
+    
     // bring up progress modal first
     await openProgressModal("Exporting", steps);
     
-    await exportCSS();
+    // TODO: add prettify CSS and JSON
 
-    await PC.pendResult();
-
-    setTimeout(() => {
-        closeOverlay();
-    }, 300);
+    let result: string;
+    try{
+        switch(get(targetFileType)){
+            case "css":
+                result = await exportCSS();
+                break;
+            case "json":
+                result = await exportJSON();
+                break;
+            default:
+                throw new Error(`Transpilation for type "${get(targetFileType)}" is not supported.`);
+        }
+    } catch (err) {
+        await failExport(err);
+        return;
+    }
+    
+    await PC.successResult();
+    exportTextFile(get(saveName), get(targetFileType), result);
+    
+    await new Promise(res => setTimeout(res, 1000)); // wait 1 second before closing
+    closeOverlay()
 }

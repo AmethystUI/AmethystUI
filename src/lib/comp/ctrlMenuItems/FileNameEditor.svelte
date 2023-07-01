@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { fileStat } from "$lib/stores/fileStatus";
+    import { fileStat, saveName } from "$lib/stores/fileStatus";
 
     export let leftMenuWidth = 260;
     export let controlSectionWidth = 500;
@@ -10,6 +10,7 @@
         if(e.key === "Enter" || e.key === "Escape"){
             e.preventDefault();
             $fileStat.name = trimName(fileNameField.textContent)
+            $saveName = $fileStat.name; // update save name
             fileNameField.textContent = $fileStat.name;
             fileNameField.blur();
             return;

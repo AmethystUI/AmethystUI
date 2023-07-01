@@ -12,6 +12,8 @@ export let openOverlay = (id: string) => {
     })
 }
 export let closeOverlay = () => {
+    overlayClosable.set(false); // reset closable flag to disallow further manual closing
+
     mainOverlayData.set({
         opened: false,
         windowID: ""
@@ -19,3 +21,4 @@ export let closeOverlay = () => {
 }
 
 export const overlayReady = writable<boolean>(false);
+export const overlayClosable = writable<boolean>(false);

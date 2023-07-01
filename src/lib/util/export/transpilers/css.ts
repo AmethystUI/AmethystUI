@@ -14,7 +14,7 @@ export const estimateSteps = (): number => {
     return get(collection).length;
 }
 
-const exportCSS = async (usePC = true) => {
+const exportCSS = async (usePC = true, verbose = false): Promise<string> => {
     // Get current collection
     const coll: element[] = get(collection);
 
@@ -33,7 +33,7 @@ const exportCSS = async (usePC = true) => {
             const rootTemplate = generateCSSTemplate(get(exportConfigs), elementType, elementStyle);
             // initialize buffer object and generate root style string
             buffer[elementType] = {
-                style: getStyleString(rootTemplate),
+                style: getStyleString(rootTemplate, verbose),
                 psuedoElmnts: {},
                 overrideStyles: {}
             }
@@ -57,7 +57,7 @@ const exportCSS = async (usePC = true) => {
                 // generate style template for override
                 const overrideTemplate = generateCSSTemplate(<exportConfig>{...get(exportConfigs), common: {compressionAmt: 0}}, elementType, overrideStyle, false);
                 buffer[elementType].overrideStyles[overrideElmnt.name] = {
-                    style: getStyleString(overrideTemplate),
+                    style: getStyleString(overrideTemplate, verbose),
                     psuedoElmnts: {},
                 };
     
@@ -91,7 +91,9 @@ const exportCSS = async (usePC = true) => {
         }
     }
 
-    console.log(finalCSS);
+    if(verbose) console.log(finalCSS);
+
+    return finalCSS;
 }
 
 const genFontFaces = (collection: element[], loadFull = false, useBase64 = false): string => {

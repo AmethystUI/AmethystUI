@@ -1,18 +1,16 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
-    import { closeModal as rootCloseModal } from "$src/lib/comp/modals/modalManager";
+    import { overlayClosable, closeOverlay as rootCloseOverlay } from "./overlayManager";
     import ProgressOverlay from "./overlayWindows/progress/ProgressOverlay.svelte";
 
-    // prevent closing the modal when we drag on something and release outside
-    let pressedOnSpace = false;
-    const setPressedOnSpace = () => pressedOnSpace = true;
-    const closeModal = () => {
-        if(pressedOnSpace) rootCloseModal();
-        pressedOnSpace = false;
+    const closeOverlay = async () => {
+        if($overlayClosable){
+            rootCloseOverlay();
+        }
     }
 </script>
 
-<main transition:fade={{duration:200}}>
+<main transition:fade={{duration:200}} on:click={closeOverlay}>
     <!-- I forgot why I needed this line, but if shit breaks and you need it, it's here. -->
     <!-- on:mousedown={e => e.stopPropagation()} -->
     <section on:click={e => e.stopPropagation()}>

@@ -13,3 +13,5 @@ export let fileStat = writable<status>({
     autoSavetoCloud: false,
     alwaysShowSaveStatus: false
 });
+
+export let saveName = writable<string>(get(fileStat).name);
