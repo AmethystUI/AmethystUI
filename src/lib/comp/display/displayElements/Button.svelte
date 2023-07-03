@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
     import TextContent from "$lib/comp/display/displayElements/util/TextContent.svelte";
+  import ElementResizer from "../displayControl/ElementResizer.svelte";
 
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
@@ -133,6 +134,9 @@
         <!-- Text content -->
         <TextContent currentStyle={currentStyle}/>
     </button>
+
+    <!-- REQUIRED -->
+    <ElementResizer />
 </main>
 
 <style lang="scss">

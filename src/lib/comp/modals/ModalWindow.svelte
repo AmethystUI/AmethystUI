@@ -1,6 +1,5 @@
 <script lang="ts">
-    import { fade, fly } from "svelte/transition";
-    import { closeModal } from "$src/lib/comp/modals/modalManager";
+    import { fly } from "svelte/transition";
     import { quartOut } from "svelte/easing";
 
 </script>

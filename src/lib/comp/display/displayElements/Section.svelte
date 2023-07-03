@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
+  import ElementResizer from "../displayControl/ElementResizer.svelte";
 
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
@@ -108,6 +109,9 @@
     `}
     class="no-drag">
     </section>
+    
+    <!-- REQUIRED -->
+    <ElementResizer />
 </main>
 
 <style lang="scss">

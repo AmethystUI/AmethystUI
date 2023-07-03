@@ -274,35 +274,7 @@
     $: cornerKnobLightness = currentStyle.USEBACKGROUND ? currentStyle.backgroundColor?.l + 30 ?? defaultKnobLightness : defaultKnobLightness
 </script>
 
-<main style={`
-    ${(currentStyle.width?.u ?? "px") === "fit-content"
-    ? // if the current width is "fit-content"
-    `
-        width: 100%;
-    ` : // other wise, just use normal width
-    `
-        width: calc(
-            ${currentStyle.width?.v ?? 0}${currentStyle.width?.u ?? "px"} + 
-            ${currentStyle.paddingLeft?.v ?? 0}${currentStyle.paddingLeft?.u ?? "px"} +
-            ${currentStyle.paddingRight?.v ?? 0}${currentStyle.paddingRight?.u ?? "px"}
-        );
-    `}
-
-    ${(currentStyle.height?.u ?? "px") === "fit-content"
-    ? // if the current width is "fit-content"
-    `
-        height: 100%;
-    ` : // other wise, just use normal width
-    `
-        height: calc(
-            ${currentStyle.height?.v ?? 0}${currentStyle.height?.u ?? "px"} + 
-            ${currentStyle.paddingTop?.v ?? 0}${currentStyle.paddingTop?.u ?? "px"} +
-            ${currentStyle.paddingBottom?.v ?? 0}${currentStyle.paddingBottom?.u ?? "px"}
-        );
-    `}
-
-    transform: translate3d(calc(${cBR/2}${cBRu} + ${cBL/2}${cBLu}), calc(${cBT/2}${cBTu} + ${cBB/2}${cBBu}), 0px);
-`}>
+<main>
     {#if $activeStyles.width || $activeStyles.height}
         <!-- size handlers -->
 
@@ -347,19 +319,19 @@
     {#if $activeStyles.marginTop || $activeStyles.marginBottom || $activeStyles.marginLeft || $activeStyles.marginRight}
         <!-- top -->
         <div class="margin-handle vert-margins {$canvasStatus.darkCanvas ? "darkmode" : "lightmode"}" id="top" style={`
-            transform: translate3d(0,calc(${-cMT-1}${cMTu} + ${-cBT}${cBTu}),0); min-width:min(${cML}${cMLu}, ${cMR}${cMRu}); opacity:${cMT < 1 ? 0 : 1}; cursor: ${cMT > 0 ? "ns-resize" : "n-resize"};
+            transform: translate3d(0,calc(${-cMT-1}${cMTu}),0); min-width:min(${cML}${cMLu}, ${cMR}${cMRu}); opacity:${cMT < 1 ? 0 : 1}; cursor: ${cMT > 0 ? "ns-resize" : "n-resize"};
             `} on:mousedown={startMTDrag}></div>
         <!-- right -->
         <div class="margin-handle hori-margins {$canvasStatus.darkCanvas ? "darkmode" : "lightmode"}" id="right" style={`
-            transform: translate3d(calc(${cMR}${cMRu} + ${cBR}${cBRu}),0,0); min-height:min(${cMT}${cMTu}, ${cMB}${cMBu}); opacity:${cMR < 1 ? 0 : 1}; cursor: ${cMR > 0 ? "ew-resize" : "e-resize"};
+            transform: translate3d(calc(${cMR}${cMRu}),0,0); min-height:min(${cMT}${cMTu}, ${cMB}${cMBu}); opacity:${cMR < 1 ? 0 : 1}; cursor: ${cMR > 0 ? "ew-resize" : "e-resize"};
             `} on:mousedown={startMRDrag}></div>
         <!-- bottom -->
         <div class="margin-handle vert-margins {$canvasStatus.darkCanvas ? "darkmode" : "lightmode"}" id="bottom" style={`
-            transform: translate3d(0,calc(${cMB}${cMBu} + ${cBB}${cBBu}),0); min-width:min(${cML}${cMLu}, ${cMR}${cMRu}); opacity:${cMB < 1 ? 0 : 1}; cursor: ${cMB > 0 ? "ns-resize" : "s-resize"};
+            transform: translate3d(0,calc(${cMB}${cMBu}),0); min-width:min(${cML}${cMLu}, ${cMR}${cMRu}); opacity:${cMB < 1 ? 0 : 1}; cursor: ${cMB > 0 ? "ns-resize" : "s-resize"};
             `} on:mousedown={startMBDrag}></div>
         <!-- left -->
         <div class="margin-handle hori-margins {$canvasStatus.darkCanvas ? "darkmode" : "lightmode"}" id="left" style={`
-            transform: translate3d(calc(${-cML-1}${cMLu} + ${-cBL}${cBLu}),0,0); min-height:min(${cMT}${cMTu}, ${cMB}${cMBu}); opacity:${cML < 1 ? 0 : 1}; cursor: ${cML > 0 ? "ew-resize" : "w-resize"};
+            transform: translate3d(calc(${-cML-1}${cMLu}),0,0); min-height:min(${cMT}${cMTu}, ${cMB}${cMBu}); opacity:${cML < 1 ? 0 : 1}; cursor: ${cML > 0 ? "ew-resize" : "w-resize"};
             `} on:mousedown={startMLDrag}></div>
     {/if}
 </main>
@@ -370,7 +342,8 @@
     main{
         $corner-offset: -3.5px;
 
-        position: absolute;
+        width: 100%; height: 100%;
+        position: absolute; top: 0px; left: 0px;
         background: none;
         display:flex; flex-direction: column; justify-content: center; align-items: center;
         padding: 0px;

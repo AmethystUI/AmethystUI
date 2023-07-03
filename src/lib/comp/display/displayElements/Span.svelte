@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
     import TextContent from "$lib/comp/display/displayElements/util/TextContent.svelte";
+  import ElementResizer from "../displayControl/ElementResizer.svelte";
 
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
@@ -31,10 +32,7 @@
 </script>
 
 <!-- Container transformation to keep the element in the center -->
-<main style={`
-    
-`}
-class="no-drag">
+<main class="no-drag">
     <!-- We have do this terribleness if we want to use anything with a united attribute. It's also fast -->
     <!-- If you want a quick guide, "currentStyle.width?" checks if width exist on the current style. If it's undefined, it will default to whatever is after the "??" -->
     <span style={`
@@ -138,6 +136,9 @@ class="no-drag">
         <!-- Text content -->
         <TextContent currentStyle={currentStyle}/>
     </span>
+    
+    <!-- REQUIRED -->
+    <ElementResizer />
 </main>
 
 <style lang="scss">

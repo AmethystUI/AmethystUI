@@ -9,8 +9,8 @@ interface modalInfo {
 }
 
 export const mainModalData = writable<modalInfo>({
-    opened: true, // DEBUG: reset to false when testing is done
-    windowID: "appinfo"
+    opened: false,
+    windowID: null
 });
 export let openModal = (id: modalID) => {
     mainModalData.set({

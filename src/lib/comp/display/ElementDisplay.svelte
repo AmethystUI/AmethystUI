@@ -41,8 +41,6 @@
             || currentStyle.opacity < 10// OR opacity is less than 10, then absolutely show
         ) ? "outlined" : ""}
     `}>
-        <ElementResizer />
-
         {#if currentComponent?.type === "DIV"}
             <Div/>
         {:else if currentComponent?.type === "SECTION"}

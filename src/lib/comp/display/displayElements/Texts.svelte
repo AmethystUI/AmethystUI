@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
     import TextContent from "$lib/comp/display/displayElements/util/TextContent.svelte";
+  import ElementResizer from "../displayControl/ElementResizer.svelte";
 
     export let headingType: string;
 
@@ -127,6 +128,9 @@
     {:else if headingType === "p"}
         <p style={dynamicStyle} class="no-drag"> <TextContent currentStyle={currentStyle}/> </p>
     {/if}
+
+    <!-- REQUIRED -->
+    <ElementResizer />
 </main>
 
 <style lang="scss">

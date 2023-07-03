@@ -7,7 +7,6 @@
     export let v: any;
     let lastWorkingV = v;
     export let u:units = "px";
-    let lastWorkingU = u;
     export let hasMargin: boolean;
     export let maxWidth:string = "";
     export let minWidth:string = "";
@@ -157,7 +156,7 @@
         valueInputField.value = v;
     }
 
-    $: if(u !== lastWorkingU) { // react to any changes in u.
+    $: if(!!u) { // react to any changes in u.
         // if there is changes in u, we need to dispatch the new unit in
         setTimeout(() => { // make sure this unit update happens AFTER the value has been updated.'
             dispatchLastWorkingV();

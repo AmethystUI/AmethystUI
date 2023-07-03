@@ -48,6 +48,7 @@
     import DropdownControl, { type menuItem } from "./GeneralAppControl/DropdownControl.svelte";
     import type { dropdownStatusType } from "../ctrlMenus/TopMenu.svelte";
     import { openModal } from "$src/lib/comp/modals/modalManager";
+  import { startImport } from "$src/lib/util/import/importManager";
 
     export let dropdownStatus: dropdownStatusType = {
         currentID : "",
@@ -86,8 +87,11 @@
         <img id="pfp" src="/src/assets/pngs/testpfp.png" alt="">
     </DropdownControl> -->
 
+    <!-- import -->
+    <RegularControl imageURI="/src/assets/icons/import-outline.svg" alt="Import" cta={startImport} />
+
     <!-- export -->
-    <RegularControl imageURI="/src/assets/icons/share.svg" alt="Export" cta={() => openModal("export")} />
+    <RegularControl imageURI="/src/assets/icons/share-outline.svg" alt="Export" cta={() => openModal("export")} />
 
     <!-- full screen -->
     <!-- <RegularControl imageURI="/src/assets/icons/expand.svg" alt="Checklist" /> -->

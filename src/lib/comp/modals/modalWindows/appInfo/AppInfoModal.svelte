@@ -98,7 +98,7 @@
             font-size: 10px;
             line-height: 150%;
             text-align: center;
-            margin-top: 17px;
+            margin-top: 20px;
         }
 
         h2{
