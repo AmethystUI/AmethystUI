@@ -1,1 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g data-name="Layer 2"><g data-name="file"><rect width="24" height="24" opacity="0"/><path d="M19.74 7.33l-4.44-5a1 1 0 0 0-.74-.33h-8A2.53 2.53 0 0 0 4 4.5v15A2.53 2.53 0 0 0 6.56 22h10.88A2.53 2.53 0 0 0 20 19.5V8a1 1 0 0 0-.26-.67zM14 4l3.74 4h-3a.79.79 0 0 1-.74-.85z"/></g></g></svg>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 27.6.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill-opacity:0;}
+</style>
+<g>
+	<g>
+		<rect class="st0" width="24" height="24"/>
+		<path d="M19.7,7.3l-4.4-5C15.1,2.1,14.8,2,14.6,2h-8C5.2,2,4,3.1,4,4.5c0,0,0,0,0,0v15C4,20.9,5.2,22,6.6,22c0,0,0,0,0,0h10.9
+			c1.4,0,2.5-1.1,2.6-2.5c0,0,0,0,0,0V8C20,7.8,19.9,7.5,19.7,7.3z M14,4l3.7,4h-3C14.3,8,14,7.6,14,7.2c0,0,0,0,0,0V4z"/>
+	</g>
+</g>
+</svg>

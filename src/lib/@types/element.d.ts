@@ -7,7 +7,7 @@
  * @property First Letter Cap - Properties used in the backend as an aid to style elements. Does not directly affect the stylesheet.
  * @property Normal Camel Case - Properties that will directly affect the styling of the element.
  */
-interface elementStyle{
+interface elementStyle {
     USEBACKGROUND? : boolean; // done
     backgroundColor? : color, // done
     opacity? : number, // done

@@ -9,6 +9,10 @@
     "allowJs": false,
     "checkJs": false,
     "isolatedModules": true,
+
+    "plugins": [
+      { "transform": "ts-transformer-keys/transformer" }
+    ]
   },
 
   "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],

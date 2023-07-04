@@ -32,6 +32,12 @@ interface element { // a single HTML element
     showOutline: boolean // show the dashed outline on the editor
 };
 
+interface project { // a project object that can be exported
+    name: string,
+    exportDate: number,
+    content: element[]
+}
+
 /**
  * Attributes with a unit. Mostly used for width, height, and stuff of that sort.
  */
@@ -131,6 +137,7 @@ declare let typeCategories : typeCategories;
 
 declare let override : override;
 declare let element : element;
+declare let project : project;
 declare let unitedAttr : unitedAttr;
 declare let shadow : shadow;
 declare let boxShadow : boxShadow;
