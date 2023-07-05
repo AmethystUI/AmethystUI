@@ -74,7 +74,7 @@
             clr = currentStyle.color;
 
             // typeface setup. We have to do some special initialization 
-            if(!currentStyle.typeStyle){ // if there's no type style, then we need to set it to the default
+            if(!currentStyle.typeStyle || !fontRef){ // if there's no type style, then we need to set it to the default
                 currentStyle.typeStyle = {...systemDefaultStyles.typeStyle}; // set current style's type style to the default type style
                 fontRef = {...currentStyle.typeStyle}; // reflow fontRef
             } else if (Object.keys(currentStyle.typeStyle).length !== Object.keys(fontRef).length) { // if the type style has a different number of properties than the fontRef, we know that we're initializing from an incomplete object. In this case, we need to transfer what we have to the default type style and use that to initialize.

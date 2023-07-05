@@ -1,4 +1,9 @@
-import { systemDefaultStyles } from "$src/lib/@const/element.const";
+import { _elementStyle, _unitedAttr } from "$src/lib/@types/element";
+import { _project } from "$src/lib/@types/general";
+import { closeOverlay, overlayClosable } from "$src/lib/comp/overlays/overlayManager";
+import { openProgressOverlay, progressController as PC } from "$src/lib/comp/overlays/overlayWindows/progress/progressOverlayManager";
+import { collection } from "$src/lib/stores/collection";
+import { fileSettings } from "$src/lib/stores/fileStatus";
 import * as t from 'io-ts';
 import _ from "lodash";
 
@@ -8,7 +13,7 @@ const fileUploadTemplate = `
 `;
 
 // Function to parse the uploaded JSON file
-const parseUploadedJSON = (file: File): Promise<any[]> => {
+const parseUploadedJSON = (file: File): Promise<any> => {
     return new Promise((res, rej) => {
         const reader = new FileReader();
 
@@ -61,33 +66,59 @@ const generateIoTsValidator = (type: any): any => {
     return t.any;
 };
 
+const updateProject = (dat: project) => {
+    fileSettings.update(v => {
+        v.name = dat.name;
+        return v;
+    });
+    collection.set(dat.content);
+}
+
 export const startImport = async () => {
-    // const fileUploadContainer = document.createElement("div");
-    // fileUploadContainer.innerHTML = fileUploadTemplate;
+    const fileUploadContainer = document.createElement("div");
+    fileUploadContainer.innerHTML = fileUploadTemplate;
 
-    // const fileUploadInput = fileUploadContainer.querySelector(
-    //     "#fileUpload"
-    // ) as HTMLInputElement;
+    const fileUploadInput = fileUploadContainer.querySelector(
+        "#fileUpload"
+    ) as HTMLInputElement;
 
-    // fileUploadInput.onchange = async () => {
-    //     const selectedFile = fileUploadInput.files && fileUploadInput.files[0];
+    fileUploadInput.onchange = async () => {
+        fileUploadInput.onchange = null;
 
-    //     if (selectedFile) {
-    //         try {
-    //             const parsedData: any[] = await parseUploadedJSON(selectedFile);
-    //             console.log(parsedData.length);
-    //             // console.log(verifyData(parsedData));
-    //             // resolve(parsedData);
-    //         } catch (error) {
-    //             console.error(error);
-    //         }
-    //     } else {
-    //         // reject(new Error("No file selected"));
-    //         console.error("No file selected");
-    //     }
-    // };
+        // open overlay
+        openProgressOverlay("Importing", 1);
+        
+        const selectedFile = fileUploadInput.files && fileUploadInput.files[0];
 
-    // fileUploadInput.click();
+        if (selectedFile) {
+            try {
+                const parsedData = await parseUploadedJSON(selectedFile);
+                
+                if(_project.decode(parsedData)._tag !== "Right") throw new Error("JSON structure corrupted");
+
+                PC.successResult();
+
+                updateProject(parsedData);
+        
+                closeOverlay(1200);
+
+                return <project> parsedData;
+            } catch (err) {
+                let message = "Broken JSON";
+                if (err instanceof Error) message = err.message;
+                else message = String(err)
+                
+                await PC.errorResult(message, "Import failed.");
+            }
+        } else {
+            await PC.errorResult("No file selected", "Import failed.");
+        }
+        
+        closeOverlay(5000, true);
+    };
+
+    fileUploadInput.click();
 };
+
 
 // npx ts-json-schema-generator --path "./src/lib/@types/*.d.ts" --type "project"

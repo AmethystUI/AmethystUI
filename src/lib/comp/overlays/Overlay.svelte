@@ -5,7 +5,7 @@
 
     const closeOverlay = async () => {
         if($overlayClosable){
-            rootCloseOverlay();
+            rootCloseOverlay(0);
         }
     }
 </script>

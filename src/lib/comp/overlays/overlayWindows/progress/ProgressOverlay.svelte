@@ -2,8 +2,7 @@
     import { overlayReady } from "../../overlayManager";
     import { progressOverlayData } from "./progressOverlayManager";
     import { onMount } from "svelte";
-    import { expoOut, linear  } from "svelte/easing";
-    import { tweened } from "svelte/motion";
+    import { expoOut } from "svelte/easing";
     import { fly } from "svelte/transition";
 
     onMount(() => {
@@ -11,11 +10,6 @@
     });
 
     $: realProgress = $progressOverlayData.currentStep / $progressOverlayData.totalSteps * 100;
-    $: progressTween.set(realProgress); // update the tween dynamically
-    const progressTween = tweened(0, {
-		duration: 300,
-		easing: linear
-	});
 </script>
 
 <section in:fly={{y: -50, opacity: 0, duration:700, delay: 100, easing: expoOut}} style="transform: scale(90%)">
@@ -77,7 +71,7 @@
             width:    $circle-size;
             height:   $circle-size;
             position: absolute;
-            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden; -webkit-backface-visibility: hidden;
             transition: transform $transition-length linear;
             border-radius: 50%;
         }

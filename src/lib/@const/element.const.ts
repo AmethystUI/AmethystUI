@@ -146,7 +146,6 @@ export const defaultCSSStyles: Record<HTMLtags | "COM", elementStyle> = {
         borderWidthLeft: { v: 1, u: "px" }
     },
     INPUT: {},
-    LABEL: {},
     OL: {
         display: "block",
         marginTop: { v: 1, u: "em" },

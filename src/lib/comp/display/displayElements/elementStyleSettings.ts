@@ -131,7 +131,6 @@ const enabledStyles: Record<HTMLtags, activeStylesType> =
         USETEXT: false,
     },
     PROGRESS: {},
-    LABEL: {},
     UL: {},
     OL: {},
 };

@@ -9,7 +9,7 @@ import exportCSS from "./transpilers/css";
 
 import { estimateSteps as estimateCSSsteps } from "./transpilers/css"
 
-import { openProgressModal } from "$src/lib/comp/overlays/overlayWindows/progress/progressOverlayManager";
+import { openProgressOverlay } from "$src/lib/comp/overlays/overlayWindows/progress/progressOverlayManager";
 import { closeOverlay, overlayClosable } from "$src/lib/comp/overlays/overlayManager";
 import { saveName } from "$src/lib/stores/fileStatus";
 import exportJSON, { estimateSteps as estimateJSONsteps } from "./transpilers/json";
@@ -94,14 +94,14 @@ export const startExport = async () => {
 
     const failExport = async (err: Error) => {
         console.error(err); // log err
-        await PC.errorResult(err); // show error screen
+        await PC.errorResult(err.message, "Export failed."); // show error screen
         overlayClosable.set(true); // allow users to dismiss the overlay if needed
-        await new Promise(res => setTimeout(res, 5000)); // wait 5 seconds before closing
-        closeOverlay();
+        
+        closeOverlay(5000, true);
     }
     
     // bring up progress modal first
-    await openProgressModal("Exporting", steps);
+    await openProgressOverlay("Exporting", steps);
     
     // TODO: add prettify CSS and JSON
 
@@ -125,6 +125,5 @@ export const startExport = async () => {
     await PC.successResult();
     exportTextFile(get(saveName), get(targetFileType), result);
     
-    await new Promise(res => setTimeout(res, 1000)); // wait 1 second before closing
     closeOverlay()
 }

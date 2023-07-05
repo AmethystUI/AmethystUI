@@ -1,5 +1,5 @@
 import { get, writable } from "svelte/store";
-import { openOverlay, overlayReady } from "../../overlayManager";
+import { openOverlay, overlayClosable, overlayReady } from "../../overlayManager";
 
 export interface progressData {
     taskName: string;
@@ -15,7 +15,7 @@ export const progressOverlayData = writable<progressData>({
     state: "inprogress"
 });
 
-export const openProgressModal = (taskName: string, totalSteps: number): Promise<void> => {
+export const openProgressOverlay = (taskName: string, totalSteps: number): Promise<void> => {
     progressController.reset(); // reset all controls first
     
     openOverlay("progress");
@@ -72,6 +72,7 @@ export const progressController = {
     successResult: async function () { // set the state to "success"
         // pend result first
         await this.pendResult();
+        
         // update to success 
         if (get(progressOverlayData).state === "pending") {
             progressOverlayData.update(dat => {
@@ -80,13 +81,16 @@ export const progressController = {
             });
         }
     },
-    errorResult: async function (err: Error) { // set the state to "error"
+    errorResult: async function (err: string, msg: string) { // set the state to "error"
         // pend result first
         await this.pendResult();
+        
+        overlayClosable.set(true);
+        
         // update to err
         progressOverlayData.update(dat => {
-            dat.taskName = "Export Failed.";
-            dat.stepDescription = `Reason: ${err.message}`;
+            dat.taskName = msg;
+            dat.stepDescription = `Reason: ${err}`;
             dat.state = "error";
             return dat;
         });

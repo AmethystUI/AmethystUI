@@ -1,6 +1,6 @@
 const getStringFor = {
     
-    unitedAttr : (val: unitedAttr<number>) => {
+    unitedAttr : (val: unitedAttr) => {
         if(val.u === "fit-content") return "fit-content";
         return `${val.v}${val.u}`;
     },

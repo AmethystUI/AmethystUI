@@ -33,7 +33,7 @@
     // reactive
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
-    let shadows:boxShadow[];
+    let shadows: boxShadow[];
     // we don't have a color defined here because we're using MuxBoxShadClr as a multiplexer
 
     // these variables determine which editors will be visible, based on whatever the current active styles are. Here for organization

@@ -16,7 +16,7 @@ export const HTMltagInfo: {[K in HTMLtags] : {name: string, iconURI: string}} = 
     "H6"        : {"name" : "Caption", "iconURI" : "/src/assets/icons/heading.svg"},
     "HR"        : {"name" : "Horizontal line", "iconURI" : "/src/assets/icons/minus.svg"},
     "INPUT"     : {"name" : "Input", "iconURI" : "/src/assets/icons/globe.svg"},
-    "LABEL"     : {"name" : "Label", "iconURI" : "/src/assets/icons/pricetags.svg"},
+    // "LABEL"     : {"name" : "Label", "iconURI" : "/src/assets/icons/pricetags.svg"},
     "OL"        : {"name" : "Organized list", "iconURI" : "/src/assets/icons/list.svg"},
     "UL"        : {"name" : "Unorganized list", "iconURI" : "/src/assets/icons/menu.svg"},
     "PROGRESS"  : {"name" : "Progress", "iconURI" : "/src/assets/icons/clock.svg"},

@@ -47,11 +47,11 @@ const cutil = {
             return true;
         }
     },
-    isUnitedValueZero: function (...items: unitedAttr<number>[]){
+    isUnitedValueZero: function (...items: unitedAttr[]){
         // check if the values are all equal to 0
         return items.every(item => !!(item?.v === 0));
     },
-    isUnitedValueEqual: function (...items: unitedAttr<number>[]){
+    isUnitedValueEqual: function (...items: unitedAttr[]){
         // check if the values are all equal to 0 first
         if(this.isUnitedValueZero(...items)) return true;
 

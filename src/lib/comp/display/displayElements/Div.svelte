@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { collection, selectedComponent, selectedOverride } from "$lib/stores/collection";
     import TextContent from "$lib/comp/display/displayElements/util/TextContent.svelte";
-  import ElementResizer from "../displayControl/ElementResizer.svelte";
+    import ElementResizer from "../displayControl/ElementResizer.svelte";
 
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
@@ -13,7 +13,7 @@
     $: textUnderlined = !!currentStyle ? currentStyle?.typeStyle?.textDecorations?.includes("underline") ?? false : false;
     $: textStriked = !!currentStyle ? currentStyle?.typeStyle?.textDecorations?.includes("strike") ?? false : false;
 
-    const generateShadowString = (shadow: boxShadow):string => {
+    const generateShadowString = (shadow: boxShadow): string => {
         return `${shadow.x.v}${shadow.x.u} ` +
                 `${shadow.y.v}${shadow.y.u} ` +
                 `${shadow.radius.v}${shadow.radius.u} ` +
