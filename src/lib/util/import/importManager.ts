@@ -2,10 +2,11 @@ import { _elementStyle, _unitedAttr } from "$src/lib/@types/element";
 import { _project } from "$src/lib/@types/general";
 import { closeOverlay, overlayClosable } from "$src/lib/comp/overlays/overlayManager";
 import { openProgressOverlay, progressController as PC } from "$src/lib/comp/overlays/overlayWindows/progress/progressOverlayManager";
-import { collection } from "$src/lib/stores/collection";
+import { collection, focusedComponent, focusedOverride, selectedComponent, selectedOverride } from "$src/lib/stores/collection";
 import { fileSettings } from "$src/lib/stores/fileStatus";
 import * as t from 'io-ts';
 import _ from "lodash";
+import { get } from "svelte/store";
 
 // HTML template for the file upload prompt
 const fileUploadTemplate = `
@@ -71,6 +72,22 @@ const updateProject = (dat: project) => {
         v.name = dat.name;
         return v;
     });
+    
+    // check if the currently selected override & element exists
+    if(!dat.content[get(selectedComponent)]){ // if the currently selected component doesn't exist
+        // deselect both the component and override
+        focusedComponent.set(-1);
+        selectedComponent.set(-1);
+        focusedOverride.set(-1);
+        selectedOverride.set(-1);
+    } else {
+        if(!dat.content[get(selectedComponent)].styleOverrides[get(selectedOverride)]){ // if the override doesn't exist
+            // deselect both the override
+            focusedOverride.set(-1);
+            selectedOverride.set(-1);
+        }
+    }
+
     collection.set(dat.content);
 }
 

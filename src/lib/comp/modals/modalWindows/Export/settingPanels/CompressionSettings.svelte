@@ -10,11 +10,13 @@
             iconDir : "",
             val : 1,
             alt : "Concise"
-        }, {
-            iconDir : "",
-            val : 2,
-            alt : "Minimized"
         },
+        // TODO: enable when we have a good enough way to compress.
+        // {
+        //     iconDir : "",
+        //     val : 2,
+        //     alt : "Minimized"
+        // },
     ]
 </script>
 
