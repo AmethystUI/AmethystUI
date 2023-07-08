@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-    export const defaultMouseDownAction = (e) => { // root event. Essentially just blurs the selection on the elements
+    export const defaultMouseDownAction = () => { // root event. Essentially just blurs the selection on the elements
         setTimeout(() => {
             if(get(layerBlurLock) === true){
                 // if locked, unlock for next time
@@ -22,13 +22,11 @@
     import getStyleSetting from "$lib/comp/display/displayElements/elementStyleSettings";
     import ElementDisplay from "$lib/comp/display/ElementDisplay.svelte";
     import { activeStyles } from "$lib/stores/activeStyles";
-    import { addComponent, addOverride, collection, focusedComponent, focusedOverride, layerBlurLock, selectedComponent, selectedOverride } from "$lib/stores/collection"
+    import { collection, focusedComponent, focusedOverride, layerBlurLock, selectedComponent, selectedOverride } from "$lib/stores/collection"
     import { currentView } from "$lib/stores/viewingManager";
     import { mainModalData } from "$src/lib/comp/modals/modalManager";
     import ModalBase from "$lib/comp/modals/Modal.svelte";
     import OverlayBase from "./lib/comp/overlays/Overlay.svelte";
-    import { onMount, tick } from "svelte";
-    import { initializeColorFromHSLA, initializeColorFromRGBA } from "./lib/util/colorMaths";
     import { mainOverlayData } from "./lib/comp/overlays/overlayManager";
 
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;

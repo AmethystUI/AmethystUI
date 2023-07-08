@@ -375,7 +375,7 @@ E.g. "This app fucking sucks."`,
         dropdownStatus.active = false;
         
         setTimeout(() => { // add these at the next tick so the overlay can be opened again
-            if(e) defaultMouseDownAction(e); // activate the default mouse down action first because we have technically already clicked.
+            if(e) defaultMouseDownAction(); // activate the default mouse down action first because we have technically already clicked.
             document.onmousedown = defaultMouseDownAction;
         }, 0);
     }
