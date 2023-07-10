@@ -2,6 +2,7 @@ import { writable, get } from 'svelte/store';
 // import { defaultHeight, defaultMargin, defaultPadding, defaultWidth } from '../comp/ctrlMenuItems/StyleEditors/BoundingBoxEditor.svelte';
 // import { defaultFlexAlign, defaultOpacity, defaultOverflow } from '../comp/ctrlMenuItems/StyleEditors/AppearanceEditor.svelte';
 
+export let initialColl = writable<element[]>([]); // the project file data
 export let collection = writable<element[]>([]); // the project file data
 
 export let selectedComponent = writable<number>(-1);

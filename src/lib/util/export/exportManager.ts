@@ -13,6 +13,7 @@ import { openProgressOverlay } from "$src/lib/comp/overlays/overlayWindows/progr
 import { closeOverlay, overlayClosable } from "$src/lib/comp/overlays/overlayManager";
 import { saveName } from "$src/lib/stores/fileStatus";
 import exportJSON, { estimateSteps as estimateJSONsteps } from "./transpilers/json";
+import { collection, initialColl } from "$src/lib/stores/collection";
 
 /**
  * A union type that represents supported file types.
@@ -125,5 +126,10 @@ export const startExport = async () => {
     await PC.successResult();
     exportTextFile(get(saveName), get(targetFileType), result);
     
+    // check if the export type is JSON. If it is, reset initial Coll and set saved to true
+    if(get(targetFileType) === "json"){
+        initialColl.set( JSON.parse(JSON.stringify(get(collection))) );
+    }
+
     closeOverlay()
 }

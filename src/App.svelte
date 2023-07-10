@@ -22,12 +22,14 @@
     import getStyleSetting from "$lib/comp/display/displayElements/elementStyleSettings";
     import ElementDisplay from "$lib/comp/display/ElementDisplay.svelte";
     import { activeStyles } from "$lib/stores/activeStyles";
-    import { collection, focusedComponent, focusedOverride, layerBlurLock, selectedComponent, selectedOverride } from "$lib/stores/collection"
+    import { collection, focusedComponent, focusedOverride, initialColl, layerBlurLock, selectedComponent, selectedOverride } from "$lib/stores/collection"
     import { currentView } from "$lib/stores/viewingManager";
     import { mainModalData } from "$src/lib/comp/modals/modalManager";
     import ModalBase from "$lib/comp/modals/Modal.svelte";
     import OverlayBase from "./lib/comp/overlays/Overlay.svelte";
     import { mainOverlayData } from "./lib/comp/overlays/overlayManager";
+    import _ from "lodash";
+    import { fileSettings } from "./lib/stores/fileStatus";
 
     $: currentStyle = $selectedOverride === -1 ? $collection[$selectedComponent]?.style : $collection[$selectedComponent]?.styleOverrides[$selectedOverride]?.style;
 
@@ -46,6 +48,20 @@
     $: if(!!currentStyle){
         const currentElement = $collection[get(selectedComponent)];
         $activeStyles = getStyleSetting(currentElement?.type);
+    }
+
+    $: if( !_.isEqual($collection, $initialColl) ){
+        $fileSettings.saved = false;
+        
+        // Enable navigation prompt
+        window.onbeforeunload = function() {
+            return true;
+        };
+    } else {
+        $fileSettings.saved = true;
+
+        // Remove navigation prompt
+        window.onbeforeunload = null;
     }
 </script>
 
