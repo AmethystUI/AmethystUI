@@ -47,8 +47,5 @@
         padding: 10px 0px 0px 10px;
         overflow-y: auto; overflow-x:hidden;
         overflow: -moz-scrollbars-none;
-
-        // hide scrollbar
-        // &::-webkit-scrollbar { width: 0 !important }
     }
 </style>
