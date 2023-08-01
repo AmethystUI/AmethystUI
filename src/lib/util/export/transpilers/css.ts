@@ -9,7 +9,6 @@ import { systemDefaultStyles } from "$src/lib/@const/element.const";
 import setImmediate from "../../setImmediate";
 import _ from "lodash";
 import { progressController } from "$src/lib/comp/overlays/overlayWindows/progress/progressOverlayManager";
-import CleanCSS from "clean-css";
 
 export const estimateSteps = (): number => {
     return get(collection).length;
