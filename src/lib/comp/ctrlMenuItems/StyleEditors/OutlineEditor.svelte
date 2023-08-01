@@ -6,7 +6,6 @@
     import ColorPicker from "./Advanced/ColorPicker.svelte";
     import Dropdown from "./Basics/Dropdown.svelte";
     import { clearColorPickerRef, mainColorPickerData } from "$lib/stores/colorPickerManager";
-    import { initializeColorFromHSLA } from "$lib/util/colorMaths";
     import { activeStyles } from "$lib/stores/activeStyles";
     import { systemDefaultStyles } from "$src/lib/@const/element.const";
     
