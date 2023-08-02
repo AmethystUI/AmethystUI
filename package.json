@@ -7,7 +7,7 @@
         "dev": "run-p --print-label dev:*",
         "dev:vite": "vite --port 8080",
         "dev:swrk": "rollup -c rollup.config.js -w",
-        "build": "tsc && vite build && rollup -c rollup.config.js",
+        "build": "vite build && rollup -c rollup.config.js",
         "serve": "vite preview",
         "check": "svelte-check --tsconfig ./tsconfig.json"
     },
