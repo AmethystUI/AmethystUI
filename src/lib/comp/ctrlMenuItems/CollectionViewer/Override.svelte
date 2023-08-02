@@ -117,7 +117,7 @@
     layer ${$selectedOverride === overrideIndex && $selectedComponent === elmntIndex ? "selected" : ""} ${$focusedOverride !== overrideIndex && $selectedOverride === overrideIndex && $selectedComponent === elmntIndex ? "blurred" : ""}`} on:mousedown={focusOverride} style="min-height: {height}px;" in:fly={{y:-10, duration:300}}
     on:dblclick={setEditableTrue}>
     <!-- icon + title -->
-    <img src="$assets/icons/copy.svg" alt="">
+    <img src="/src/assets/icons/copy.svg" alt="">
 
     <p bind:this={nameField} contenteditable={editable} class={`${editable ? "editable" : ""}`} style={`cursor: ${editable ? "text" : "normal"}`} on:blur={e => {editable=false; nameField.scrollLeft = 0; changeName(e)}} on:keypress={checkKeyPress}>
         {$collection[elmntIndex]?.styleOverrides[overrideIndex]?.name ?? ""}

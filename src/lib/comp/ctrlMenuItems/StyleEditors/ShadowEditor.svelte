@@ -153,11 +153,11 @@
 
             <section id="check-container">
                 <input type="checkbox" checked={currentStyle.USESHADOW} on:click={toggleUseShadow}>
-                <img src="$assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USESHADOW ? "1" : "0"}">
+                <img src="/src/assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USESHADOW ? "1" : "0"}">
             </section>
 
             <section id="add-container" on:click={addNewShadow} on:mousedown={keepOpenOverlay}>
-                <img src="$assets/icons/plus.svg" alt="">
+                <img src="/src/assets/icons/plus.svg" alt="">
             </section>
         </section>
 
@@ -234,7 +234,7 @@
                                 hasMargin={true} sub={true}/>
     
                             <button on:click={() => removeShadow(i)} title="Delete shadow">
-                                <img src="$assets/icons/trash.svg" alt="">
+                                <img src="/src/assets/icons/trash.svg" alt="">
                             </button>
                         </section>
                     {/each}
@@ -303,7 +303,7 @@
                 position: relative;
                 transform: translate3d(0px, 10px, 0px);
 
-                background-image: url("$assets/svgs/checkerBoardPattern.svg");
+                background-image: url("/src/assets/svgs/checkerBoardPattern.svg");
                 background-size: 50%;
 
                 .activated{

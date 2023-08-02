@@ -218,7 +218,7 @@
 
             <section id="check-container">
                 <input type="checkbox" checked={currentStyle.USEBORDER} on:click={toggleUseBorder}>
-                <img src="$assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USEBORDER ? "1" : "0"}">
+                <img src="/src/assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USEBORDER ? "1" : "0"}">
             </section>
         </section>
 
@@ -264,7 +264,7 @@
                         {#if useStyleTop && (useStyleBottom || useStyleLeft || useStyleRight) || useStyleBottom && (useStyleLeft || useStyleRight) || useStyleLeft && useStyleRight}
                             <section id="check-container">
                                 <input type="checkbox" checked={syncStyle} on:click={updateStyleSyncing}>
-                                <img src="$assets/icons/chain.svg" alt="" style="opacity: {syncStyle ? "1" : "0.5"}">
+                                <img src="/src/assets/icons/chain.svg" alt="" style="opacity: {syncStyle ? "1" : "0.5"}">
                             </section>
                         {/if}
                     </section>

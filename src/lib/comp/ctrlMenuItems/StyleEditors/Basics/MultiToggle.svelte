@@ -17,19 +17,19 @@
     // default sets
     export const textAlignment:multiToggleSelection<textAlignment>[] = [
         {
-            iconDir : "$assets/icons/align-left.svg",
+            iconDir : "/src/assets/icons/align-left.svg",
             val : "left",
             alt : "Align Left"
         }, {
-            iconDir : "$assets/icons/align-center.svg",
+            iconDir : "/src/assets/icons/align-center.svg",
             val : "center",
             alt : "Align Center"
         }, {
-            iconDir : "$assets/icons/align-right.svg",
+            iconDir : "/src/assets/icons/align-right.svg",
             val : "right",
             alt : "Align Right"
         }, {
-            iconDir : "$assets/icons/align-justify.svg",
+            iconDir : "/src/assets/icons/align-justify.svg",
             val : "justify",
             alt : "Justify Content"
         }
@@ -37,15 +37,15 @@
 
     export const textCasing:multiToggleSelection<textCasing>[] = [
         {
-            iconDir : "$assets/icons/lower-case.svg",
+            iconDir : "/src/assets/icons/lower-case.svg",
             val : "lowercase",
             alt : "All Lowercase"
         }, {
-            iconDir : "$assets/icons/mix-case.svg",
+            iconDir : "/src/assets/icons/mix-case.svg",
             val : "none",
             alt : "Mixed Case"
         }, {
-            iconDir : "$assets/icons/upper-case.svg",
+            iconDir : "/src/assets/icons/upper-case.svg",
             val : "uppercase",
             alt : "All Uppercase"
         }

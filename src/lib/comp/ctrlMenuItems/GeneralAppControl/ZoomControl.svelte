@@ -7,7 +7,7 @@
         {Math.round($canvasStatus.zoom * 100)}%
     </p>
     
-    <img class="more-options" src="$assets/icons/chevron-down.svg" alt="">
+    <img class="more-options" src="/src/assets/icons/chevron-down.svg" alt="">
 </main>
 
 <style lang="scss">

@@ -50,7 +50,7 @@
 
             <section id="check-container">
                 <input type="checkbox" checked={currentStyle.USEBACKGROUND} on:click={toggleUseBackground}>
-                <img src="$assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USEBACKGROUND ? "1" : "0"}">
+                <img src="/src/assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USEBACKGROUND ? "1" : "0"}">
             </section>
         </section>
 

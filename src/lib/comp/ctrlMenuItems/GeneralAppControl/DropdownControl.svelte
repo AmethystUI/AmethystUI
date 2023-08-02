@@ -104,7 +104,7 @@
         <slot style="transform: translate3d({showArrow ? "3px" : "0px"}, 0px, 0px); {showHoverEffect ? "" : "opacity: 1"}"></slot>
         
         {#if showArrow}
-            <img class="more-options" src="$assets/icons/chevron-down.svg" alt="">
+            <img class="more-options" src="/src/assets/icons/chevron-down.svg" alt="">
         {/if}
     </section>
 

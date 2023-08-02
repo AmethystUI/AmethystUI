@@ -643,7 +643,7 @@
         }
 
         &#alpha-slider{
-            background-image: url("$assets/svgs/checkerBoardPattern.svg");
+            background-image: url("/src/assets/svgs/checkerBoardPattern.svg");
             background-color: $primary;
             background-size: 17.5px;
             position: relative;

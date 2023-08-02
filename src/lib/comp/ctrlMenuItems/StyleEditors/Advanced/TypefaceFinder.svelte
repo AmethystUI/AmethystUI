@@ -117,7 +117,7 @@
         style="font-family: '{typeface.fontObj.family}', 'Inter', 'system-ui', 'Tahoma', 'sans-serif'"></p>
         
         <!-- Search icon -->
-        <img bind:this={searchIcon} id="search-icon" src="$assets/icons/search.svg" alt="">
+        <img bind:this={searchIcon} id="search-icon" src="/src/assets/icons/search.svg" alt="">
     </section>
 </main>
 

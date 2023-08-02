@@ -132,7 +132,7 @@
     <!-- arrow -->
     
     <div on:click={toggleShow}>
-        <img src="$assets/icons/arrow-ios-forward.svg" class={$collection[elmntIndex].showing ? "showArrow" : ""} alt=""
+        <img src="/src/assets/icons/arrow-ios-forward.svg" class={$collection[elmntIndex].showing ? "showArrow" : ""} alt=""
         title={$collection[elmntIndex].showing ? "collapse" : "expand"}>
     </div>
     <!-- icon + title -->
@@ -141,7 +141,7 @@
 
     
     <div style="margin-right:4px; pointer-events: all;" on:click={() => {addOverride(elmntIndex)}} on:mousedown={e => e.stopPropagation()} title="Add Override">
-        <img src={"$assets/icons/plus.svg"} alt="">
+        <img src={"/src/assets/icons/plus.svg"} alt="">
     </div>
 </main>
 

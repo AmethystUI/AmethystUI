@@ -26,38 +26,38 @@
 
     const horizontalAlignments:multiToggleSelection<flexAlignment>[] = [
         {
-            iconDir : "$assets/icons/none.svg",
+            iconDir : "/src/assets/icons/none.svg",
             val : "none",
             alt : "No Alignment"
         },{
-            iconDir : "$assets/icons/flex-align-left.svg",
+            iconDir : "/src/assets/icons/flex-align-left.svg",
             val : "flex-start",
             alt : "Align Left"
         }, {
-            iconDir : "$assets/icons/flex-align-center-h.svg",
+            iconDir : "/src/assets/icons/flex-align-center-h.svg",
             val : "center",
             alt : "Align Center"
         }, {
-            iconDir : "$assets/icons/flex-align-right.svg",
+            iconDir : "/src/assets/icons/flex-align-right.svg",
             val : "flex-end",
             alt : "Align Right"
         },
     ]
     const verticalAlignments:multiToggleSelection<flexAlignment>[] = [
         {
-            iconDir : "$assets/icons/none.svg",
+            iconDir : "/src/assets/icons/none.svg",
             val : "none",
             alt : "No Alignment"
         },{
-            iconDir : "$assets/icons/flex-align-top.svg",
+            iconDir : "/src/assets/icons/flex-align-top.svg",
             val : "flex-start",
             alt : "Align Top"
         }, {
-            iconDir : "$assets/icons/flex-align-center-v.svg",
+            iconDir : "/src/assets/icons/flex-align-center-v.svg",
             val : "center",
             alt : "Align Center"
         }, {
-            iconDir : "$assets/icons/flex-align-bottom.svg",
+            iconDir : "/src/assets/icons/flex-align-bottom.svg",
             val : "flex-end",
             alt : "Align Bottom"
         },
@@ -193,7 +193,7 @@
                 {#if useOverflowX && useOverflowY}
                     <section id="check-container">
                         <input type="checkbox" checked={syncOverflow} on:click={updateOverflowSyncing}>
-                        <img src="$assets/icons/chain.svg" alt="" style="opacity: {syncOverflow ? "1" : "0.5"}">
+                        <img src="/src/assets/icons/chain.svg" alt="" style="opacity: {syncOverflow ? "1" : "0.5"}">
                     </section>
                 {/if}
             </section>

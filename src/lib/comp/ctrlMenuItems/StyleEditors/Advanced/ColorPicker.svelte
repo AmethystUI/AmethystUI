@@ -188,7 +188,7 @@
             margin-right: 15px;
             position: relative;
 
-            background-image: url("$assets/svgs/checkerBoardPattern.svg");
+            background-image: url("/src/assets/svgs/checkerBoardPattern.svg");
             background-size: 50%;
 
             div{
