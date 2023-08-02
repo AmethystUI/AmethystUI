@@ -24,7 +24,7 @@
         { // div
             type : "reg",
             title : "Account Settings",
-            iconSrc : "/src/assets/icons/info-outline.svg",
+            iconSrc : "$assets/icons/info-outline.svg",
             desc: "",
             cta : () => {}
         },
@@ -34,7 +34,7 @@
         { // div
             type : "reg",
             title : "Log Out",
-            iconSrc : "/src/assets/icons/arrow-circle-left-outline.svg",
+            iconSrc : "$assets/icons/arrow-circle-left-outline.svg",
             desc: "",
             cta : () => {}
         },
@@ -84,21 +84,21 @@
 <main bind:this={mainContainer}>
     <!-- TODO: contact server later to get pfp and do account verificatino -->
     <!-- <DropdownControl alt="My Account" id="accountConfig" items={accountItems} {...dropdownStatus} on:openDropdown={openOverlay} on:closeDropdown={() => closeOverlay()} on:keepOpenDropdown={keepOpenDropdown} on:updateCurrentID={updateCurrentID} evenSpacing={true} showArrow={false} showHoverEffect={false}>
-        <img id="pfp" src="/src/assets/pngs/testpfp.png" alt="">
+        <img id="pfp" src="$assets/pngs/testpfp.png" alt="">
     </DropdownControl> -->
 
     <!-- import -->
-    <RegularControl imageURI="/src/assets/icons/import-outline.svg" alt="Import" cta={startImport} />
+    <RegularControl imageURI="$assets/icons/import-outline.svg" alt="Import" cta={startImport} />
 
     <!-- export -->
-    <RegularControl imageURI="/src/assets/icons/share-outline.svg" alt="Export" cta={() => openModal("export")} />
+    <RegularControl imageURI="$assets/icons/share-outline.svg" alt="Export" cta={() => openModal("export")} />
 
     <!-- full screen -->
-    <!-- <RegularControl imageURI="/src/assets/icons/expand.svg" alt="Checklist" /> -->
+    <!-- <RegularControl imageURI="$assets/icons/expand.svg" alt="Checklist" /> -->
 
     <!-- toggle light & dark mode -->
     <RegularControl
-        imageURI="/src/assets/icons/{$canvasStatus.darkCanvas ? "sun" : "moon"}.svg"
+        imageURI="$assets/icons/{$canvasStatus.darkCanvas ? "sun" : "moon"}.svg"
         alt="Use {$canvasStatus.darkCanvas ? "light" : "dark"} canvas"
         cta={toggleCanvasApperance}/>
 

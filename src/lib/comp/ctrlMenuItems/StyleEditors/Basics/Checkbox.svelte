@@ -28,7 +28,7 @@
     <!-- <input type="checkbox" checked={checked} on:click={updateChecked}> -->
     <section id="check-container">
         <input type="checkbox" checked={checked} on:click={toggleChecked} style="width: {checkboxSize}px; height: {checkboxSize}px">
-        <img src="/src/assets/icons/checkmark.svg" alt="" style="opacity: {checked ? "1" : "0"};">
+        <img src="$assets/icons/checkmark.svg" alt="" style="opacity: {checked ? "1" : "0"};">
     </section>
 
     {#if !!name}

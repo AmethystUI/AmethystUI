@@ -8,15 +8,15 @@
 
     export const textDecoration: multiSelectSelection<textDecoration>[] = [
         {
-            iconDir : "/src/assets/icons/italicize.svg",
+            iconDir : "$assets/icons/italicize.svg",
             val : "italicize",
             alt : "Italicize"
         }, {
-            iconDir : "/src/assets/icons/underline.svg",
+            iconDir : "$assets/icons/underline.svg",
             val : "underline",
             alt : "Underline"
         }, {
-            iconDir : "/src/assets/icons/strike-through.svg",
+            iconDir : "$assets/icons/strike-through.svg",
             val : "strike",
             alt : "Strikethrough"
         }
@@ -24,23 +24,23 @@
 
     export const typeFilters:multiSelectSelection<typeCategories>[] = [
         {
-            iconDir : "/src/assets/icons/sans-serif.svg",
+            iconDir : "$assets/icons/sans-serif.svg",
             val : "sans-serif",
             alt : "Sans Serif"
         }, {
-            iconDir : "/src/assets/icons/serif.svg",
+            iconDir : "$assets/icons/serif.svg",
             val : "serif",
             alt : "Serif"
         }, {
-            iconDir : "/src/assets/icons/display.svg",
+            iconDir : "$assets/icons/display.svg",
             val : "display",
             alt : "Display"
         }, {
-            iconDir : "/src/assets/icons/handWriting.svg",
+            iconDir : "$assets/icons/handWriting.svg",
             val : "handwriting",
             alt : "Script"
         }, {
-            iconDir : "/src/assets/icons/monospace.svg",
+            iconDir : "$assets/icons/monospace.svg",
             val : "monospace",
             alt : "Monospace"
         }

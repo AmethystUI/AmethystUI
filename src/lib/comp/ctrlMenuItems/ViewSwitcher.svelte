@@ -5,11 +5,11 @@
 
     const viewToggleElements:multiToggleSelection<viewTypes>[] = [
         {
-            iconDir : "/src/assets/icons/single-layer.svg",
+            iconDir : "$assets/icons/single-layer.svg",
             val : "element",
             alt : "Elements & Overrides"
         }, {
-            iconDir : "/src/assets/icons/layers-horizontal-solid.svg",
+            iconDir : "$assets/icons/layers-horizontal-solid.svg",
             val : "component",
             alt : "Component composition"
         }
@@ -29,7 +29,7 @@
 
 <!-- HTML -->
 <main>
-    <button on:click={openAboutApp}><img src="/src/assets/svgs/emblem_flat.svg" alt=""></button>
+    <button on:click={openAboutApp}><img src="$assets/svgs/emblem_flat.svg" alt=""></button>
     
     <section>
         <MultiToggle elements={viewToggleElements} selection={0} on:valueChange={updateView}/>

@@ -44,7 +44,7 @@
 class="{cardVisible ? "fullscreen" : ""}"
 style="width: {tagSize}; height: {tagSize}; margin:{margin};">
     <img
-        src="/src/assets/icons/info.svg" alt="Info" style="width: {tagSize}; height: {tagSize}"
+        src="$assets/icons/info.svg" alt="Info" style="width: {tagSize}; height: {tagSize}"
         on:mousedown={showCard}>
 
     <div class="card {cardVisible ? "show" : ""}" on:mousedown= {e => e.stopPropagation()}>

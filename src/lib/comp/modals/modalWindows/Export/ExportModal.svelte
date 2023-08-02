@@ -4,18 +4,18 @@
 
     const configFilters:multiToggleSelection<exportableFileTypes>[] = [
         {
-            iconDir : "/src/assets/icons/css.svg",
+            iconDir : "$assets/icons/css.svg",
             val : "css",
             alt : "CSS"
         },
         // TODO: enable in future versions
         // {
-        //     iconDir : "/src/assets/icons/scss.svg",
+        //     iconDir : "$assets/icons/scss.svg",
         //     val : "scss",
         //     alt : "SCSS"
         // },
         {
-            iconDir : "/src/assets/icons/json.svg",
+            iconDir : "$assets/icons/json.svg",
             val : "json",
             alt : "JSON"
         },

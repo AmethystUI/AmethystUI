@@ -418,7 +418,7 @@ E.g. "This app fucking sucks."`,
         
         {#if $currentView === "element"}        
             <DropdownControl alt="Add element" id="addElement" items={addMenuItems} {...dropdownStatus} on:openDropdown={openOverlay} on:closeDropdown={() => closeOverlay()} on:keepOpenDropdown={keepOpenDropdown} on:updateCurrentID={updateCurrentID} evenSpacing={true}>
-                <img src="/src/assets/icons/plus.svg" alt="">            
+                <img src="$assets/icons/plus.svg" alt="">            
             </DropdownControl>
             
             <!-- spacer -->

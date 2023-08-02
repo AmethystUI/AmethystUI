@@ -239,7 +239,7 @@
 
             <section id="check-container">
                 <input type="checkbox" checked={currentStyle.USETEXT} on:click={toggleUseText}>
-                <img src="/src/assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USETEXT ? "1" : "0"}">
+                <img src="$assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USETEXT ? "1" : "0"}">
             </section>
         </section>
 

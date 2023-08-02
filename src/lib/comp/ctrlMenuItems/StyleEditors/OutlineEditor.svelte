@@ -191,7 +191,7 @@
 
             <section id="check-container">
                 <input type="checkbox" checked={currentStyle.USEOUTLINE} on:click={toggleUseOutline}>
-                <img src="/src/assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USEOUTLINE ? "1" : "0"}">
+                <img src="$assets/icons/checkmark.svg" alt="" style="opacity: {currentStyle.USEOUTLINE ? "1" : "0"}">
             </section>
         </section>
 

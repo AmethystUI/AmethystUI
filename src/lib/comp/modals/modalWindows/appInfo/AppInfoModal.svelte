@@ -32,7 +32,7 @@
 
 <main>
     <div class="icon-container">
-        <img src="/src/assets/svgs/emblem_flat.svg" alt="">
+        <img src="$assets/svgs/emblem_flat.svg" alt="">
     </div>
     <h2 class="no-drag">Amethyst<span>UI</span></h2>
     <h6>Version 0.0.0 | Public Alpha</h6>
